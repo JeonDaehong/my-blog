@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import CategoryClient from "./CategoryClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type Props = { params: { slug: string } };
 

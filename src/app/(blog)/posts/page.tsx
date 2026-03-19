@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import PostsClient from "./PostsClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // ISR: 60초마다 재생성
 export const metadata: Metadata = { title: "전체 글" };
 
 export default async function PostsPage() {
