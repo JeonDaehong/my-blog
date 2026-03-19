@@ -61,14 +61,11 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
       <aside className={`fixed top-0 left-0 z-40 h-full w-[260px] bg-bg-secondary border-r border-border-color flex flex-col transition-transform duration-200 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
         {/* Logo */}
         <div className="h-14 flex items-center px-4 border-b border-border-color">
-          <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
+          <Link href="/posts" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
             <div className="w-7 h-7 rounded-md bg-accent flex items-center justify-center">
-              <span className="text-white font-bold text-xs">B</span>
+              <span className="text-white font-bold text-xs">D</span>
             </div>
-            <span className="font-semibold text-[15px] text-text-primary tracking-tight">My Blog</span>
-            <span className="text-[11px] px-1.5 py-0.5 rounded bg-bg-tertiary text-text-tertiary border border-border-color">
-              docs
-            </span>
+            <span className="font-semibold text-[15px] text-text-primary tracking-tight">Daehong Blog</span>
           </Link>
         </div>
 
@@ -78,7 +75,9 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
             <p className="px-3 mb-2 text-[11px] font-semibold text-text-tertiary uppercase tracking-widest">
               {t("navigation")}
             </p>
-            {navLink("/", t("home"))}
+            <a href="/" className="block px-3 py-1.5 rounded-md text-[13px] text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors">
+              {t("home")}
+            </a>
             {navLink("/posts", t("allPosts"))}
           </div>
 
