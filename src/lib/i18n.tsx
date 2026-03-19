@@ -174,7 +174,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   }
 
   function t(key: TranslationKey, vars?: Record<string, string | number>): string {
-    let text = translations[locale][key] || translations.ko[key] || key;
+    let text: string = translations[locale][key] || translations.ko[key] || key;
     if (vars) {
       Object.entries(vars).forEach(([k, v]) => {
         text = text.replace(`{${k}}`, String(v));
@@ -186,7 +186,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   if (!mounted) {
     // SSR: default Korean
     const tDefault = (key: TranslationKey, vars?: Record<string, string | number>) => {
-      let text = translations.ko[key] || key;
+      let text: string = translations.ko[key] || key;
       if (vars) Object.entries(vars).forEach(([k, v]) => { text = text.replace(`{${k}}`, String(v)); });
       return text;
     };
