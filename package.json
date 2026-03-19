@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "node scripts/patch-next.js",
+    "postinstall": "prisma generate && node scripts/patch-next.js",
     "seed": "npx tsx prisma/seed.ts"
   },
   "prisma": {
