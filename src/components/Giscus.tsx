@@ -7,9 +7,9 @@ export default function Giscus() {
     <div className="mt-12 pt-8 border-t border-border-color">
       <GiscusWidget
         repo="JeonDaehong/my-blog"
-        repoId=""
+        repoId="R_kgDORrZBGg"
         category="General"
-        categoryId=""
+        categoryId="DIC_kwDORrZBGs4C43Ri"
         mapping="pathname"
         strict="0"
         reactionsEnabled="1"
