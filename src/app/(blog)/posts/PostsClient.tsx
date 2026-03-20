@@ -35,13 +35,11 @@ export default function PostsClient({ posts }: { posts: any[] }) {
               href={`/posts/${post.slug}`}
               className="group flex items-center gap-4 px-4 py-3.5 hover:bg-bg-hover transition-colors"
             >
-              {post.coverImage && (
-                <img
-                  src={post.coverImage}
-                  alt=""
-                  className="w-16 h-10 sm:w-20 sm:h-12 rounded object-cover border border-border-color shrink-0"
-                />
-              )}
+              <img
+                src={post.coverImage || "/images/default-thumbnail.png"}
+                alt=""
+                className="w-16 h-10 sm:w-20 sm:h-12 rounded object-cover border border-border-color shrink-0"
+              />
               <div className="flex-1 min-w-0">
                 <h2 className="text-[14px] font-medium text-text-primary group-hover:text-accent transition-colors truncate">
                   {getTitle(post)}
