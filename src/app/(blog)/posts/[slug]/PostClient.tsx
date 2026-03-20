@@ -1,15 +1,23 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
 import Link from "next/link";
-import { HiOutlineArrowLeft, HiOutlineCalendar, HiOutlineFolder } from "react-icons/hi2";
+import { HiOutlineArrowLeft, HiOutlineCalendar, HiOutlineFolder, HiOutlineEye } from "react-icons/hi2";
 import { useI18n } from "@/lib/i18n";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import TableOfContents from "@/components/TableOfContents";
 
 export default function PostClient({ post }: { post: any }) {
   const { locale, t } = useI18n();
+  const [viewCount, setViewCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const path = `/posts/${post.slug}`;
+    fetch("/api/views", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path }) }).catch(() => {});
+    fetch(`/api/views?path=${encodeURIComponent(path)}`).then(r => r.json()).then(d => setViewCount(d.total)).catch(() => {});
+  }, [post.slug]);
   const dateLocale = locale === "ko" ? ko : enUS;
   const dateFmt = locale === "ko" ? "yyyy년 M월 d일" : "MMMM d, yyyy";
 
@@ -43,6 +51,12 @@ export default function PostClient({ post }: { post: any }) {
               <HiOutlineFolder size={14} />
               {catName}
             </Link>
+          )}
+          {viewCount !== null && (
+            <span className="flex items-center gap-1.5">
+              <HiOutlineEye size={14} />
+              {viewCount.toLocaleString()} views
+            </span>
           )}
         </div>
       </header>

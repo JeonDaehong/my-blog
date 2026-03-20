@@ -39,3 +39,12 @@ model Post {
   @@index([categoryId])
   @@index([published, createdAt])
 }
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  viewedAt  DateTime @default(now())
+
+  @@index([path])
+  @@index([viewedAt])
+}

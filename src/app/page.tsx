@@ -46,9 +46,15 @@ export default function LandingPage() {
   const [lang, setLang] = useState<"ko" | "en">("en");
   const [displayText, setDisplayText] = useState("");
   const [typingDone, setTypingDone] = useState(false);
+  const [views, setViews] = useState<{ total: number; today: number } | null>(null);
   const t = TEXT[lang];
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    // 조회수 기록 & 가져오기
+    fetch("/api/views", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/" }) }).catch(() => {});
+    fetch("/api/views").then(r => r.json()).then(setViews).catch(() => {});
+  }, []);
 
   useEffect(() => {
     setDisplayText("");
@@ -189,7 +195,15 @@ export default function LandingPage() {
               <HiArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
           </div>
-          <p className="text-[11px] text-white/15">© 2026 Daehong. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            {views && (
+              <>
+                <span className="text-[11px] text-white/30">Total <span className="text-white/50 font-medium">{views.total.toLocaleString()}</span></span>
+                <span className="text-[11px] text-white/30">Today <span className="text-white/50 font-medium">{views.today.toLocaleString()}</span></span>
+              </>
+            )}
+            <p className="text-[11px] text-white/15">© 2026 Daehong</p>
+          </div>
         </div>
       </div>
     </div>
