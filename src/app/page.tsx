@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   HiOutlineBookOpen,
   HiOutlineNewspaper,
@@ -79,8 +78,8 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#0a0a0a] text-[#f5f5f5] flex flex-col">
       {/* Background ambient glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[700px] bg-gradient-radial from-orange-500/6 via-transparent to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-gradient-radial from-blue-500/4 via-transparent to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[700px] rounded-full blur-3xl" style={{ background: "radial-gradient(circle, rgba(249,115,22,0.06) 0%, transparent 70%)" }} />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[400px] rounded-full blur-3xl" style={{ background: "radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%)" }} />
       </div>
 
       <main className="flex-1 flex flex-col items-center px-5 sm:px-6 pt-16 sm:pt-24 pb-12 relative">
@@ -93,13 +92,10 @@ export default function LandingPage() {
           {/* Profile Image */}
           <div className="relative flex-shrink-0">
             <div className="w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-3xl overflow-hidden border-2 border-[#2a2a2a] shadow-2xl shadow-orange-500/10">
-              <Image
+              <img
                 src="/images/main_1.jpeg"
                 alt="전대홍 - 오픈소스 컨퍼런스 발표"
-                width={288}
-                height={288}
                 className="w-full h-full object-cover object-top"
-                priority
               />
             </div>
             {/* Decorative accent */}
@@ -186,13 +182,10 @@ export default function LandingPage() {
               </span>
             </div>
             {/* Screenshot */}
-            <Image
+            <img
               src="/images/main_2.png"
               alt="오픈소스 Contribution 활동 목록"
-              width={1200}
-              height={600}
               className="w-full h-auto"
-              priority
             />
           </div>
         </section>
