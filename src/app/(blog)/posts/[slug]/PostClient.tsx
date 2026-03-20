@@ -8,6 +8,7 @@ import { HiOutlineArrowLeft, HiOutlineCalendar, HiOutlineFolder, HiOutlineEye } 
 import { useI18n } from "@/lib/i18n";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import TableOfContents from "@/components/TableOfContents";
+import Giscus from "@/components/Giscus";
 
 export default function PostClient({ post }: { post: any }) {
   const { locale, t } = useI18n();
@@ -64,6 +65,7 @@ export default function PostClient({ post }: { post: any }) {
       <div className="flex gap-10">
         <div className="flex-1 min-w-0">
           <MarkdownRenderer content={content} />
+          <Giscus />
         </div>
         <TableOfContents content={content} />
       </div>
