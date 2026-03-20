@@ -43,7 +43,7 @@ const TEXT = {
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
-  const [lang, setLang] = useState<"ko" | "en">("ko");
+  const [lang, setLang] = useState<"ko" | "en">("en");
   const [displayText, setDisplayText] = useState("");
   const [typingDone, setTypingDone] = useState(false);
   const t = TEXT[lang];
@@ -138,24 +138,20 @@ export default function LandingPage() {
                 <HiArrowRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
               </Link>
             </div>
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2">
               {[
-                { label: lang === "ko" ? "데이터 엔지니어" : "Data Engineer", color: "bg-blue-500" },
-                { label: lang === "ko" ? "백엔드 엔지니어" : "Backend Engineer", color: "bg-violet-500" },
-                { label: lang === "ko" ? "오픈소스 컨트리뷰터" : "OSS Contributor", color: "bg-emerald-500" },
+                { label: lang === "ko" ? "데이터 엔지니어" : "Data Engineer", color: "bg-blue-500", tooltip: null },
+                { label: lang === "ko" ? "백엔드 엔지니어" : "Backend Engineer", color: "bg-violet-500", tooltip: null },
+                { label: lang === "ko" ? "오픈소스 컨트리뷰터" : "OSS Contributor", color: "bg-emerald-500", tooltip: "Spring Kafka · Apache Iceberg · Gravitino" },
               ].map((c) => (
-                <span key={c.label} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/[0.08] text-xs text-white/50">
+                <span key={c.label} className="relative group inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/[0.08] text-xs text-white/50 cursor-default">
                   <span className={`w-1.5 h-1.5 rounded-full ${c.color}`} />
                   {c.label}
-                </span>
-              ))}
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] text-white/30 uppercase tracking-widest mr-1">Contributed to</span>
-              {["Spring Kafka", "Apache Iceberg", "Gravitino"].map((tag) => (
-                <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-white/40">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                  {tag}
+                  {c.tooltip && (
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/10 text-[11px] text-white/70 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      {c.tooltip}
+                    </span>
+                  )}
                 </span>
               ))}
             </div>
