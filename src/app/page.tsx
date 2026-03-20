@@ -135,13 +135,13 @@ export default function LandingPage() {
               >
                 <HiOutlineNewspaper size={18} />
                 {t.cardNews}
-                <HiArrowRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                <HiArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
             <div className="flex flex-wrap gap-2">
               {[
-                { label: lang === "ko" ? "데이터 엔지니어" : "Data Engineer", color: "bg-blue-500", tooltip: null },
-                { label: lang === "ko" ? "백엔드 엔지니어" : "Backend Engineer", color: "bg-violet-500", tooltip: null },
+                { label: lang === "ko" ? "데이터 엔지니어" : "Data Engineer", color: "bg-blue-500", tooltip: "Hadoop · Spark · Airflow · Kafka · Kubernetes · Iceberg" },
+                { label: lang === "ko" ? "백엔드 엔지니어" : "Backend Engineer", color: "bg-violet-500", tooltip: "Java · Python · Spring" },
                 { label: lang === "ko" ? "오픈소스 컨트리뷰터" : "OSS Contributor", color: "bg-emerald-500", tooltip: "Spring Kafka · Apache Iceberg · Gravitino" },
               ].map((c) => (
                 <span key={c.label} className="relative group inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/[0.08] text-xs text-white/50 cursor-default">
