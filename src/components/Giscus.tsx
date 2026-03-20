@@ -16,7 +16,7 @@ export default function Giscus() {
         reactionsEnabled="1"
         emitMetadata="0"
         inputPosition="top"
-        theme="dark_dimmed"
+        theme="dark"
         lang="ko"
         loading="lazy"
       />
