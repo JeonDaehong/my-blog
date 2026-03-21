@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Noto_Sans_KR } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import CustomCursor from "@/components/CustomCursor";
+import NavigationProgress from "@/components/NavigationProgress";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -49,6 +51,9 @@ export default function RootLayout({
     >
       <body className="min-h-full font-sans cursor-none">
         <CustomCursor />
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         {children}
       </body>
     </html>
