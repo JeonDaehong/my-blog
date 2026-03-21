@@ -54,7 +54,7 @@ export default function PostClient({ post }: { post: any }) {
             </Link>
           )}
           {viewCount !== null && (
-            <span className="flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-muted text-accent text-[12px] font-medium">
               <HiOutlineEye size={14} />
               {viewCount.toLocaleString()} views
             </span>

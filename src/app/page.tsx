@@ -11,6 +11,7 @@ import {
 } from "react-icons/hi2";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { HiOutlineGlobeAlt } from "react-icons/hi2";
+import CustomCursor from "@/components/CustomCursor";
 
 const LINKS = {
   blog: "/posts",
@@ -73,7 +74,8 @@ export default function LandingPage() {
   }, [lang, mounted]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
+    <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden cursor-none">
+      <CustomCursor />
       {/* Gradient blob */}
       <div
         className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] rounded-full blur-[120px] pointer-events-none"
@@ -198,8 +200,16 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             {views && (
               <>
-                <span className="text-[11px] text-white/30">Total <span className="text-white/50 font-medium">{views.total.toLocaleString()}</span></span>
-                <span className="text-[11px] text-white/30">Today <span className="text-white/50 font-medium">{views.today.toLocaleString()}</span></span>
+                <span className="flex items-center gap-1.5 text-xs text-white/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500/60" />
+                  Total
+                  <span className="text-white/70 font-semibold tabular-nums">{views.total.toLocaleString()}</span>
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-white/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
+                  Today
+                  <span className="text-white/70 font-semibold tabular-nums">{views.today.toLocaleString()}</span>
+                </span>
               </>
             )}
             <p className="text-[11px] text-white/15">© 2026 Daehong</p>

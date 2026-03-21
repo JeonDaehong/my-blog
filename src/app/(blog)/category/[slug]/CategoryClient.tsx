@@ -3,16 +3,30 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
-import { HiOutlineArrowRight, HiOutlineArrowLeft } from "react-icons/hi2";
+import { HiOutlineArrowLeft, HiOutlineEye } from "react-icons/hi2";
 import { useI18n } from "@/lib/i18n";
+import { useEffect, useState } from "react";
 
 export default function CategoryClient({ category }: { category: any }) {
   const { locale, t } = useI18n();
   const dateLocale = locale === "ko" ? ko : enUS;
+  const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
 
   const catName = locale === "en" && category.nameEn ? category.nameEn : category.name;
   const getTitle = (post: any) => locale === "en" && post.titleEn ? post.titleEn : post.title;
   const getExcerpt = (post: any) => locale === "en" && post.excerptEn ? post.excerptEn : post.excerpt;
+
+  useEffect(() => {
+    category.posts.forEach((post: any) => {
+      const path = `/posts/${post.slug}`;
+      fetch(`/api/views?path=${encodeURIComponent(path)}`)
+        .then((r) => r.json())
+        .then((d) => {
+          setViewCounts((prev) => ({ ...prev, [post.slug]: d.total }));
+        })
+        .catch(() => {});
+    });
+  }, [category.posts]);
 
   return (
     <div>
@@ -35,22 +49,44 @@ export default function CategoryClient({ category }: { category: any }) {
           <p className="text-text-tertiary text-sm">{t("noCategoryPosts")}</p>
         </div>
       ) : (
-        <div className="border border-border-color rounded-lg divide-y divide-border-color overflow-hidden">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {category.posts.map((post: any) => (
-            <Link key={post.id} href={`/posts/${post.slug}`}
-              className="group flex items-center gap-4 px-4 py-3.5 hover:bg-bg-hover transition-colors">
-              <div className="flex-1 min-w-0">
-                <h2 className="text-[14px] font-medium text-text-primary group-hover:text-accent transition-colors truncate">
+            <Link
+              key={post.id}
+              href={`/posts/${post.slug}`}
+              className="group rounded-xl border border-border-color overflow-hidden hover:border-border-light hover:shadow-lg hover:shadow-black/20 transition-all duration-200 bg-bg-secondary"
+            >
+              {/* Thumbnail */}
+              <div className="relative w-full overflow-hidden" style={{ aspectRatio: "1280 / 720" }}>
+                <img
+                  src={post.coverImage || "/images/default-thumbnail.png"}
+                  alt=""
+                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="px-4 py-4">
+                <h2 className="text-[15px] font-semibold text-text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-2">
                   {getTitle(post)}
                 </h2>
                 {getExcerpt(post) && (
-                  <p className="text-[12px] text-text-tertiary mt-0.5 truncate">{getExcerpt(post)}</p>
+                  <p className="text-[13px] text-text-tertiary line-clamp-2 leading-relaxed mb-3">
+                    {getExcerpt(post)}
+                  </p>
                 )}
+                <div className="flex items-center justify-between text-[12px] text-text-tertiary">
+                  <span>
+                    {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
+                  </span>
+                  {viewCounts[post.slug] !== undefined && (
+                    <span className="inline-flex items-center gap-1 text-accent/80">
+                      <HiOutlineEye size={13} />
+                      {viewCounts[post.slug].toLocaleString()}
+                    </span>
+                  )}
+                </div>
               </div>
-              <span className="text-[12px] text-text-tertiary whitespace-nowrap hidden sm:block">
-                {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
-              </span>
-              <HiOutlineArrowRight size={14} className="text-text-tertiary group-hover:text-accent shrink-0 transition-colors" />
             </Link>
           ))}
         </div>
