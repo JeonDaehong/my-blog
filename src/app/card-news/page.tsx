@@ -310,7 +310,7 @@ export default function CardNewsPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-[11px] text-[#555] font-mono">
-                        {bigCat.subCategories.length}개 주제 · {totalCards}장
+                        소카테고리 {bigCat.subCategories.length}개 · 카드 {totalCards}장
                       </span>
                       <HiOutlineChevronRight
                         size={16}
@@ -351,7 +351,7 @@ export default function CardNewsPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-[11px] text-[#555] font-mono">
-                      {subCat.cards.length}장
+                      카드뉴스 {subCat.cards.length}장
                     </span>
                     <HiOutlineChevronRight
                       size={16}
