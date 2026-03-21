@@ -11,7 +11,6 @@ import {
 } from "react-icons/hi2";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { HiOutlineGlobeAlt } from "react-icons/hi2";
-import CustomCursor from "@/components/CustomCursor";
 
 const LINKS = {
   blog: "/posts",
@@ -74,8 +73,7 @@ export default function LandingPage() {
   }, [lang, mounted]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden cursor-none">
-      <CustomCursor />
+    <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
       {/* Gradient blob */}
       <div
         className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] rounded-full blur-[120px] pointer-events-none"
