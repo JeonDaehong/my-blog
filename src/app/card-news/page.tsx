@@ -284,10 +284,6 @@ export default function CardNewsPage() {
         {view.step === "bigCategories" && (
           <div className="space-y-3 animate-in">
             {CARD_NEWS_DATA.map((bigCat) => {
-              const totalCards = bigCat.subCategories.reduce(
-                (sum, sc) => sum + sc.cards.length,
-                0
-              );
               return (
                 <button
                   key={bigCat.name}
@@ -310,7 +306,7 @@ export default function CardNewsPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-[11px] text-[#555] font-mono">
-                        소카테고리 {bigCat.subCategories.length}개 · 카드 {totalCards}장
+                        소카테고리 {bigCat.subCategories.length}개
                       </span>
                       <HiOutlineChevronRight
                         size={16}
@@ -351,7 +347,7 @@ export default function CardNewsPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-[11px] text-[#555] font-mono">
-                      카드뉴스 {subCat.cards.length}장
+                      카드뉴스 {subCat.cards.length}개
                     </span>
                     <HiOutlineChevronRight
                       size={16}
@@ -366,7 +362,7 @@ export default function CardNewsPage() {
 
         {/* ── Step 3: 대표 썸네일 카드 1개 ── */}
         {view.step === "thumbnail" && (
-          <div className="animate-in flex justify-center">
+          <div className="animate-in">
             <button
               onClick={() => setModalCards(view.subCat.cards)}
               className="group text-left w-full max-w-md rounded-2xl border overflow-hidden hover:shadow-xl hover:shadow-black/30 transition-all duration-200"
@@ -401,10 +397,7 @@ export default function CardNewsPage() {
                   {view.subCat.cards[0].body}
                 </p>
 
-                <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-[#555]">
-                    총 {view.subCat.cards.length}장의 카드뉴스
-                  </span>
+                <div className="flex items-center justify-end">
                   <span
                     className="inline-flex items-center gap-1 text-[12px] font-medium group-hover:gap-2 transition-all"
                     style={{ color: view.subCat.accent }}
