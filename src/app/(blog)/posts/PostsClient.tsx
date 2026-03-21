@@ -132,22 +132,20 @@ export default function PostsClient({ posts }: { posts: any[] }) {
             <Link
               key={post.id}
               href={`/posts/${post.slug}`}
-              className="group flex items-center gap-4 px-4 py-3.5 hover:bg-bg-hover transition-colors"
+              className="group flex items-center gap-2.5 sm:gap-4 px-3 sm:px-4 py-3 sm:py-3.5 hover:bg-bg-hover transition-colors overflow-hidden"
             >
               <img
                 src={post.coverImage || "/images/default-thumbnail.png"}
                 alt=""
-                className="w-16 h-10 sm:w-20 sm:h-12 rounded object-cover border border-border-color shrink-0"
+                className="w-12 h-8 sm:w-20 sm:h-12 rounded object-cover border border-border-color shrink-0"
               />
-              <div className="flex-1 min-w-0">
-                <h2 className="text-[14px] font-medium text-text-primary group-hover:text-accent transition-colors truncate">
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <h2 className="text-[13px] sm:text-[14px] font-medium text-text-primary group-hover:text-accent transition-colors truncate">
                   {getTitle(post)}
                 </h2>
-                {getExcerpt(post) && (
-                  <p className="text-[12px] text-text-tertiary mt-0.5 truncate">
-                    {getExcerpt(post)}
-                  </p>
-                )}
+                <p className="text-[11px] sm:text-[12px] text-text-tertiary mt-0.5 truncate">
+                  {getExcerpt(post) || format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
+                </p>
               </div>
               <div className="hidden sm:flex items-center gap-3 shrink-0">
                 {post.category && (
@@ -165,7 +163,7 @@ export default function PostsClient({ posts }: { posts: any[] }) {
                   {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
                 </span>
               </div>
-              <HiOutlineArrowRight size={14} className="text-text-tertiary group-hover:text-accent shrink-0 transition-colors" />
+              <HiOutlineArrowRight size={14} className="text-text-tertiary group-hover:text-accent shrink-0 transition-colors hidden sm:block" />
             </Link>
           ))}
         </div>
