@@ -7,7 +7,6 @@ import {
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
   HiXMark,
-  HiOutlineChevronDown,
 } from "react-icons/hi2";
 
 /* ─────────────────────────────────────────────
@@ -224,66 +223,84 @@ function CardModal({
 }
 
 /* ─────────────────────────────────────────────
-   메인 페이지 (드릴다운 방식)
+   뷰 타입: 페이지 전환 방식 드릴다운
    ───────────────────────────────────────────── */
 
-export default function CardNewsPage() {
-  const [modalCards, setModalCards] = useState<Card[] | null>(null);
-  const [expandedBigCat, setExpandedBigCat] = useState<string | null>(null);
-  const [expandedSubCat, setExpandedSubCat] = useState<string | null>(null);
+type View =
+  | { step: "bigCategories" }
+  | { step: "subCategories"; bigCat: BigCategory }
+  | { step: "thumbnail"; bigCat: BigCategory; subCat: SubCategory };
 
-  const toggleBigCat = (name: string) => {
-    if (expandedBigCat === name) {
-      setExpandedBigCat(null);
-      setExpandedSubCat(null);
-    } else {
-      setExpandedBigCat(name);
-      setExpandedSubCat(null);
+export default function CardNewsPage() {
+  const [view, setView] = useState<View>({ step: "bigCategories" });
+  const [modalCards, setModalCards] = useState<Card[] | null>(null);
+
+  const goBack = () => {
+    if (view.step === "thumbnail") {
+      setView({ step: "subCategories", bigCat: view.bigCat });
+    } else if (view.step === "subCategories") {
+      setView({ step: "bigCategories" });
     }
   };
 
-  const toggleSubCat = (name: string) => {
-    setExpandedSubCat(expandedSubCat === name ? null : name);
-  };
+  // 브레드크럼 텍스트
+  const breadcrumb =
+    view.step === "subCategories"
+      ? view.bigCat.name
+      : view.step === "thumbnail"
+        ? `${view.bigCat.name} / ${view.subCat.name}`
+        : null;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-[#f5f5f5]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-[13px] text-[#666] hover:text-[#e87040] mb-8 transition-colors"
-        >
-          <HiOutlineArrowLeft size={14} /> 홈으로
-        </Link>
+        {/* 상단 네비게이션 */}
+        {view.step === "bigCategories" ? (
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-[13px] text-[#666] hover:text-[#e87040] mb-8 transition-colors"
+          >
+            <HiOutlineArrowLeft size={14} /> 홈으로
+          </Link>
+        ) : (
+          <button
+            onClick={goBack}
+            className="inline-flex items-center gap-1.5 text-[13px] text-[#666] hover:text-[#e87040] mb-8 transition-colors"
+          >
+            <HiOutlineArrowLeft size={14} /> 뒤로
+          </button>
+        )}
 
-        <h1 className="text-2xl font-bold tracking-tight mb-2">카드뉴스</h1>
-        <p className="text-[#666] text-sm mb-10">핵심만 담은 비주얼 콘텐츠</p>
+        <h1 className="text-2xl font-bold tracking-tight mb-1">카드뉴스</h1>
+        {breadcrumb ? (
+          <p className="text-[#e87040] text-sm mb-10 font-medium">
+            {breadcrumb}
+          </p>
+        ) : (
+          <p className="text-[#666] text-sm mb-10">핵심만 담은 비주얼 콘텐츠</p>
+        )}
 
-        {/* 대카테고리 목록 */}
-        <div className="space-y-3">
-          {CARD_NEWS_DATA.map((bigCat) => {
-            const isBigOpen = expandedBigCat === bigCat.name;
-            const totalCards = bigCat.subCategories.reduce(
-              (sum, sc) => sum + sc.cards.length,
-              0
-            );
-
-            return (
-              <div key={bigCat.name}>
-                {/* 대카테고리 버튼 */}
+        {/* ── Step 1: 대카테고리 목록 ── */}
+        {view.step === "bigCategories" && (
+          <div className="space-y-3 animate-in">
+            {CARD_NEWS_DATA.map((bigCat) => {
+              const totalCards = bigCat.subCategories.reduce(
+                (sum, sc) => sum + sc.cards.length,
+                0
+              );
+              return (
                 <button
-                  onClick={() => toggleBigCat(bigCat.name)}
-                  className={`w-full text-left rounded-xl border transition-all duration-200 px-5 py-4 group ${
-                    isBigOpen
-                      ? "border-[#e87040]/30 bg-[#e87040]/5"
-                      : "border-[#2a2a2a] bg-[#141414] hover:border-[#333] hover:bg-[#1a1a1a]"
-                  }`}
+                  key={bigCat.name}
+                  onClick={() =>
+                    setView({ step: "subCategories", bigCat })
+                  }
+                  className="w-full text-left rounded-xl border border-[#2a2a2a] bg-[#141414] hover:border-[#444] hover:bg-[#1a1a1a] transition-all duration-200 px-5 py-5 group"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{bigCat.icon}</span>
+                      <span className="text-3xl">{bigCat.icon}</span>
                       <div>
-                        <h2 className="text-[15px] font-bold text-[#f5f5f5]">
+                        <h2 className="text-base font-bold text-[#f5f5f5] group-hover:text-white">
                           {bigCat.name}
                         </h2>
                         <p className="text-[12px] text-[#666] mt-0.5">
@@ -295,121 +312,110 @@ export default function CardNewsPage() {
                       <span className="text-[11px] text-[#555] font-mono">
                         {bigCat.subCategories.length}개 주제 · {totalCards}장
                       </span>
-                      <HiOutlineChevronDown
+                      <HiOutlineChevronRight
                         size={16}
-                        className={`text-[#555] transition-transform duration-200 ${
-                          isBigOpen ? "rotate-180" : ""
-                        }`}
+                        className="text-[#444] group-hover:text-[#888] transition-colors"
                       />
                     </div>
                   </div>
                 </button>
+              );
+            })}
+          </div>
+        )}
 
-                {/* 소카테고리 목록 (펼쳐질 때) */}
-                {isBigOpen && (
-                  <div className="mt-2 ml-4 sm:ml-8 space-y-2 animate-in">
-                    {bigCat.subCategories.map((subCat) => {
-                      const isSubOpen = expandedSubCat === subCat.name;
-
-                      return (
-                        <div key={subCat.name}>
-                          {/* 소카테고리 버튼 */}
-                          <button
-                            onClick={() => toggleSubCat(subCat.name)}
-                            className={`w-full text-left rounded-lg border transition-all duration-200 px-4 py-3 ${
-                              isSubOpen
-                                ? "bg-[#1a1a1a] border-[#333]"
-                                : "border-[#222] bg-[#111] hover:border-[#333] hover:bg-[#181818]"
-                            }`}
-                            style={
-                              isSubOpen
-                                ? { borderColor: `${subCat.accent}40` }
-                                : undefined
-                            }
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2.5">
-                                <span className="text-lg">{subCat.icon}</span>
-                                <span
-                                  className="text-[14px] font-semibold"
-                                  style={{ color: subCat.accent }}
-                                >
-                                  {subCat.name}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2.5">
-                                <span className="text-[11px] text-[#555] font-mono">
-                                  {subCat.cards.length}장
-                                </span>
-                                <HiOutlineChevronDown
-                                  size={14}
-                                  className={`text-[#555] transition-transform duration-200 ${
-                                    isSubOpen ? "rotate-180" : ""
-                                  }`}
-                                />
-                              </div>
-                            </div>
-                          </button>
-
-                          {/* 대표 썸네일 1개 (소카테고리 펼쳐질 때) */}
-                          {isSubOpen && (
-                            <div className="mt-2 ml-4 sm:ml-6 animate-in">
-                              <button
-                                onClick={() => setModalCards(subCat.cards)}
-                                className="group text-left w-full max-w-sm rounded-xl border overflow-hidden hover:shadow-lg hover:shadow-black/30 transition-all duration-200"
-                                style={{
-                                  borderColor: `${subCat.accent}25`,
-                                }}
-                              >
-                                <div
-                                  className="h-1"
-                                  style={{ background: subCat.accent }}
-                                />
-                                <div
-                                  className="px-4 py-4"
-                                  style={{
-                                    background: `${subCat.accent}0a`,
-                                  }}
-                                >
-                                  <div className="flex items-start gap-3">
-                                    <span className="text-2xl mt-0.5">
-                                      {subCat.cards[0].icon}
-                                    </span>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-[13px] font-semibold text-[#e0e0e0] leading-snug group-hover:text-white transition-colors">
-                                        {subCat.cards[0].title}
-                                      </p>
-                                      <p
-                                        className="text-[11px] mt-1 line-clamp-1"
-                                        style={{
-                                          color: `${subCat.accent}aa`,
-                                        }}
-                                      >
-                                        {subCat.cards[0].subtitle}
-                                      </p>
-                                      <p className="text-[11px] text-[#555] mt-2">
-                                        클릭하여 {subCat.cards.length}장의
-                                        카드뉴스 보기
-                                      </p>
-                                    </div>
-                                    <HiOutlineChevronRight
-                                      size={16}
-                                      className="text-[#444] group-hover:text-[#888] mt-1 transition-colors shrink-0"
-                                    />
-                                  </div>
-                                </div>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+        {/* ── Step 2: 소카테고리 목록 ── */}
+        {view.step === "subCategories" && (
+          <div className="space-y-3 animate-in">
+            {view.bigCat.subCategories.map((subCat) => (
+              <button
+                key={subCat.name}
+                onClick={() =>
+                  setView({
+                    step: "thumbnail",
+                    bigCat: view.bigCat,
+                    subCat,
+                  })
+                }
+                className="w-full text-left rounded-xl border border-[#2a2a2a] bg-[#141414] hover:border-[#444] hover:bg-[#1a1a1a] transition-all duration-200 px-5 py-4 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{subCat.icon}</span>
+                    <span
+                      className="text-[15px] font-semibold"
+                      style={{ color: subCat.accent }}
+                    >
+                      {subCat.name}
+                    </span>
                   </div>
-                )}
+                  <div className="flex items-center gap-3">
+                    <span className="text-[11px] text-[#555] font-mono">
+                      {subCat.cards.length}장
+                    </span>
+                    <HiOutlineChevronRight
+                      size={16}
+                      className="text-[#444] group-hover:text-[#888] transition-colors"
+                    />
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ── Step 3: 대표 썸네일 카드 1개 ── */}
+        {view.step === "thumbnail" && (
+          <div className="animate-in flex justify-center">
+            <button
+              onClick={() => setModalCards(view.subCat.cards)}
+              className="group text-left w-full max-w-md rounded-2xl border overflow-hidden hover:shadow-xl hover:shadow-black/30 transition-all duration-200"
+              style={{ borderColor: `${view.subCat.accent}30` }}
+            >
+              <div
+                className="h-1.5"
+                style={{ background: view.subCat.accent }}
+              />
+              <div
+                className="px-6 py-6"
+                style={{ background: `${view.subCat.accent}08` }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">
+                    {view.subCat.cards[0].icon}
+                  </span>
+                  <div>
+                    <p className="text-[15px] font-bold text-[#f5f5f5] group-hover:text-white transition-colors">
+                      {view.subCat.cards[0].title}
+                    </p>
+                    <p
+                      className="text-[12px] mt-0.5"
+                      style={{ color: `${view.subCat.accent}cc` }}
+                    >
+                      {view.subCat.cards[0].subtitle}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-[13px] text-[#888] leading-relaxed line-clamp-3 mb-4">
+                  {view.subCat.cards[0].body}
+                </p>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] text-[#555]">
+                    총 {view.subCat.cards.length}장의 카드뉴스
+                  </span>
+                  <span
+                    className="inline-flex items-center gap-1 text-[12px] font-medium group-hover:gap-2 transition-all"
+                    style={{ color: view.subCat.accent }}
+                  >
+                    모두 보기 <HiOutlineChevronRight size={14} />
+                  </span>
+                </div>
               </div>
-            );
-          })}
-        </div>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 모달 */}
