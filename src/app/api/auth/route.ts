@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { isAuthenticated } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (await isAuthenticated()) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
+  if (session?.value === "authenticated") {
     return NextResponse.json({ authenticated: true });
   }
   return NextResponse.json({ authenticated: false }, { status: 401 });
