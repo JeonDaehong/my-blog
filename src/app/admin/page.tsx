@@ -43,7 +43,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/auth").then((r) => {
+    fetch("/api/auth", { cache: "no-store" }).then((r) => {
       if (r.ok) { setAuthenticated(true); loadData(); }
       else setLoading(false);
     }).catch(() => setLoading(false));

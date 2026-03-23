@@ -6,10 +6,11 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const cookieStore = await cookies();
   const session = cookieStore.get("admin_session");
+  const headers = { "Cache-Control": "no-store, no-cache, must-revalidate" };
   if (session?.value === "authenticated") {
-    return NextResponse.json({ authenticated: true });
+    return NextResponse.json({ authenticated: true }, { headers });
   }
-  return NextResponse.json({ authenticated: false }, { status: 401 });
+  return NextResponse.json({ authenticated: false }, { status: 401, headers });
 }
 
 export async function POST(req: NextRequest) {
