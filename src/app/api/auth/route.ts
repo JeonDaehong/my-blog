@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { isAuthenticated } from "@/lib/auth";
+
+export async function GET() {
+  if (await isAuthenticated()) {
+    return NextResponse.json({ authenticated: true });
+  }
+  return NextResponse.json({ authenticated: false }, { status: 401 });
+}
 
 export async function POST(req: NextRequest) {
   const { password } = await req.json();

@@ -43,7 +43,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/posts").then((r) => {
+    fetch("/api/auth").then((r) => {
       if (r.ok) { setAuthenticated(true); loadData(); }
       else setLoading(false);
     }).catch(() => setLoading(false));
@@ -130,27 +130,27 @@ export default function AdminPage() {
           {posts.length === 0 ? (
             <div className="text-center py-16 text-text-tertiary text-sm">아직 작성된 글이 없습니다</div>
           ) : (
-            <div className="border border-border-color rounded-lg overflow-hidden">
-              <table className="w-full">
+            <div className="border border-border-color rounded-lg overflow-x-auto -mx-4 sm:mx-0">
+              <table className="w-full min-w-[400px]">
                 <thead className="bg-bg-secondary text-left">
                   <tr>
-                    <th className="px-4 py-2.5 text-[12px] font-medium text-text-tertiary">제목</th>
-                    <th className="px-4 py-2.5 text-[12px] font-medium text-text-tertiary hidden sm:table-cell">카테고리</th>
-                    <th className="px-4 py-2.5 text-[12px] font-medium text-text-tertiary">상태</th>
-                    <th className="px-4 py-2.5 text-[12px] font-medium text-text-tertiary text-right">작업</th>
+                    <th className="px-3 sm:px-4 py-2.5 text-[12px] font-medium text-text-tertiary">제목</th>
+                    <th className="px-3 sm:px-4 py-2.5 text-[12px] font-medium text-text-tertiary hidden sm:table-cell">카테고리</th>
+                    <th className="px-3 sm:px-4 py-2.5 text-[12px] font-medium text-text-tertiary">상태</th>
+                    <th className="px-3 sm:px-4 py-2.5 text-[12px] font-medium text-text-tertiary text-right">작업</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border-color">
                   {posts.map((post) => (
                     <tr key={post.id} className="hover:bg-bg-hover transition-colors">
-                      <td className="px-4 py-2.5 text-[13px] font-medium text-text-primary">{post.title}</td>
-                      <td className="px-4 py-2.5 text-[12px] text-text-tertiary hidden sm:table-cell">{post.category?.name || "-"}</td>
-                      <td className="px-4 py-2.5">
-                        <span className={`text-[11px] px-2 py-0.5 rounded-full ${post.published ? "bg-green-900/30 text-green-400" : "bg-yellow-900/30 text-yellow-400"}`}>
+                      <td className="px-3 sm:px-4 py-2.5 text-[12px] sm:text-[13px] font-medium text-text-primary max-w-[180px] sm:max-w-none truncate">{post.title}</td>
+                      <td className="px-3 sm:px-4 py-2.5 text-[12px] text-text-tertiary hidden sm:table-cell">{post.category?.name || "-"}</td>
+                      <td className="px-3 sm:px-4 py-2.5">
+                        <span className={`text-[11px] px-2 py-0.5 rounded-full whitespace-nowrap ${post.published ? "bg-green-900/30 text-green-400" : "bg-yellow-900/30 text-yellow-400"}`}>
                           {post.published ? "공개" : "비공개"}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5">
+                      <td className="px-3 sm:px-4 py-2.5">
                         <div className="flex items-center justify-end gap-0.5">
                           <button onClick={() => togglePublish(post)} className="p-1.5 rounded text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors">
                             {post.published ? <HiOutlineEyeSlash size={15} /> : <HiOutlineEye size={15} />}
