@@ -40,14 +40,7 @@ export default function AdminPage() {
   const [tab, setTab] = useState<"posts" | "categories">("posts");
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/auth", { cache: "no-store" }).then((r) => {
-      if (r.ok) { setAuthenticated(true); loadData(); }
-      else setLoading(false);
-    }).catch(() => setLoading(false));
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   async function login() {
     setError("");
