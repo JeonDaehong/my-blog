@@ -111,7 +111,6 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
               {t("extras")}
             </p>
             {navLink("/guestbook", t("guestbook"))}
-            {navLink("/games", t("games"))}
           </div>
         </nav>
       </aside>
