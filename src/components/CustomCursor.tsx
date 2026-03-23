@@ -95,7 +95,7 @@ export default function CustomCursor() {
       {/* 외곽 링 — lerp로 부드럽게 따라옴 */}
       <div
         ref={ringRef}
-        className="fixed z-[9999] pointer-events-none rounded-full"
+        className="custom-cursor-el fixed z-[9999] pointer-events-none rounded-full"
         style={{
           width: 32,
           height: 32,
@@ -110,7 +110,7 @@ export default function CustomCursor() {
       {/* 중심 dot — 즉시 따라감 */}
       <div
         ref={dotRef}
-        className="fixed z-[9999] pointer-events-none rounded-full"
+        className="custom-cursor-el fixed z-[9999] pointer-events-none rounded-full"
         style={{
           width: 6,
           height: 6,
