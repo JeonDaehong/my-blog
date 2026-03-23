@@ -32,14 +32,17 @@ export default function MarkdownRenderer({ content }: { content: string }) {
       const text = String(children);
       return <h3 id={headingId(text)}>{children}</h3>;
     },
-    img: ({ src, alt }) => (
-      <img
-        src={src}
-        alt={alt || ""}
-        className="cursor-zoom-in"
-        onClick={() => src && setLightbox(src)}
-      />
-    ),
+    img: ({ src, alt }) => {
+      const url = typeof src === "string" ? src : "";
+      return (
+        <img
+          src={url}
+          alt={alt || ""}
+          className="cursor-zoom-in"
+          onClick={() => url && setLightbox(url)}
+        />
+      );
+    },
     pre: ({ children }) => {
       return <div className="code-block-wrapper">{children}</div>;
     },
