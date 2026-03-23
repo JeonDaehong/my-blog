@@ -40,6 +40,16 @@ model Post {
   @@index([published, createdAt])
 }
 
+model GuestbookEntry {
+  id        String   @id @default(cuid())
+  nickname  String
+  message   String
+  emoji     String   @default("👋")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model PageView {
   id        String   @id @default(cuid())
   path      String

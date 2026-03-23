@@ -116,7 +116,7 @@ export default function AdminPage() {
       ) : tab === "posts" ? (
         <div>
           <div className="flex justify-end mb-4">
-            <Link href="/admin/write" className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-accent text-white text-[13px] font-medium hover:bg-accent-hover transition-colors">
+            <Link href="/wjseoghd/write" className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-accent text-white text-[13px] font-medium hover:bg-accent-hover transition-colors">
               <HiOutlinePlus size={14} /> 새 글 작성
             </Link>
           </div>
@@ -148,7 +148,7 @@ export default function AdminPage() {
                           <button onClick={() => togglePublish(post)} className="p-1.5 rounded text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors">
                             {post.published ? <HiOutlineEyeSlash size={15} /> : <HiOutlineEye size={15} />}
                           </button>
-                          <Link href={`/admin/write?id=${post.id}`} className="p-1.5 rounded text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors">
+                          <Link href={`/wjseoghd/write?id=${post.id}`} className="p-1.5 rounded text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors">
                             <HiOutlinePencilSquare size={15} />
                           </Link>
                           <button onClick={() => deletePost(post.id)} className="p-1.5 rounded text-text-tertiary hover:bg-red-900/20 hover:text-red-400 transition-colors">

@@ -13,6 +13,9 @@ const translations = {
     navigation: "네비게이션",
     categories: "카테고리",
     settings: "설정",
+    extras: "즐길거리",
+    guestbook: "방명록",
+    games: "웹게임",
     search: "검색...",
 
     // Home
@@ -82,6 +85,9 @@ const translations = {
     navigation: "Navigation",
     categories: "Categories",
     settings: "Settings",
+    extras: "Extras",
+    guestbook: "Guestbook",
+    games: "Games",
     search: "Search...",
 
     welcome: "Welcome",

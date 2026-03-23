@@ -62,9 +62,7 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
         {/* Logo */}
         <div className="h-14 flex items-center px-4 border-b border-border-color">
           <Link href="/posts" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-            <div className="w-7 h-7 rounded-md bg-accent flex items-center justify-center">
-              <span className="text-white font-bold text-xs">D</span>
-            </div>
+            <img src="/images/img.jpg" alt="Daehong" className="w-7 h-7 rounded-md object-cover" />
             <span className="font-semibold text-[15px] text-text-primary tracking-tight">Daehong Blog</span>
           </Link>
         </div>
@@ -110,9 +108,10 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
 
           <div className="space-y-0.5">
             <p className="px-3 mb-2 text-[11px] font-semibold text-text-tertiary uppercase tracking-widest">
-              {t("settings")}
+              {t("extras")}
             </p>
-            {navLink("/admin", t("admin"))}
+            {navLink("/guestbook", t("guestbook"))}
+            {navLink("/games", t("games"))}
           </div>
         </nav>
       </aside>

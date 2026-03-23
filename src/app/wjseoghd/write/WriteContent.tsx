@@ -93,7 +93,7 @@ export default function WriteContent() {
     try {
       const url = editId ? `/api/posts/${editId}` : "/api/posts";
       const res = await fetch(url, { method: editId ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-      if (res.ok) router.push("/admin");
+      if (res.ok) router.push("/wjseoghd");
       else { const data = await res.json(); alert(data.error || "저장 실패"); }
     } finally { setSaving(false); }
   }
@@ -108,35 +108,35 @@ export default function WriteContent() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-3">
-          <Link href="/admin" className="text-text-tertiary hover:text-text-primary transition-colors">
+          <Link href="/wjseoghd" className="text-text-tertiary hover:text-text-primary transition-colors">
             <HiOutlineArrowLeft size={18} />
           </Link>
           <h1 className="text-lg font-bold text-text-primary">{editId ? "글 수정" : "새 글 작성"}</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Language tab */}
-          <div className="flex items-center border border-border-color rounded-md overflow-hidden mr-2">
+          <div className="flex items-center border border-border-color rounded-md overflow-hidden mr-1 sm:mr-2">
             <button onClick={() => setLang("ko")}
-              className={`px-3 py-1.5 text-[12px] font-medium transition-colors ${lang === "ko" ? "bg-accent text-white" : "text-text-tertiary hover:text-text-primary"}`}>
+              className={`px-2.5 sm:px-3 py-1.5 text-[12px] font-medium transition-colors ${lang === "ko" ? "bg-accent text-white" : "text-text-tertiary hover:text-text-primary"}`}>
               한글
             </button>
             <button onClick={() => setLang("en")}
-              className={`px-3 py-1.5 text-[12px] font-medium transition-colors ${lang === "en" ? "bg-accent text-white" : "text-text-tertiary hover:text-text-primary"}`}>
+              className={`px-2.5 sm:px-3 py-1.5 text-[12px] font-medium transition-colors ${lang === "en" ? "bg-accent text-white" : "text-text-tertiary hover:text-text-primary"}`}>
               EN
             </button>
           </div>
           <button onClick={() => setPreview(!preview)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border-color text-[13px] hover:bg-bg-hover transition-colors">
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md border border-border-color text-[12px] sm:text-[13px] hover:bg-bg-hover transition-colors">
             <HiOutlineEye size={14} /> {preview ? "편집" : "미리보기"}
           </button>
           <button onClick={() => save(true)} disabled={saving}
-            className="px-3 py-1.5 rounded-md border border-border-color text-[13px] hover:bg-bg-hover transition-colors disabled:opacity-50">
+            className="px-2.5 sm:px-3 py-1.5 rounded-md border border-border-color text-[12px] sm:text-[13px] hover:bg-bg-hover transition-colors disabled:opacity-50">
             임시저장
           </button>
           <button onClick={() => { setPublished(true); save(false); }} disabled={saving}
-            className="px-3 py-1.5 rounded-md bg-accent text-white text-[13px] font-medium hover:bg-accent-hover transition-colors disabled:opacity-50">
+            className="px-2.5 sm:px-3 py-1.5 rounded-md bg-accent text-white text-[12px] sm:text-[13px] font-medium hover:bg-accent-hover transition-colors disabled:opacity-50">
             {editId ? "수정" : "발행"}
           </button>
         </div>
@@ -159,7 +159,7 @@ export default function WriteContent() {
         <div className="space-y-4">
           <input type="text" placeholder={lang === "ko" ? "제목을 입력하세요" : "Enter title (English)"}
             value={currentTitle} onChange={(e) => setCurrentTitle(e.target.value)}
-            className="w-full text-2xl font-bold px-0 py-2 border-0 border-b border-border-color bg-transparent text-text-primary focus:outline-none focus:border-accent placeholder:text-text-tertiary" />
+            className="w-full text-xl sm:text-2xl font-bold px-0 py-2 border-0 border-b border-border-color bg-transparent text-text-primary focus:outline-none focus:border-accent placeholder:text-text-tertiary" />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
@@ -201,8 +201,8 @@ export default function WriteContent() {
               placeholder={lang === "ko" ? "내용을 작성하세요... (Markdown 지원)" : "Write content in English... (Markdown supported)"}
               value={currentContent}
               onChange={(e) => setCurrentContent(e.target.value)}
-              rows={22}
-              className="w-full px-4 py-3 rounded-lg border border-border-color bg-bg-secondary text-text-primary focus:outline-none focus:ring-2 focus:ring-accent text-[13px] font-mono resize-y placeholder:text-text-tertiary"
+              rows={14}
+              className="w-full px-3 sm:px-4 py-3 rounded-lg border border-border-color bg-bg-secondary text-text-primary focus:outline-none focus:ring-2 focus:ring-accent text-[13px] font-mono resize-y placeholder:text-text-tertiary min-h-[200px] sm:min-h-[400px]"
             />
           </div>
         </div>
