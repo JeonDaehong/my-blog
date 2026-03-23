@@ -1,9 +1,19 @@
 "use client";
 
-// Dark mode only - no toggle needed
-// This file is kept for compatibility but does nothing
+import { createContext, useContext, useEffect, useState } from "react";
+
+type Theme = "dark" | "light";
+
+const ThemeContext = createContext<{
+  theme: Theme;
+  toggleTheme: () => void;
+}>({
+  theme: "dark",
+  toggleTheme: () => {},
+});
+
 export function useTheme() {
-  return { theme: "dark" as const };
+  return useContext(ThemeContext);
 }
 
 export default function ThemeProvider({
@@ -11,5 +21,36 @@ export default function ThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const [theme, setTheme] = useState<Theme>("dark");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme") as Theme | null;
+    if (saved === "dark" || saved === "light") {
+      setTheme(saved);
+      document.documentElement.setAttribute("data-theme", saved);
+    }
+    setMounted(true);
+  }, []);
+
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    localStorage.setItem("theme", next);
+    document.documentElement.setAttribute("data-theme", next);
+  }
+
+  if (!mounted) {
+    return (
+      <ThemeContext.Provider value={{ theme: "dark", toggleTheme }}>
+        {children}
+      </ThemeContext.Provider>
+    );
+  }
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }

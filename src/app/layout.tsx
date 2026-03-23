@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Noto_Sans_KR } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
-import CustomCursor from "@/components/CustomCursor";
+import ThemeProvider from "@/components/ThemeProvider";
 import NavigationProgress from "@/components/NavigationProgress";
 
 const inter = Inter({
@@ -49,12 +49,13 @@ export default function RootLayout({
       lang="ko"
       className={`${inter.variable} ${notoSansKR.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full font-sans cursor-none">
-        <CustomCursor />
-        <Suspense fallback={null}>
-          <NavigationProgress />
-        </Suspense>
-        {children}
+      <body className="min-h-full font-sans">
+        <ThemeProvider>
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

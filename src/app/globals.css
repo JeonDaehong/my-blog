@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark theme (default) */
 :root {
   --bg-primary: #0a0a0a;
   --bg-secondary: #141414;
@@ -20,11 +21,35 @@
   --link-color: #e87040;
 }
 
+/* Light theme */
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f7f8;
+  --bg-tertiary: #eeeeef;
+  --bg-hover: #e8e8ea;
+  --bg-active: #dddde0;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555555;
+  --text-tertiary: #999999;
+  --border-color: #e0e0e2;
+  --border-light: #d0d0d2;
+  --accent: #e87040;
+  --accent-hover: #d56030;
+  --accent-muted: rgba(232, 112, 64, 0.1);
+  --code-bg: #f5f5f5;
+  --link-color: #e87040;
+}
+
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Orange pointer cursor */
+*, *::before, *::after {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='28' viewBox='0 0 20 28'%3E%3Cpath d='M2 1L2 22L7 17L11 26L14 24.5L10 16L16.5 16Z' fill='%23e87040' stroke='%23c05020' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E") 2 1, auto !important;
 }
 
 @layer base {
@@ -43,17 +68,17 @@ body {
   .prose li { margin-bottom: 0.375rem; }
   .prose code { background: var(--code-bg); padding: 0.125rem 0.375rem; border-radius: 4px; font-size: 0.75rem; font-family: var(--font-mono), monospace; border: 1px solid var(--border-color); color: var(--text-primary); word-break: break-all; }
 
-  /* Code blocks */
+  /* Code blocks — always dark for syntax highlighting */
   .prose .code-block-wrapper { position: relative; margin-bottom: 1.25rem; }
   .prose .code-block-wrapper .code-lang-label {
     position: absolute; top: 0; right: 0;
     padding: 0.2rem 0.625rem; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
-    color: var(--text-tertiary); background: var(--bg-tertiary); border-radius: 0 8px 0 6px; border-bottom: 1px solid var(--border-color); border-left: 1px solid var(--border-color);
+    color: #888; background: #1a1a1a; border-radius: 0 8px 0 6px; border-bottom: 1px solid #333; border-left: 1px solid #333;
     z-index: 1; user-select: none;
   }
-  .prose pre { background: var(--code-bg); padding: 0.75rem; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border-color); margin: 0; -webkit-overflow-scrolling: touch; }
+  .prose pre { background: #1e1e1e; padding: 0.75rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; margin: 0; -webkit-overflow-scrolling: touch; }
   .prose .code-block-wrapper pre { margin-bottom: 0; }
-  .prose pre code { background: none; padding: 0; border: none; font-size: 0.7rem; word-break: normal; }
+  .prose pre code { background: none; padding: 0; border: none; font-size: 0.7rem; word-break: normal; color: #d4d4d4; }
   .prose pre code.hljs { background: transparent !important; padding: 0 !important; }
 
   /* Blockquote — Notion style */
@@ -63,7 +88,7 @@ body {
     font-size: 0.8125rem; line-height: 1.65; color: var(--text-primary);
   }
   .prose blockquote p { margin-bottom: 0; }
-  .prose blockquote code { background: rgba(255,255,255,0.06); }
+  .prose blockquote code { background: var(--bg-hover); }
   .prose a { color: var(--link-color); text-decoration: none; word-break: break-all; }
   .prose a:hover { text-decoration: underline; }
   .prose img { border-radius: 8px; margin: 1rem 0; max-width: 100%; height: auto; border: 1px solid var(--border-color); }
@@ -97,10 +122,6 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
 
 ::selection { background: var(--accent-muted); color: var(--text-primary); }
-
-/* Custom cursor — hide default on all pages, except iframes (Giscus etc.) */
-.cursor-none, .cursor-none * { cursor: none !important; }
-.giscus-wrapper, .giscus-wrapper * { cursor: auto !important; }
 
 /* Modal animation */
 @keyframes animate-in {

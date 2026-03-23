@@ -1,13 +1,15 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n";
-import { HiOutlineMagnifyingGlass, HiOutlineGlobeAlt } from "react-icons/hi2";
+import { useTheme } from "@/components/ThemeProvider";
+import { HiOutlineMagnifyingGlass, HiOutlineGlobeAlt, HiOutlineSun, HiOutlineMoon } from "react-icons/hi2";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function TopBar() {
   const { locale, setLocale, t } = useI18n();
+  const { theme, toggleTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const router = useRouter();
@@ -23,7 +25,7 @@ export default function TopBar() {
 
   return (
     <>
-      <header className="sticky top-0 z-20 h-14 flex items-center justify-between px-6 border-b border-border-color bg-bg-primary/80 backdrop-blur-md">
+      <header className="sticky top-0 z-20 h-14 flex items-center justify-between px-4 sm:px-6 border-b border-border-color bg-bg-primary/80 backdrop-blur-md">
         <div className="flex items-center gap-3 ml-10 lg:ml-0">
           <nav className="hidden sm:flex items-center gap-1 text-[13px] text-text-tertiary">
             <Link href="/" className="hover:text-text-primary transition-colors">
@@ -32,7 +34,15 @@ export default function TopBar() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center p-2 rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
+          >
+            {theme === "dark" ? <HiOutlineSun size={16} /> : <HiOutlineMoon size={16} />}
+          </button>
+
           {/* Language toggle */}
           <button
             onClick={() => setLocale(locale === "ko" ? "en" : "ko")}

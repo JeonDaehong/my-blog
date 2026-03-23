@@ -8,9 +8,12 @@ import {
   HiOutlineHeart,
   HiArrowRight,
   HiArrowUpRight,
+  HiOutlineGlobeAlt,
+  HiOutlineSun,
+  HiOutlineMoon,
 } from "react-icons/hi2";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
-import { HiOutlineGlobeAlt } from "react-icons/hi2";
+import { useTheme } from "@/components/ThemeProvider";
 
 const LINKS = {
   blog: "/posts",
@@ -47,11 +50,12 @@ export default function LandingPage() {
   const [displayText, setDisplayText] = useState("");
   const [typingDone, setTypingDone] = useState(false);
   const [views, setViews] = useState<{ total: number; today: number } | null>(null);
+  const { theme, toggleTheme } = useTheme();
   const t = TEXT[lang];
+  const isLight = theme === "light";
 
   useEffect(() => {
     setMounted(true);
-    // 조회수 기록 & 가져오기
     fetch("/api/views", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/" }) }).catch(() => {});
     fetch("/api/views").then(r => r.json()).then(setViews).catch(() => {});
   }, []);
@@ -73,39 +77,45 @@ export default function LandingPage() {
   }, [lang, mounted]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
+    <div className="min-h-screen bg-bg-primary text-text-primary relative overflow-hidden">
       {/* Gradient blob */}
       <div
-        className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] rounded-full blur-[120px] pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(234,88,12,0.35) 0%, rgba(251,191,36,0.15) 40%, transparent 70%)" }}
+        className="absolute bottom-[-20%] right-[-10%] w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] lg:w-[700px] lg:h-[700px] rounded-full blur-[80px] sm:blur-[120px] pointer-events-none"
+        style={{ background: `radial-gradient(circle, rgba(234,88,12,${isLight ? 0.12 : 0.35}) 0%, rgba(251,191,36,${isLight ? 0.06 : 0.15}) 40%, transparent 70%)` }}
       />
       <div
-        className="absolute top-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(234,88,12,0.08) 0%, transparent 70%)" }}
+        className="absolute top-[-10%] left-[-5%] w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] lg:w-[400px] lg:h-[400px] rounded-full blur-[60px] sm:blur-[100px] pointer-events-none"
+        style={{ background: `radial-gradient(circle, rgba(234,88,12,${isLight ? 0.03 : 0.08}) 0%, transparent 70%)` }}
       />
 
       {/* Nav */}
       <nav className="relative z-10 max-w-6xl mx-auto px-4 sm:px-10 py-4 sm:py-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <img src="/images/img.jpg" alt="" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-white/20" />
+            <img src="/images/img.jpg" alt="" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-border-color" />
             <span className="font-bold text-sm tracking-tight hidden sm:inline">Daehong</span>
           </Link>
           <div className="flex items-center gap-0.5 sm:gap-2">
-            <Link href={LINKS.blog} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-white/60 hover:text-white transition-colors whitespace-nowrap">{t.navBlog}</Link>
-            <Link href={LINKS.cardNews} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-white/60 hover:text-white transition-colors whitespace-nowrap">{t.navCardNews}</Link>
-            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-white/60 hover:text-white transition-colors hidden sm:block">GitHub</a>
-            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="p-2 text-white/60 hover:text-white transition-colors sm:hidden">
+            <Link href={LINKS.blog} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navBlog}</Link>
+            <Link href={LINKS.cardNews} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navCardNews}</Link>
+            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors hidden sm:block">GitHub</a>
+            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="p-2 text-text-secondary hover:text-text-primary transition-colors sm:hidden">
               <FaGithub size={16} />
             </a>
             <button
+              onClick={toggleTheme}
+              className="inline-flex items-center p-2 text-text-secondary hover:text-text-primary transition-colors"
+            >
+              {theme === "dark" ? <HiOutlineSun size={16} /> : <HiOutlineMoon size={16} />}
+            </button>
+            <button
               onClick={() => setLang(lang === "ko" ? "en" : "ko")}
-              className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-white/60 hover:text-white transition-colors"
+              className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors"
             >
               <HiOutlineGlobeAlt size={16} />
               {lang === "ko" ? "EN" : "KR"}
             </button>
-            <a href={LINKS.sponsor} target="_blank" rel="noopener noreferrer" className="ml-0.5 sm:ml-1 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-white/20 hover:bg-white hover:text-black transition-all whitespace-nowrap">{t.sponsor}</a>
+            <a href={LINKS.sponsor} target="_blank" rel="noopener noreferrer" className="ml-0.5 sm:ml-1 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-border-color hover:bg-text-primary hover:text-bg-primary transition-all whitespace-nowrap">{t.sponsor}</a>
           </div>
         </div>
       </nav>
@@ -123,7 +133,7 @@ export default function LandingPage() {
               {displayText}
               <span className={`inline-block w-[3px] sm:w-[5px] h-[0.75em] bg-orange-500 ml-1 align-baseline rounded-sm ${typingDone ? "animate-pulse" : ""}`} />
             </h1>
-            <p className="text-white/45 text-sm sm:text-base max-w-sm leading-relaxed mb-8">
+            <p className="text-text-tertiary text-sm sm:text-base max-w-sm leading-relaxed mb-8">
               {t.desc}
             </p>
             <div className="flex flex-wrap gap-3 mb-8">
@@ -137,7 +147,7 @@ export default function LandingPage() {
               </Link>
               <Link
                 href={LINKS.cardNews}
-                className="group inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 text-white/80 font-medium text-sm hover:bg-white/10 transition-colors"
+                className="group inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border-color text-text-secondary font-medium text-sm hover:bg-bg-hover transition-colors"
               >
                 <HiOutlineNewspaper size={18} />
                 {t.cardNews}
@@ -150,11 +160,11 @@ export default function LandingPage() {
                 { label: lang === "ko" ? "백엔드 엔지니어" : "Backend Engineer", color: "bg-violet-500", tooltip: "Java · Python · Spring" },
                 { label: lang === "ko" ? "오픈소스 컨트리뷰터" : "OSS Contributor", color: "bg-emerald-500", tooltip: "Spring Kafka · Apache Iceberg · Gravitino" },
               ].map((c) => (
-                <span key={c.label} className="relative group inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/[0.08] text-xs text-white/50 cursor-default">
+                <span key={c.label} className="relative group inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bg-hover border border-border-color text-xs text-text-tertiary cursor-default">
                   <span className={`w-1.5 h-1.5 rounded-full ${c.color}`} />
                   {c.label}
                   {c.tooltip && (
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/10 text-[11px] text-white/70 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 rounded-lg bg-bg-active backdrop-blur-md border border-border-color text-[11px] text-text-secondary whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                       {c.tooltip}
                     </span>
                   )}
@@ -169,7 +179,7 @@ export default function LandingPage() {
               mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
             }`}
           >
-            <div className="rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-orange-500/5">
+            <div className="rounded-3xl overflow-hidden border border-border-color shadow-2xl shadow-orange-500/5">
               <img
                 src="/images/main_1.jpeg"
                 alt="전대홍 - 오픈소스 컨퍼런스 발표"
@@ -181,15 +191,15 @@ export default function LandingPage() {
       </main>
 
       {/* Bottom bar */}
-      <div className="relative z-10 border-t border-white/[0.06]">
+      <div className="relative z-10 border-t border-border-color">
         <div className="max-w-6xl mx-auto px-6 sm:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-6">
-            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 text-white/30 hover:text-white/70 transition-colors">
+            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 text-text-tertiary hover:text-text-secondary transition-colors">
               <FaGithub size={16} />
               <span className="text-xs">GitHub</span>
               <HiArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
-            <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 text-white/30 hover:text-white/70 transition-colors">
+            <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 text-text-tertiary hover:text-text-secondary transition-colors">
               <FaLinkedin size={16} />
               <span className="text-xs">LinkedIn</span>
               <HiArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -198,19 +208,19 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             {views && (
               <>
-                <span className="flex items-center gap-1.5 text-xs text-white/40">
+                <span className="flex items-center gap-1.5 text-xs text-text-tertiary">
                   <span className="w-1.5 h-1.5 rounded-full bg-orange-500/60" />
                   Total
-                  <span className="text-white/70 font-semibold tabular-nums">{views.total.toLocaleString()}</span>
+                  <span className="text-text-secondary font-semibold tabular-nums">{views.total.toLocaleString()}</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-xs text-white/40">
+                <span className="flex items-center gap-1.5 text-xs text-text-tertiary">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
                   Today
-                  <span className="text-white/70 font-semibold tabular-nums">{views.today.toLocaleString()}</span>
+                  <span className="text-text-secondary font-semibold tabular-nums">{views.today.toLocaleString()}</span>
                 </span>
               </>
             )}
-            <p className="text-[11px] text-white/15">© 2026 Daehong</p>
+            <p className="text-[11px] text-text-tertiary opacity-40">© 2026 Daehong</p>
           </div>
         </div>
       </div>
