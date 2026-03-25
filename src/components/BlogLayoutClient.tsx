@@ -21,11 +21,11 @@ export default function BlogLayoutClient({
 }) {
   return (
     <I18nProvider>
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen overflow-x-hidden">
         <Sidebar categories={categories} />
-        <div className="flex-1 lg:pl-[260px]">
+        <div className="flex-1 lg:pl-[260px] overflow-x-hidden">
           <TopBar />
-          <main className="max-w-5xl mx-auto px-6 py-10">
+          <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
             {children}
           </main>
         </div>
