@@ -34,7 +34,7 @@ export default function CategoryClient({ category }: { category: any }) {
         <HiOutlineArrowLeft size={14} /> {t("backToHome")}
       </Link>
 
-      <h1 className="text-2xl font-bold tracking-tight mb-1 text-text-primary">{catName}</h1>
+      <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1 text-text-primary">{catName}</h1>
       {category.description && (
         <p className="text-text-tertiary text-sm mb-2">
           {locale === "en" && category.descriptionEn ? category.descriptionEn : category.description}
@@ -66,16 +66,16 @@ export default function CategoryClient({ category }: { category: any }) {
               </div>
 
               {/* Content */}
-              <div className="px-4 py-4">
-                <h2 className="text-[15px] font-semibold text-text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-2">
+              <div className="px-3 sm:px-4 py-3 sm:py-4">
+                <h2 className="text-[14px] sm:text-[15px] font-semibold text-text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-1.5 sm:mb-2">
                   {getTitle(post)}
                 </h2>
                 {getExcerpt(post) && (
-                  <p className="text-[13px] text-text-tertiary line-clamp-2 leading-relaxed mb-3">
+                  <p className="text-[12px] sm:text-[13px] text-text-tertiary line-clamp-2 leading-relaxed mb-2.5 sm:mb-3">
                     {getExcerpt(post)}
                   </p>
                 )}
-                <div className="flex items-center justify-between text-[12px] text-text-tertiary">
+                <div className="flex items-center justify-between text-[11px] sm:text-[12px] text-text-tertiary">
                   <span>
                     {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
                   </span>
