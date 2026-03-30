@@ -136,3 +136,27 @@ body {
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 .animate-in { animation: animate-in 0.2s ease-out; }
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .animate-in { animation: none; }
+}
+
+/* Skip to content */
+.skip-to-content {
+  position: absolute; top: -100%; left: 50%; transform: translateX(-50%);
+  padding: 0.75rem 1.5rem; background: var(--accent); color: white;
+  font-size: 0.875rem; font-weight: 600; border-radius: 0 0 8px 8px;
+  z-index: 100; transition: top 0.2s;
+}
+.skip-to-content:focus { top: 0; }
+
+/* Print styles */
+@media print {
+  nav, .sidebar, button, .code-block-wrapper .group-hover\\:opacity-100 { display: none !important; }
+  body { background: white; color: black; }
+  .prose { font-size: 12pt; }
+  .prose a { color: black; text-decoration: underline; }
+  .prose a::after { content: " (" attr(href) ")"; font-size: 10pt; color: #666; }
+}

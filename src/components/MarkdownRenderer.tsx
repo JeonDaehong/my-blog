@@ -1,17 +1,49 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark-dimmed.css";
 import { Components } from "react-markdown";
+import { HiOutlineClipboard, HiOutlineCheck } from "react-icons/hi2";
 
 function headingId(text: string): string {
   return text
     .toLowerCase()
     .replace(/[^a-z0-9가-힣ㄱ-ㅎㅏ-ㅣ\s-]/g, "")
     .replace(/\s+/g, "-");
+}
+
+function CopyButton({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [code]);
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="absolute top-2 right-2 z-10 p-1.5 rounded-md bg-white/10 hover:bg-white/20 text-gray-400 hover:text-gray-200 transition-all opacity-0 group-hover:opacity-100"
+      aria-label="Copy code"
+    >
+      {copied ? <HiOutlineCheck size={14} className="text-green-400" /> : <HiOutlineClipboard size={14} />}
+    </button>
+  );
+}
+
+function extractText(node: React.ReactNode): string {
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (node && typeof node === "object" && "props" in node) {
+    return extractText((node as any).props.children);
+  }
+  return "";
 }
 
 export default function MarkdownRenderer({ content }: { content: string }) {
@@ -44,7 +76,13 @@ export default function MarkdownRenderer({ content }: { content: string }) {
       );
     },
     pre: ({ children }) => {
-      return <div className="code-block-wrapper">{children}</div>;
+      const codeText = extractText(children);
+      return (
+        <div className="code-block-wrapper group relative">
+          <CopyButton code={codeText} />
+          {children}
+        </div>
+      );
     },
     code: ({ className, children, ...props }) => {
       const match = /language-(\w+)/.exec(className || "");

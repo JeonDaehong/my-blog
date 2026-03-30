@@ -11,6 +11,15 @@ export async function GET() {
   return NextResponse.json(entries);
 }
 
+const ALLOWED_EMOJIS = ["👋", "😊", "🔥", "💜", "🚀", "⭐", "🎉", "☕"];
+
+function sanitize(str: string): string {
+  return str.replace(/[<>&"']/g, (c) => {
+    const map: Record<string, string> = { "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" };
+    return map[c] || c;
+  });
+}
+
 export async function POST(req: NextRequest) {
   const { nickname, message, emoji } = await req.json();
 
@@ -18,15 +27,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "닉네임과 메시지를 입력하세요" }, { status: 400 });
   }
 
-  if (nickname.length > 20 || message.length > 500) {
+  if (nickname.trim().length > 20 || message.trim().length > 500) {
     return NextResponse.json({ error: "닉네임 20자, 메시지 500자 이내" }, { status: 400 });
   }
 
+  const safeEmoji = ALLOWED_EMOJIS.includes(emoji) ? emoji : "👋";
+
   const entry = await prisma.guestbookEntry.create({
     data: {
-      nickname: nickname.trim(),
-      message: message.trim(),
-      emoji: emoji || "👋",
+      nickname: sanitize(nickname.trim()),
+      message: sanitize(message.trim()),
+      emoji: safeEmoji,
     },
   });
 

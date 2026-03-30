@@ -16,6 +16,7 @@ const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
   weight: ["400", "700", "900"],
   display: "swap",
+  preload: true,
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -32,17 +33,21 @@ export const viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "My Blog",
-    template: "%s | My Blog",
+    default: "대홍의 데이터 기록",
+    template: "%s | 대홍의 데이터 기록",
   },
-  description: "개발, 기술, 일상을 기록하는 개인 블로그",
+  description: "데이터 엔지니어링, 백엔드, 오픈소스를 기록하는 기술 블로그",
+  metadataBase: new URL("https://daehong.dev"),
   openGraph: {
-    title: "My Blog",
-    description: "개발, 기술, 일상을 기록하는 개인 블로그",
+    title: "대홍의 데이터 기록",
+    description: "데이터 엔지니어링, 백엔드, 오픈소스를 기록하는 기술 블로그",
     type: "website",
     locale: "ko_KR",
+    siteName: "대홍의 데이터 기록",
   },
   robots: { index: true, follow: true },
+  icons: { icon: "/favicon.ico" },
+  alternates: { types: { "application/rss+xml": "/feed" } },
 };
 
 export default function RootLayout({
