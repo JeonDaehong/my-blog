@@ -5,7 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { useTheme } from "@/components/ThemeProvider";
 import GiscusWidget from "@giscus/react";
 
-const EMOJIS = ["👋", "😊", "🔥", "💜", "🚀", "⭐", "🎉", "☕"];
+const EMOJIS = ["👋", "😊", "🔥", "💜", "🚀", "⭐", "🎉"];
 
 type Entry = {
   id: string;

@@ -11,7 +11,7 @@ export async function GET() {
   return NextResponse.json(entries);
 }
 
-const ALLOWED_EMOJIS = ["👋", "😊", "🔥", "💜", "🚀", "⭐", "🎉", "☕"];
+const ALLOWED_EMOJIS = ["👋", "😊", "🔥", "💜", "🚀", "⭐", "🎉"];
 
 function sanitize(str: string): string {
   return str.replace(/[<>&"']/g, (c) => {
