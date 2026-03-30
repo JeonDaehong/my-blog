@@ -104,22 +104,22 @@ export default function GuestbookPage() {
         </h2>
 
         <form onSubmit={handleSubmit} className="mb-8 p-4 rounded-xl border border-border-color bg-bg-secondary space-y-3">
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex gap-2 sm:gap-3 items-center">
             <input
               type="text"
               placeholder={isKo ? "닉네임" : "Nickname"}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={20}
-              className="w-full sm:w-32 px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-text-tertiary"
+              className="w-24 sm:w-32 shrink-0 px-2 sm:px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-text-tertiary"
             />
-            <div className="flex items-center gap-1 flex-wrap">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               {EMOJIS.map((e) => (
                 <button
                   key={e}
                   type="button"
                   onClick={() => setEmoji(e)}
-                  className={`w-8 h-8 rounded-md text-base flex items-center justify-center transition-colors ${
+                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md text-sm sm:text-base flex items-center justify-center transition-colors ${
                     emoji === e ? "bg-accent-muted ring-1 ring-accent" : "hover:bg-bg-hover"
                   }`}
                 >
