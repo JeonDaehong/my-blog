@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { useState } from "react";
@@ -62,7 +63,7 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
         {/* Logo */}
         <div className="h-14 flex items-center px-4 border-b border-border-color">
           <Link href="/posts" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-            <img src="/images/img.jpg" alt="Daehong" className="w-7 h-7 rounded-md object-cover" />
+            <Image src="/images/img.jpg" alt="Daehong" width={28} height={28} className="w-7 h-7 rounded-md object-cover" />
             <span className="font-semibold text-[15px] text-text-primary tracking-tight">Daehong Blog</span>
           </Link>
         </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   HiOutlineBookOpen,
   HiOutlineNewspaper,
@@ -92,7 +93,7 @@ export default function LandingPage() {
       <nav className="relative z-10 max-w-6xl mx-auto px-4 sm:px-10 py-4 sm:py-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <img src="/images/img.jpg" alt="" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-border-color" />
+            <Image src="/images/img.jpg" alt="" width={36} height={36} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-border-color" />
             <span className="font-bold text-sm tracking-tight hidden sm:inline">Daehong</span>
           </Link>
           <div className="flex items-center gap-0.5 sm:gap-2">
@@ -180,9 +181,12 @@ export default function LandingPage() {
             }`}
           >
             <div className="rounded-3xl overflow-hidden border border-border-color shadow-2xl shadow-orange-500/5">
-              <img
+              <Image
                 src="/images/main_1.jpeg"
                 alt="전대홍 - 오픈소스 컨퍼런스 발표"
+                width={420}
+                height={560}
+                priority
                 className="w-full aspect-[3/4] object-cover object-[center_65%]"
               />
             </div>

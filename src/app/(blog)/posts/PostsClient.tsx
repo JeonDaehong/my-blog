@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
 import { HiOutlineEye, HiOutlineArrowRight } from "react-icons/hi2";
@@ -26,15 +27,21 @@ export default function PostsClient({ posts }: { posts: any[] }) {
   }, [viewMode]);
 
   useEffect(() => {
-    posts.forEach((post) => {
-      const path = `/posts/${post.slug}`;
-      fetch(`/api/views?path=${encodeURIComponent(path)}`)
-        .then((r) => r.json())
-        .then((d) => {
-          setViewCounts((prev) => ({ ...prev, [post.slug]: d.total }));
-        })
-        .catch(() => {});
-    });
+    if (posts.length === 0) return;
+    const paths = posts.map((post) => `/posts/${post.slug}`).join(",");
+    fetch(`/api/views?paths=${encodeURIComponent(paths)}`)
+      .then((r) => r.json())
+      .then((countMap: Record<string, number>) => {
+        const result: Record<string, number> = {};
+        for (const post of posts) {
+          const path = `/posts/${post.slug}`;
+          if (countMap[path] !== undefined) {
+            result[post.slug] = countMap[path];
+          }
+        }
+        setViewCounts(result);
+      })
+      .catch(() => {});
   }, [posts]);
 
   const getTitle = (post: any) => locale === "en" && post.titleEn ? post.titleEn : post.title;
@@ -43,12 +50,12 @@ export default function PostsClient({ posts }: { posts: any[] }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight mb-1 text-text-primary">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1 text-text-primary">
             {t("allPosts")}
           </h1>
-          <p className="text-text-tertiary text-sm">
+          <p className="text-text-tertiary text-xs sm:text-sm">
             {t("totalPosts", { count: posts.length })}
           </p>
         </div>
@@ -92,10 +99,12 @@ export default function PostsClient({ posts }: { posts: any[] }) {
               className="group rounded-xl border border-border-color overflow-hidden hover:border-border-light hover:shadow-lg hover:shadow-black/20 transition-all duration-200 bg-bg-secondary"
             >
               <div className="relative w-full overflow-hidden" style={{ aspectRatio: "1280 / 720" }}>
-                <img
+                <Image
                   src={post.coverImage || "/images/default-thumbnail.png"}
                   alt=""
-                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
                 />
                 {post.category && (
                   <span className="absolute top-3 left-3 text-[11px] px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white/90 border border-white/10 font-medium">
@@ -103,16 +112,16 @@ export default function PostsClient({ posts }: { posts: any[] }) {
                   </span>
                 )}
               </div>
-              <div className="px-4 py-4">
-                <h2 className="text-[15px] font-semibold text-text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-2">
+              <div className="px-3 sm:px-4 py-3 sm:py-4">
+                <h2 className="text-[14px] sm:text-[15px] font-semibold text-text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-1.5 sm:mb-2">
                   {getTitle(post)}
                 </h2>
                 {getExcerpt(post) && (
-                  <p className="text-[13px] text-text-tertiary line-clamp-2 leading-relaxed mb-3">
+                  <p className="text-[12px] sm:text-[13px] text-text-tertiary line-clamp-2 leading-relaxed mb-2.5 sm:mb-3">
                     {getExcerpt(post)}
                   </p>
                 )}
-                <div className="flex items-center justify-between text-[12px] text-text-tertiary">
+                <div className="flex items-center justify-between text-[11px] sm:text-[12px] text-text-tertiary">
                   <span>{format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}</span>
                   {viewCounts[post.slug] !== undefined && (
                     <span className="inline-flex items-center gap-1 text-accent/80">
@@ -134,11 +143,15 @@ export default function PostsClient({ posts }: { posts: any[] }) {
               href={`/posts/${post.slug}`}
               className="group flex items-center gap-2.5 sm:gap-4 px-3 sm:px-4 py-3 sm:py-3.5 hover:bg-bg-hover transition-colors overflow-hidden"
             >
-              <img
-                src={post.coverImage || "/images/default-thumbnail.png"}
-                alt=""
-                className="w-12 h-8 sm:w-20 sm:h-12 rounded object-cover border border-border-color shrink-0"
-              />
+              <div className="relative w-12 h-8 sm:w-20 sm:h-12 shrink-0">
+                <Image
+                  src={post.coverImage || "/images/default-thumbnail.png"}
+                  alt=""
+                  fill
+                  sizes="80px"
+                  className="rounded object-cover border border-border-color"
+                />
+              </div>
               <div className="flex-1 min-w-0 overflow-hidden">
                 <h2 className="text-[13px] sm:text-[14px] font-medium text-text-primary group-hover:text-accent transition-colors truncate">
                   {getTitle(post)}
