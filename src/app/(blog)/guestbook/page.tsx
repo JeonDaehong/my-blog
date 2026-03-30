@@ -104,16 +104,16 @@ export default function GuestbookPage() {
         </h2>
 
         <form onSubmit={handleSubmit} className="mb-8 p-4 rounded-xl border border-border-color bg-bg-secondary space-y-3">
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               placeholder={isKo ? "닉네임" : "Nickname"}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={20}
-              className="w-32 px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-text-tertiary"
+              className="w-full sm:w-32 px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-text-tertiary"
             />
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-wrap">
               {EMOJIS.map((e) => (
                 <button
                   key={e}
