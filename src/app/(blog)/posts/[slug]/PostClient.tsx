@@ -10,6 +10,7 @@ import { useI18n } from "@/lib/i18n";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import TableOfContents from "@/components/TableOfContents";
 import Giscus from "@/components/Giscus";
+import type { PostWithCategory } from "@/lib/types";
 
 type AdjacentPost = { slug: string; title: string } | null;
 
@@ -23,7 +24,7 @@ export default function PostClient({
   prevPost,
   nextPost,
 }: {
-  post: any;
+  post: PostWithCategory;
   prevPost?: AdjacentPost;
   nextPost?: AdjacentPost;
 }) {

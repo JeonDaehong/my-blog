@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import type { PostWithCategory } from "@/lib/types";
 import PostClient from "./PostClient";
 
 export const revalidate = 60;
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function JsonLd({ post }: { post: any }) {
+function JsonLd({ post }: { post: PostWithCategory }) {
   const data = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -45,6 +46,21 @@ function JsonLd({ post }: { post: any }) {
   );
 }
 
+function serializePost(post: Awaited<ReturnType<typeof prisma.post.findUnique>> & { category: Awaited<ReturnType<typeof prisma.category.findUnique>> | null }): PostWithCategory {
+  return {
+    ...post!,
+    createdAt: post!.createdAt.toISOString(),
+    updatedAt: post!.updatedAt.toISOString(),
+    category: post!.category
+      ? {
+          ...post!.category,
+          createdAt: post!.category.createdAt.toISOString(),
+          updatedAt: post!.category.updatedAt.toISOString(),
+        }
+      : null,
+  };
+}
+
 export default async function PostPage({ params }: Props) {
   const post = await prisma.post.findUnique({
     where: { slug: params.slug, published: true },
@@ -53,7 +69,7 @@ export default async function PostPage({ params }: Props) {
 
   if (!post) notFound();
 
-  const serializedPost = JSON.parse(JSON.stringify(post));
+  const serializedPost = serializePost(post);
 
   const [prevPost, nextPost] = await Promise.all([
     prisma.post.findFirst({

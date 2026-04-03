@@ -53,8 +53,12 @@ export default function AdminPage() {
 
   async function loadData() {
     setLoading(true);
-    const [p, c] = await Promise.all([fetch("/api/posts"), fetch("/api/categories")]);
-    setPosts(await p.json()); setCategories(await c.json()); setLoading(false);
+    const [p, c] = await Promise.all([fetch("/api/posts?all=true"), fetch("/api/categories")]);
+    const postsData = await p.json();
+    // API returns { posts, pagination } for paginated, or array for ?all=true
+    setPosts(Array.isArray(postsData) ? postsData : postsData.posts ?? []);
+    setCategories(await c.json());
+    setLoading(false);
   }
 
   async function deletePost(id: string) { if (!confirm("정말 삭제하시겠습니까?")) return; await fetch(`/api/posts/${id}`, { method: "DELETE" }); loadData(); }

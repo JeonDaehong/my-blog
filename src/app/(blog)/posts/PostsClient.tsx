@@ -2,16 +2,32 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
-import { HiOutlineEye, HiOutlineArrowRight } from "react-icons/hi2";
+import {
+  HiOutlineEye,
+  HiOutlineArrowRight,
+  HiChevronLeft,
+  HiChevronRight,
+  HiOutlineMagnifyingGlass,
+  HiOutlineXMark,
+} from "react-icons/hi2";
 import { HiOutlineViewGrid, HiOutlineViewList } from "react-icons/hi";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
+import type { PostSummary, PaginationMeta } from "@/lib/types";
 
 type ViewMode = "card" | "list";
 
-export default function PostsClient({ posts }: { posts: any[] }) {
+type Props = {
+  posts: PostSummary[];
+  pagination: PaginationMeta;
+  query?: string | null;
+};
+
+export default function PostsClient({ posts, pagination, query }: Props) {
+  const router = useRouter();
   const { locale, t } = useI18n();
   const dateLocale = locale === "ko" ? ko : enUS;
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
@@ -44,20 +60,64 @@ export default function PostsClient({ posts }: { posts: any[] }) {
       .catch(() => {});
   }, [posts]);
 
-  const getTitle = (post: any) => locale === "en" && post.titleEn ? post.titleEn : post.title;
-  const getExcerpt = (post: any) => locale === "en" && post.excerptEn ? post.excerptEn : post.excerpt;
-  const getCatName = (cat: any) => locale === "en" && cat.nameEn ? cat.nameEn : cat.name;
+  const getTitle = (post: PostSummary) =>
+    locale === "en" && post.titleEn ? post.titleEn : post.title;
+  const getExcerpt = (post: PostSummary) =>
+    locale === "en" && post.excerptEn ? post.excerptEn : post.excerpt;
+  const getCatName = (cat: NonNullable<PostSummary["category"]>) =>
+    locale === "en" && cat.nameEn ? cat.nameEn : cat.name;
+
+  function goToPage(p: number) {
+    const params = new URLSearchParams();
+    if (p > 1) params.set("page", String(p));
+    if (query) params.set("q", query);
+    router.push(`/posts${params.size ? `?${params}` : ""}`);
+  }
+
+  function clearSearch() {
+    router.push("/posts");
+  }
+
+  const isSearching = !!query;
 
   return (
     <div>
+      {/* Header */}
       <div className="flex items-center justify-between mb-6 sm:mb-8">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1 text-text-primary">
-            {t("allPosts")}
-          </h1>
-          <p className="text-text-tertiary text-xs sm:text-sm">
-            {t("totalPosts", { count: posts.length })}
-          </p>
+          {isSearching ? (
+            <>
+              <div className="flex items-center gap-2 mb-1">
+                <HiOutlineMagnifyingGlass size={16} className="text-accent" />
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
+                  &lsquo;{query}&rsquo;
+                </h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-text-tertiary text-xs sm:text-sm">
+                  {pagination.total === 0
+                    ? "검색 결과가 없습니다"
+                    : `검색 결과 ${pagination.total}개`}
+                </p>
+                <button
+                  onClick={clearSearch}
+                  className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border border-border-color text-text-tertiary hover:text-accent hover:border-accent transition-colors"
+                >
+                  <HiOutlineXMark size={11} />
+                  검색 지우기
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1 text-text-primary">
+                {t("allPosts")}
+              </h1>
+              <p className="text-text-tertiary text-xs sm:text-sm">
+                {t("totalPosts", { count: pagination.total })}
+              </p>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-1 bg-bg-tertiary rounded-lg p-1 border border-border-color">
           <button
@@ -87,12 +147,28 @@ export default function PostsClient({ posts }: { posts: any[] }) {
 
       {posts.length === 0 ? (
         <div className="text-center py-20 border border-dashed border-border-color rounded-lg">
-          <p className="text-text-tertiary text-sm">{t("noPosts")}</p>
+          {isSearching ? (
+            <>
+              <HiOutlineMagnifyingGlass size={32} className="mx-auto mb-3 text-text-tertiary opacity-40" />
+              <p className="text-text-secondary text-sm font-medium mb-1">
+                &lsquo;{query}&rsquo;에 대한 결과가 없습니다
+              </p>
+              <p className="text-text-tertiary text-xs mb-4">다른 검색어를 시도해 보세요</p>
+              <button
+                onClick={clearSearch}
+                className="text-xs text-accent hover:underline"
+              >
+                전체 글 보기
+              </button>
+            </>
+          ) : (
+            <p className="text-text-tertiary text-sm">{t("noPosts")}</p>
+          )}
         </div>
       ) : viewMode === "card" ? (
         /* ── Card View ── */
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {posts.map((post: any) => (
+          {posts.map((post) => (
             <Link
               key={post.id}
               href={`/posts/${post.slug}`}
@@ -122,7 +198,9 @@ export default function PostsClient({ posts }: { posts: any[] }) {
                   </p>
                 )}
                 <div className="flex items-center justify-between text-[11px] sm:text-[12px] text-text-tertiary">
-                  <span>{format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}</span>
+                  <span>
+                    {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
+                  </span>
                   {viewCounts[post.slug] !== undefined && (
                     <span className="inline-flex items-center gap-1 text-accent/80">
                       <HiOutlineEye size={13} />
@@ -137,7 +215,7 @@ export default function PostsClient({ posts }: { posts: any[] }) {
       ) : (
         /* ── List View ── */
         <div className="border border-border-color rounded-lg divide-y divide-border-color overflow-hidden">
-          {posts.map((post: any) => (
+          {posts.map((post) => (
             <Link
               key={post.id}
               href={`/posts/${post.slug}`}
@@ -157,7 +235,8 @@ export default function PostsClient({ posts }: { posts: any[] }) {
                   {getTitle(post)}
                 </h2>
                 <p className="text-[11px] sm:text-[12px] text-text-tertiary mt-0.5 truncate">
-                  {getExcerpt(post) || format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
+                  {getExcerpt(post) ||
+                    format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
                 </p>
               </div>
               <div className="hidden sm:flex items-center gap-3 shrink-0">
@@ -176,9 +255,45 @@ export default function PostsClient({ posts }: { posts: any[] }) {
                   {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
                 </span>
               </div>
-              <HiOutlineArrowRight size={14} className="text-text-tertiary group-hover:text-accent shrink-0 transition-colors hidden sm:block" />
+              <HiOutlineArrowRight
+                size={14}
+                className="text-text-tertiary group-hover:text-accent shrink-0 transition-colors hidden sm:block"
+              />
             </Link>
           ))}
+        </div>
+      )}
+
+      {/* ── Pagination ── */}
+      {pagination.totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-8">
+          <button
+            onClick={() => goToPage(pagination.page - 1)}
+            disabled={pagination.page <= 1}
+            className="p-2 rounded-md border border-border-color text-text-tertiary hover:bg-bg-hover disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <HiChevronLeft size={16} />
+          </button>
+          {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => goToPage(p)}
+              className={`w-8 h-8 rounded-md text-[13px] font-medium transition-colors ${
+                p === pagination.page
+                  ? "bg-accent text-white"
+                  : "border border-border-color text-text-tertiary hover:bg-bg-hover"
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            onClick={() => goToPage(pagination.page + 1)}
+            disabled={pagination.page >= pagination.totalPages}
+            className="p-2 rounded-md border border-border-color text-text-tertiary hover:bg-bg-hover disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <HiChevronRight size={16} />
+          </button>
         </div>
       )}
     </div>

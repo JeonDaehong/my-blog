@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isAuthenticated } from "@/lib/auth";
 import { translateToEnglish } from "@/lib/translate";
+import { generateSlug } from "@/lib/slug";
 
 export async function GET() {
   const categories = await prisma.category.findMany({
@@ -17,14 +18,17 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const slug = body.slug || body.name
-    .toLowerCase()
-    .replace(/[^a-z0-9가-힣ㄱ-ㅎㅏ-ㅣ\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
 
-  const nameEn = body.nameEn || await translateToEnglish(body.name);
-  const descriptionEn = body.descriptionEn || (body.description ? await translateToEnglish(body.description) : null);
+  if (!body.name?.trim()) {
+    return NextResponse.json({ error: "카테고리 이름은 필수입니다" }, { status: 400 });
+  }
+
+  const slug = body.slug || generateSlug(body.name, false);
+
+  const nameEn = body.nameEn || (await translateToEnglish(body.name));
+  const descriptionEn =
+    body.descriptionEn ||
+    (body.description ? await translateToEnglish(body.description) : null);
 
   const category = await prisma.category.create({
     data: {
