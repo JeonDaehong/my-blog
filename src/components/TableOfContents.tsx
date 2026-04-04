@@ -45,31 +45,38 @@ function TocList({
   onItemClick?: () => void;
 }) {
   return (
-    <ul className="space-y-1 border-l border-border-color">
-      {toc.map((item) => (
-        <li key={item.id}>
-          <a
-            href={`#${item.id}`}
-            onClick={(e) => {
-              e.preventDefault();
-              const el = document.getElementById(item.id);
-              if (el) {
-                el.scrollIntoView({ behavior: "smooth", block: "start" });
-                onItemClick?.();
-              }
-            }}
-            className={`block text-[12px] leading-relaxed transition-colors ${
-              item.level === 1 ? "pl-3" : item.level === 2 ? "pl-5" : "pl-7"
-            } ${
-              activeId === item.id
-                ? "text-accent border-l-2 border-accent -ml-px"
-                : "text-text-tertiary hover:text-text-secondary"
-            }`}
-          >
-            {item.text}
-          </a>
-        </li>
-      ))}
+    <ul className="space-y-0.5">
+      {toc.map((item) => {
+        const isActive = activeId === item.id;
+        return (
+          <li key={item.id}>
+            <a
+              href={`#${item.id}`}
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.getElementById(item.id);
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  onItemClick?.();
+                }
+              }}
+              className={`
+                group flex items-center gap-2 py-1 pr-2 rounded-md text-[12px] leading-snug transition-all duration-150
+                ${item.level === 1 ? "pl-2" : item.level === 2 ? "pl-5" : "pl-8"}
+                ${isActive
+                  ? "text-accent bg-accent-muted font-medium"
+                  : "text-text-tertiary hover:text-text-secondary hover:bg-bg-hover"
+                }
+              `}
+            >
+              {isActive && (
+                <span className="w-1 h-1 rounded-full bg-accent shrink-0" />
+              )}
+              <span className={isActive ? "" : "pl-3"}>{item.text}</span>
+            </a>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -113,10 +120,13 @@ export default function TableOfContents({ content }: { content: string }) {
     <>
       {/* Desktop TOC */}
       <nav className="hidden xl:block w-56 shrink-0">
-        <div className="sticky top-20">
-          <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-widest mb-3">
-            On this page
-          </p>
+        <div className="sticky top-20 rounded-xl border border-border-color bg-bg-secondary p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <HiOutlineListBullet size={13} className="text-accent shrink-0" />
+            <span className="text-[11px] font-semibold text-text-secondary uppercase tracking-widest">
+              On this page
+            </span>
+          </div>
           <TocList toc={toc} activeId={activeId} />
         </div>
       </nav>
@@ -133,18 +143,31 @@ export default function TableOfContents({ content }: { content: string }) {
       {/* Mobile TOC drawer */}
       {mobileOpen && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-40 xl:hidden" onClick={() => setMobileOpen(false)} />
+          <div
+            className="fixed inset-0 bg-black/50 z-40 xl:hidden"
+            onClick={() => setMobileOpen(false)}
+          />
           <div className="fixed bottom-0 left-0 right-0 z-50 xl:hidden bg-bg-secondary border-t border-border-color rounded-t-2xl max-h-[60vh] overflow-y-auto animate-in">
             <div className="sticky top-0 flex items-center justify-between px-5 py-4 bg-bg-secondary border-b border-border-color">
-              <p className="text-[12px] font-semibold text-text-tertiary uppercase tracking-widest">
-                On this page
-              </p>
-              <button onClick={() => setMobileOpen(false)} className="p-1 text-text-tertiary hover:text-text-primary">
+              <div className="flex items-center gap-2">
+                <HiOutlineListBullet size={14} className="text-accent" />
+                <span className="text-[12px] font-semibold text-text-secondary uppercase tracking-widest">
+                  On this page
+                </span>
+              </div>
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="p-1 text-text-tertiary hover:text-text-primary"
+              >
                 <HiOutlineXMark size={18} />
               </button>
             </div>
-            <div className="px-5 py-4">
-              <TocList toc={toc} activeId={activeId} onItemClick={() => setMobileOpen(false)} />
+            <div className="px-4 py-4">
+              <TocList
+                toc={toc}
+                activeId={activeId}
+                onItemClick={() => setMobileOpen(false)}
+              />
             </div>
           </div>
         </>
