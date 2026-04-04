@@ -64,6 +64,19 @@ export default function MarkdownRenderer({ content }: { content: string }) {
       const text = String(children);
       return <h3 id={headingId(text)}>{children}</h3>;
     },
+    a: ({ href, children }) => {
+      const isExternal = href?.startsWith("http");
+      return (
+        <a
+          href={href}
+          {...(isExternal
+            ? { target: "_blank", rel: "noopener noreferrer" }
+            : {})}
+        >
+          {children}
+        </a>
+      );
+    },
     img: ({ src, alt }) => {
       const url = typeof src === "string" ? src : "";
       return (
