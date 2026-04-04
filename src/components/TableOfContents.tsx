@@ -111,16 +111,14 @@ export default function TableOfContents({ content }: { content: string }) {
   return (
     <>
       {/* Desktop TOC */}
-      <nav className="hidden xl:block w-60 shrink-0">
-        <div className="sticky top-20 rounded-xl border border-border-color bg-bg-secondary p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <HiOutlineListBullet size={13} className="text-accent shrink-0" />
-            <span className="text-[11px] font-semibold text-text-secondary uppercase tracking-widest">
-              On this page
-            </span>
-          </div>
-          <TocList toc={toc} activeId={activeId} onItemClick={(id) => setActiveId(id)} />
+      <nav className="hidden xl:block w-60 shrink-0 sticky top-20 self-start rounded-xl border border-border-color bg-bg-secondary p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <HiOutlineListBullet size={13} className="text-accent shrink-0" />
+          <span className="text-[11px] font-semibold text-text-secondary uppercase tracking-widest">
+            On this page
+          </span>
         </div>
+        <TocList toc={toc} activeId={activeId} onItemClick={(id) => setActiveId(id)} />
       </nav>
 
       {/* Mobile TOC toggle */}
