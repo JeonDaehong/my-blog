@@ -26,7 +26,7 @@ export default function BlogLayoutClient({
       </a>
       <div className="flex min-h-screen overflow-x-hidden">
         <Sidebar categories={categories} />
-        <div className="flex-1 lg:pl-[260px] overflow-x-hidden">
+        <div className="flex-1 lg:pl-[260px]">
           <TopBar />
           <main id="main-content" className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
             {children}

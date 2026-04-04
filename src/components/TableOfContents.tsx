@@ -42,7 +42,7 @@ function TocList({
 }: {
   toc: TocItem[];
   activeId: string;
-  onItemClick?: () => void;
+  onItemClick?: (id: string) => void;
 }) {
   return (
     <ul className="space-y-0.5">
@@ -57,7 +57,7 @@ function TocList({
                 const el = document.getElementById(item.id);
                 if (el) {
                   el.scrollIntoView({ behavior: "smooth", block: "start" });
-                  onItemClick?.();
+                  onItemClick?.(item.id);
                 }
               }}
               className={`
@@ -127,7 +127,7 @@ export default function TableOfContents({ content }: { content: string }) {
               On this page
             </span>
           </div>
-          <TocList toc={toc} activeId={activeId} />
+          <TocList toc={toc} activeId={activeId} onItemClick={(id) => setActiveId(id)} />
         </div>
       </nav>
 
@@ -166,7 +166,7 @@ export default function TableOfContents({ content }: { content: string }) {
               <TocList
                 toc={toc}
                 activeId={activeId}
-                onItemClick={() => setMobileOpen(false)}
+                onItemClick={(id) => { setActiveId(id); setMobileOpen(false); }}
               />
             </div>
           </div>
