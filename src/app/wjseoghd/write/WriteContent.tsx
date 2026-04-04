@@ -32,9 +32,8 @@ export default function WriteContent() {
   useEffect(() => {
     fetch("/api/categories").then((r) => r.json()).then(setCategories);
     if (editId) {
-      fetch("/api/posts").then((r) => r.json()).then((posts: any[]) => {
-        const post = posts.find((p) => p.id === editId);
-        if (post) {
+      fetch(`/api/posts/${editId}`).then((r) => r.json()).then((post: any) => {
+        if (post && post.id) {
           setTitle(post.title); setTitleEn(post.titleEn || "");
           setContent(post.content); setContentEn(post.contentEn || "");
           setExcerpt(post.excerpt || ""); setExcerptEn(post.excerptEn || "");

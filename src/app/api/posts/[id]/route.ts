@@ -6,6 +6,23 @@ import { translateToEnglish } from "@/lib/translate";
 
 type Context = { params: { id: string } };
 
+export async function GET(req: NextRequest, { params }: Context) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const post = await prisma.post.findUnique({
+    where: { id: params.id },
+    include: { category: true },
+  });
+
+  if (!post) {
+    return NextResponse.json({ error: "글을 찾을 수 없습니다" }, { status: 404 });
+  }
+
+  return NextResponse.json(post);
+}
+
 export async function PUT(req: NextRequest, { params }: Context) {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
