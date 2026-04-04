@@ -47,7 +47,7 @@ export default function PostClient({
   const readingTime = getReadingTime(content);
 
   return (
-    <article className="overflow-x-hidden">
+    <article>
       <Link href="/posts" className="inline-flex items-center gap-1.5 text-[13px] text-text-tertiary hover:text-accent mb-8 transition-colors">
         <HiOutlineArrowLeft size={14} /> {t("backToList")}
       </Link>

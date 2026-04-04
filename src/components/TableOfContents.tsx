@@ -72,7 +72,7 @@ function TocList({
               {isActive && (
                 <span className="w-1 h-1 rounded-full bg-accent shrink-0" />
               )}
-              <span className={isActive ? "" : "pl-3"}>{item.text}</span>
+              <span className={`${isActive ? "" : "pl-3"} break-words min-w-0`}>{item.text}</span>
             </a>
           </li>
         );
@@ -119,7 +119,7 @@ export default function TableOfContents({ content }: { content: string }) {
   return (
     <>
       {/* Desktop TOC */}
-      <nav className="hidden xl:block w-56 shrink-0">
+      <nav className="hidden xl:block w-60 shrink-0">
         <div className="sticky top-20 rounded-xl border border-border-color bg-bg-secondary p-4">
           <div className="flex items-center gap-2 mb-3">
             <HiOutlineListBullet size={13} className="text-accent shrink-0" />
