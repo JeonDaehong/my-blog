@@ -9,7 +9,8 @@ export const revalidate = 60;
 type Props = { params: { slug: string } };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await prisma.post.findUnique({ where: { slug: params.slug } });
+  const slug = decodeURIComponent(params.slug);
+  const post = await prisma.post.findUnique({ where: { slug } });
   if (!post) return {};
   return {
     title: post.title,
@@ -62,8 +63,9 @@ function serializePost(post: Awaited<ReturnType<typeof prisma.post.findUnique>> 
 }
 
 export default async function PostPage({ params }: Props) {
+  const slug = decodeURIComponent(params.slug);
   const post = await prisma.post.findUnique({
-    where: { slug: params.slug, published: true },
+    where: { slug, published: true },
     include: { category: true },
   });
 

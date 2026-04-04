@@ -8,14 +8,16 @@ export const revalidate = 60;
 type Props = { params: { slug: string } };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const category = await prisma.category.findUnique({ where: { slug: params.slug } });
+  const slug = decodeURIComponent(params.slug);
+  const category = await prisma.category.findUnique({ where: { slug } });
   if (!category) return {};
   return { title: category.name };
 }
 
 export default async function CategoryPage({ params }: Props) {
+  const slug = decodeURIComponent(params.slug);
   const category = await prisma.category.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       posts: { where: { published: true }, orderBy: { createdAt: "desc" } },
     },
