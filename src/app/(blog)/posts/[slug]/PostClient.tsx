@@ -74,7 +74,7 @@ export default function PostClient({
             <HiOutlineCalendar size={14} />
             {format(new Date(post.createdAt), dateFmt, { locale: dateLocale })}
           </span>
-          {catName && (
+          {catName && post.category && (
             <Link href={`/category/${post.category.slug}`} className="flex items-center gap-1.5 hover:text-accent transition-colors">
               <HiOutlineFolder size={14} />
               {catName}
