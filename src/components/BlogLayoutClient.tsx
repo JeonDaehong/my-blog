@@ -24,7 +24,7 @@ export default function BlogLayoutClient({
       <a href="#main-content" className="skip-to-content">
         Skip to content
       </a>
-      <div className="flex min-h-screen overflow-x-hidden">
+      <div className="flex min-h-screen">
         <Sidebar categories={categories} />
         <div className="flex-1 lg:pl-[260px]">
           <TopBar />

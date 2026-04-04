@@ -89,29 +89,21 @@ export default function TableOfContents({ content }: { content: string }) {
   useEffect(() => {
     if (toc.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-            break;
-          }
-        }
-      },
-      { rootMargin: "-80px 0px -60% 0px", threshold: 0.1 }
-    );
+    function onScroll() {
+      const headings = toc
+        .map(({ id }) => ({ id, el: document.getElementById(id) }))
+        .filter((h): h is { id: string; el: HTMLElement } => h.el !== null);
 
-    const timer = setTimeout(() => {
-      toc.forEach(({ id }) => {
-        const el = document.getElementById(id);
-        if (el) observer.observe(el);
-      });
-    }, 300);
+      let current = headings[0]?.id ?? "";
+      for (const { id, el } of headings) {
+        if (el.getBoundingClientRect().top <= 96) current = id;
+      }
+      setActiveId(current);
+    }
 
-    return () => {
-      clearTimeout(timer);
-      observer.disconnect();
-    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
   }, [toc]);
 
   if (toc.length === 0) return null;
