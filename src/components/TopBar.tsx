@@ -342,14 +342,27 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
       {searchOpen && (
         <div className="fixed inset-0 z-50 bg-bg-primary overflow-y-auto">
           <div className="max-w-3xl mx-auto px-5 sm:px-6 py-5 sm:py-8">
-            <div className="flex items-center justify-between mb-6 sm:mb-9">
-              <span className="text-[15px] font-semibold text-text-primary">
-                {t("search")}
-              </span>
+            <div className="relative flex items-center justify-center mb-7 sm:mb-10">
+              <Link
+                href="/"
+                onClick={close}
+                className="flex items-center gap-2.5"
+              >
+                <Image
+                  src="/images/img.jpg"
+                  alt=""
+                  width={30}
+                  height={30}
+                  className="w-[30px] h-[30px] rounded-md object-cover"
+                />
+                <span className="font-semibold text-[16px] text-text-primary tracking-tight">
+                  Daehong Blog
+                </span>
+              </Link>
               <button
                 onClick={close}
                 aria-label="닫기"
-                className="p-2 rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
+                className="absolute right-0 p-2 rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
               >
                 <HiOutlineXMark size={22} />
               </button>
@@ -405,20 +418,6 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
                     ))}
                   </div>
                 )}
-                <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2">
-                  <span className="flex items-center gap-1.5 text-[12px] text-text-tertiary">
-                    <kbd className="px-1.5 py-0.5 rounded border border-border-color bg-bg-secondary text-[11px] font-mono">↵</kbd>
-                    전체 검색
-                  </span>
-                  <span className="flex items-center gap-1.5 text-[12px] text-text-tertiary">
-                    <kbd className="px-1.5 py-0.5 rounded border border-border-color bg-bg-secondary text-[11px] font-mono">↑↓</kbd>
-                    이동
-                  </span>
-                  <span className="flex items-center gap-1.5 text-[12px] text-text-tertiary">
-                    <kbd className="px-1.5 py-0.5 rounded border border-border-color bg-bg-secondary text-[11px] font-mono">ESC</kbd>
-                    닫기
-                  </span>
-                </div>
               </div>
             )}
 
