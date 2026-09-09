@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   HiOutlineArrowLeft,
   HiOutlineChevronLeft,
@@ -129,6 +129,8 @@ const TEXT = {
     viewAll: "모두 보기",
     topics: "개 주제",
     cards: "장",
+    close: "닫기",
+    hint: "← → 로 이동 · ESC 로 닫기",
   },
   en: {
     home: "Home",
@@ -139,6 +141,8 @@ const TEXT = {
     viewAll: "View all",
     topics: " topics",
     cards: " cards",
+    close: "Close",
+    hint: "← → to navigate · ESC to close",
   },
 };
 
@@ -156,20 +160,51 @@ function CardModal({
   onClose: () => void;
 }) {
   const [current, setCurrent] = useState(0);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number | null>(null);
   const card = cards[current];
   const t = TEXT[lang];
 
   const title = lang === "en" && card.titleEn ? card.titleEn : card.title;
   const body = lang === "en" && card.bodyEn ? card.bodyEn : card.body;
 
-  const prev = () => setCurrent((c) => Math.max(0, c - 1));
-  const next = () => setCurrent((c) => Math.min(cards.length - 1, c + 1));
+  const prev = useCallback(() => setCurrent((c) => Math.max(0, c - 1)), []);
+  const next = useCallback(
+    () => setCurrent((c) => Math.min(cards.length - 1, c + 1)),
+    [cards.length]
+  );
+
+  // 이전에는 tabIndex만 있고 포커스를 주지 않아 방향키가 먹지 않았다.
+  useEffect(() => {
+    dialogRef.current?.focus();
+  }, []);
+
+  // 카드를 넘기면 본문을 항상 처음부터 읽게 한다.
+  useEffect(() => {
+    bodyRef.current?.scrollTo({ top: 0 });
+  }, [current]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowLeft") prev();
     else if (e.key === "ArrowRight") next();
     else if (e.key === "Escape") onClose();
   };
+
+  // 모바일 스와이프
+  function onTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+  }
+  function onTouchEnd(e: React.TouchEvent) {
+    if (touchStartX.current === null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(delta) < 50) return;
+    if (delta < 0) next();
+    else prev();
+  }
+
+  const progress = ((current + 1) / cards.length) * 100;
 
   return (
     <div
@@ -178,74 +213,98 @@ function CardModal({
         if (e.target === e.currentTarget) onClose();
       }}
       onKeyDown={handleKeyDown}
-      tabIndex={0}
+      ref={dialogRef}
+      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
     >
-      <div className="relative w-full max-w-lg animate-in">
+      <div className="relative w-full max-w-xl animate-in">
         <button
           onClick={onClose}
-          className="absolute -top-10 right-0 text-white/50 hover:text-white transition-colors"
+          aria-label={t.close}
+          className="absolute -top-10 right-0 text-white/60 hover:text-white transition-colors"
         >
           <HiXMark size={24} />
         </button>
 
         <div
-          className="rounded-2xl border overflow-hidden flex flex-col max-h-[85vh]"
+          className="rounded-2xl border overflow-hidden flex flex-col max-h-[85vh] bg-bg-secondary"
           style={{ borderColor: `${card.accent}33` }}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
         >
-          <div className="h-1 shrink-0" style={{ background: card.accent }} />
+          {/* 진행 바 — 몇 장 중 몇 번째인지 한눈에 */}
+          <div className="h-1 shrink-0 bg-bg-tertiary">
+            <div
+              className="h-full transition-all duration-300"
+              style={{ width: `${progress}%`, background: card.accent }}
+            />
+          </div>
 
           <div
-            className="p-6 sm:p-8 bg-bg-secondary flex-1 overflow-y-auto"
+            ref={bodyRef}
+            className="flex-1 overflow-y-auto px-6 sm:px-9 pt-6 sm:pt-8 pb-7 sm:pb-9"
             style={{ background: `${card.accent}08` }}
           >
-            <div className="flex items-center mb-5">
-              <span className="text-3xl sm:text-4xl">{card.icon}</span>
+            <div className="flex items-center justify-between mb-5">
+              <span className="text-3xl sm:text-4xl leading-none">{card.icon}</span>
+              <span className="text-[12px] font-semibold tabular-nums text-text-tertiary">
+                {current + 1} / {cards.length}
+              </span>
             </div>
 
-            <h3 className="text-lg sm:text-xl font-bold mb-4 text-text-primary">
+            <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-5 text-text-primary leading-snug tracking-tight">
               {title}
             </h3>
 
-            <div className="text-[13px] sm:text-[14px] leading-relaxed text-text-secondary whitespace-pre-line min-h-[80px] sm:min-h-[100px]">
+            <div className="text-[15px] sm:text-[16px] leading-[1.85] sm:leading-[1.9] text-text-secondary whitespace-pre-line break-words">
               {body}
             </div>
           </div>
 
           <div
-            className="flex items-center justify-between px-4 sm:px-8 py-3.5 border-t bg-bg-primary shrink-0"
+            className="shrink-0 border-t bg-bg-primary"
             style={{ borderColor: `${card.accent}20` }}
           >
-            <button
-              onClick={prev}
-              disabled={current === 0}
-              className="flex items-center gap-1 text-sm text-text-tertiary hover:text-text-primary transition-colors disabled:opacity-30"
-            >
-              <HiOutlineChevronLeft size={16} /> {t.prev}
-            </button>
+            <div className="flex items-center justify-between px-3 sm:px-5 py-3">
+              <button
+                onClick={prev}
+                disabled={current === 0}
+                className="flex items-center gap-1 px-2 py-1 rounded-md text-[13px] sm:text-sm text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+              >
+                <HiOutlineChevronLeft size={16} /> {t.prev}
+              </button>
 
-            <div className="flex items-center gap-1.5">
-              {cards.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrent(i)}
-                  className="transition-all duration-200"
-                  style={{
-                    width: i === current ? 18 : 6,
-                    height: 6,
-                    borderRadius: 3,
-                    background: i === current ? card.accent : "var(--border-light)",
-                  }}
-                />
-              ))}
+              <div className="flex items-center gap-1.5">
+                {cards.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrent(i)}
+                    aria-label={`${i + 1}`}
+                    className="transition-all duration-200"
+                    style={{
+                      width: i === current ? 18 : 6,
+                      height: 6,
+                      borderRadius: 3,
+                      background: i === current ? card.accent : "var(--border-light)",
+                    }}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={next}
+                disabled={current === cards.length - 1}
+                className="flex items-center gap-1 px-2 py-1 rounded-md text-[13px] sm:text-sm text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+              >
+                {t.next} <HiOutlineChevronRight size={16} />
+              </button>
             </div>
 
-            <button
-              onClick={next}
-              disabled={current === cards.length - 1}
-              className="flex items-center gap-1 text-sm text-text-tertiary hover:text-text-primary transition-colors disabled:opacity-30"
-            >
-              {t.next} <HiOutlineChevronRight size={16} />
-            </button>
+            <p className="hidden sm:block pb-2.5 text-center text-[11px] text-text-tertiary">
+              {t.hint}
+            </p>
           </div>
         </div>
       </div>
