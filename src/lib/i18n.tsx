@@ -7,7 +7,6 @@ export type Locale = "ko" | "en";
 const translations = {
   ko: {
     // Nav
-    home: "홈",
     allPosts: "전체 글",
     admin: "관리자",
     navigation: "네비게이션",
@@ -79,7 +78,6 @@ const translations = {
     noTitle: "제목 없음",
   },
   en: {
-    home: "Home",
     allPosts: "All Posts",
     admin: "Admin",
     navigation: "Navigation",

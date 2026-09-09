@@ -74,9 +74,6 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
             <p className="px-3 mb-2 text-[11px] font-semibold text-text-tertiary uppercase tracking-widest">
               {t("navigation")}
             </p>
-            <a href="/" className="block px-3 py-1.5 rounded-md text-[13px] text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors">
-              {t("home")}
-            </a>
             {navLink("/posts", t("allPosts"))}
           </div>
 
