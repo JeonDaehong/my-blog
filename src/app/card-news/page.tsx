@@ -208,7 +208,7 @@ function CardModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-6"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -219,21 +219,21 @@ function CardModal({
       aria-modal="true"
       aria-label={title}
     >
-      <div className="relative w-full max-w-xl animate-in">
-        <button
-          onClick={onClose}
-          aria-label={t.close}
-          className="absolute -top-10 right-0 text-white/60 hover:text-white transition-colors"
-        >
-          <HiXMark size={24} />
-        </button>
-
+      <div className="relative w-full max-w-3xl animate-in">
         <div
-          className="rounded-2xl border overflow-hidden flex flex-col max-h-[85vh] bg-bg-secondary"
+          className="relative rounded-2xl border overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[86vh] bg-bg-secondary"
           style={{ borderColor: `${card.accent}33` }}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
         >
+          <button
+            onClick={onClose}
+            aria-label={t.close}
+            className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-bg-primary/70 backdrop-blur-sm text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
+          >
+            <HiXMark size={20} />
+          </button>
+
           {/* 진행 바 — 몇 장 중 몇 번째인지 한눈에 */}
           <div className="h-1 shrink-0 bg-bg-tertiary">
             <div
@@ -244,21 +244,21 @@ function CardModal({
 
           <div
             ref={bodyRef}
-            className="flex-1 overflow-y-auto px-6 sm:px-9 pt-6 sm:pt-8 pb-7 sm:pb-9"
+            className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-12 pt-7 sm:pt-10 pb-8 sm:pb-12 min-h-[240px] sm:min-h-[320px]"
             style={{ background: `${card.accent}08` }}
           >
-            <div className="flex items-center justify-between mb-5">
-              <span className="text-3xl sm:text-4xl leading-none">{card.icon}</span>
+            <div className="flex items-center justify-between gap-3 mb-5 sm:mb-6 pr-9">
+              <span className="text-4xl sm:text-5xl leading-none">{card.icon}</span>
               <span className="text-[12px] font-semibold tabular-nums text-text-tertiary">
                 {current + 1} / {cards.length}
               </span>
             </div>
 
-            <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-5 text-text-primary leading-snug tracking-tight">
+            <h3 className="text-[22px] sm:text-[28px] font-bold mb-4 sm:mb-6 text-text-primary leading-snug tracking-tight">
               {title}
             </h3>
 
-            <div className="text-[15px] sm:text-[16px] leading-[1.85] sm:leading-[1.9] text-text-secondary whitespace-pre-line break-words">
+            <div className="text-[15px] sm:text-[17px] leading-[1.85] sm:leading-[1.9] text-text-secondary whitespace-pre-line break-words">
               {body}
             </div>
           </div>
