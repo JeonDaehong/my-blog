@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { isAuthenticated } from "@/lib/auth";
 import { translateToEnglish } from "@/lib/translate";
 import { generateSlug } from "@/lib/slug";
+import { postSummarySelect } from "@/lib/queries";
 
 const DEFAULT_LIMIT = 10;
 
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
     prisma.post.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      include: { category: true },
+      select: postSummarySelect,
       skip,
       take: limit,
     }),

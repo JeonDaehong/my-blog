@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import type { PostSummary, PaginationMeta } from "@/lib/types";
+import { postSummarySelect } from "@/lib/queries";
 import PostsClient from "./PostsClient";
 
 export const revalidate = 60;
@@ -45,7 +46,7 @@ export default async function PostsPage({ searchParams }: Props) {
       prisma.post.findMany({
         where,
         orderBy: { createdAt: "desc" },
-        include: { category: true },
+        select: postSummarySelect,
         skip,
         take: POSTS_PER_PAGE,
       }),
@@ -55,7 +56,6 @@ export default async function PostsPage({ searchParams }: Props) {
     posts = rawPosts.map((p) => ({
       ...p,
       createdAt: p.createdAt.toISOString(),
-      updatedAt: p.updatedAt.toISOString(),
       category: p.category
         ? {
             ...p.category,
