@@ -221,7 +221,7 @@ function CardModal({
     >
       <div className="relative w-full max-w-3xl animate-in">
         <div
-          className="relative rounded-2xl border overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[86vh] bg-bg-secondary"
+          className="relative rounded-2xl border overflow-hidden flex flex-col h-[82vh] sm:h-[620px] sm:max-h-[86vh] bg-bg-secondary"
           style={{ borderColor: `${card.accent}33` }}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
@@ -244,7 +244,7 @@ function CardModal({
 
           <div
             ref={bodyRef}
-            className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-12 pt-7 sm:pt-10 pb-8 sm:pb-12 min-h-[240px] sm:min-h-[320px]"
+            className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-12 pt-7 sm:pt-10 pb-8 sm:pb-12"
             style={{ background: `${card.accent}08` }}
           >
             <div className="flex items-center justify-between gap-3 mb-5 sm:mb-6 pr-9">
