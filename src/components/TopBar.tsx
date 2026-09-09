@@ -165,7 +165,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
     <>
       <header className="sticky top-0 z-20 border-b border-border-color bg-bg-primary/80 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="h-14 flex items-center justify-between gap-3">
+          <div className="h-16 flex items-center justify-between gap-3">
             <Link href="/" className="flex items-center gap-2.5 shrink-0">
               <Image
                 src="/images/img.jpg"
@@ -179,13 +179,30 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
               </span>
             </Link>
 
-        <div className="flex items-center gap-1">
+            {/* 넓은 화면에서는 토스처럼 한 줄 텍스트 내비로 둔다 */}
+            <nav className="hidden lg:flex items-center gap-7 ml-auto mr-3">
+              {navTabs.map((tab) => (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  className={`text-[15px] whitespace-nowrap transition-colors ${
+                    tab.active
+                      ? "text-accent font-semibold"
+                      : "text-text-secondary hover:text-text-primary"
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </nav>
+
+        <div className="flex items-center gap-1.5">
           <Link
             href="/guestbook"
-            className={`px-2 sm:px-2.5 py-1.5 rounded-md text-[13px] whitespace-nowrap transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors ${
               pathname === "/guestbook"
-                ? "text-accent font-medium"
-                : "text-text-tertiary hover:text-text-primary hover:bg-bg-hover"
+                ? "bg-accent-muted text-accent"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
             }`}
           >
             {t("guestbook")}
@@ -211,27 +228,25 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
           {/* Search button */}
           <button
             onClick={() => setSearchOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-color bg-bg-secondary text-text-tertiary text-[13px] hover:border-border-light hover:text-text-secondary transition-colors"
+            aria-label={t("search")}
+            title={`${t("search")} (/)`}
+            className="flex items-center p-2 rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
           >
-            <HiOutlineMagnifyingGlass size={14} />
-            <span className="hidden sm:inline">{t("search")}</span>
-            <kbd className="hidden sm:inline text-[10px] px-1.5 py-0.5 rounded bg-bg-tertiary border border-border-color ml-1 font-mono opacity-60">
-              /
-            </kbd>
+            <HiOutlineMagnifyingGlass size={18} />
           </button>
         </div>
           </div>
 
-          {/* 카테고리 탭 — 사이드바를 대신하는 주 내비게이션 */}
-          <nav className="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+          {/* 좁은 화면에서는 가로 스크롤 알약으로 내려 보낸다 */}
+          <nav className="lg:hidden flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2.5">
             {navTabs.map((tab) => (
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`shrink-0 whitespace-nowrap border-b-2 pb-2.5 pt-0.5 text-[14px] transition-colors ${
+                className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-[13px] transition-colors ${
                   tab.active
-                    ? "border-accent text-accent font-semibold"
-                    : "border-transparent text-text-tertiary hover:text-text-primary"
+                    ? "bg-accent text-white font-medium"
+                    : "bg-bg-tertiary text-text-secondary"
                 }`}
               >
                 {tab.label}

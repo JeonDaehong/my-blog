@@ -7,7 +7,6 @@ import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
 import {
   HiOutlineEye,
-  HiOutlineArrowRight,
   HiChevronLeft,
   HiChevronRight,
   HiOutlineMagnifyingGlass,
@@ -17,7 +16,11 @@ import { HiOutlineViewGrid, HiOutlineViewList } from "react-icons/hi";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import type { PostSummary, PaginationMeta, PostsExtras } from "@/lib/types";
-import { FeaturedRow, HighlightSections } from "@/components/PostsHighlights";
+import {
+  FeaturedHero,
+  PopularCard,
+  GuestbookCard,
+} from "@/components/PostsHighlights";
 
 type ViewMode = "card" | "list";
 
@@ -53,9 +56,7 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
         const result: Record<string, number> = {};
         for (const post of posts) {
           const path = `/posts/${post.slug}`;
-          if (countMap[path] !== undefined) {
-            result[post.slug] = countMap[path];
-          }
+          if (countMap[path] !== undefined) result[post.slug] = countMap[path];
         }
         setViewCounts(result);
       })
@@ -81,227 +82,260 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
   }
 
   const isSearching = !!query;
+  const hasAside = extras.popular.length > 0 || extras.guestbook.length > 0;
 
   return (
     <div>
-      <FeaturedRow posts={extras.featured} />
+      {!isSearching && <FeaturedHero posts={extras.featured} />}
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 sm:mb-8">
-        <div>
-          {isSearching ? (
-            <>
-              <div className="flex items-center gap-2 mb-1">
-                <HiOutlineMagnifyingGlass size={16} className="text-accent" />
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
-                  &lsquo;{query}&rsquo;
-                </h1>
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-text-tertiary text-xs sm:text-sm">
-                  {pagination.total === 0
-                    ? "검색 결과가 없습니다"
-                    : `검색 결과 ${pagination.total}개`}
-                </p>
-                <button
-                  onClick={clearSearch}
-                  className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border border-border-color text-text-tertiary hover:text-accent hover:border-accent transition-colors"
-                >
-                  <HiOutlineXMark size={11} />
-                  검색 지우기
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1 text-text-primary">
-                {t("allPosts")}
-              </h1>
-              <p className="text-text-tertiary text-xs sm:text-sm">
-                {t("totalPosts", { count: pagination.total })}
-              </p>
-            </>
-          )}
-        </div>
-        <div className="flex items-center gap-1 bg-bg-tertiary rounded-lg p-1 border border-border-color">
-          <button
-            onClick={() => setViewMode("card")}
-            className={`p-1.5 rounded-md transition-colors ${
-              viewMode === "card"
-                ? "bg-accent text-white"
-                : "text-text-tertiary hover:text-text-secondary"
-            }`}
-            title="Card view"
-          >
-            <HiOutlineViewGrid size={16} />
-          </button>
-          <button
-            onClick={() => setViewMode("list")}
-            className={`p-1.5 rounded-md transition-colors ${
-              viewMode === "list"
-                ? "bg-accent text-white"
-                : "text-text-tertiary hover:text-text-secondary"
-            }`}
-            title="List view"
-          >
-            <HiOutlineViewList size={16} />
-          </button>
-        </div>
-      </div>
-
-      {posts.length === 0 ? (
-        <div className="text-center py-20 border border-dashed border-border-color rounded-lg">
-          {isSearching ? (
-            <>
-              <HiOutlineMagnifyingGlass size={32} className="mx-auto mb-3 text-text-tertiary opacity-40" />
-              <p className="text-text-secondary text-sm font-medium mb-1">
-                &lsquo;{query}&rsquo;에 대한 결과가 없습니다
-              </p>
-              <p className="text-text-tertiary text-xs mb-4">다른 검색어를 시도해 보세요</p>
-              <button
-                onClick={clearSearch}
-                className="text-xs text-accent hover:underline"
-              >
-                전체 글 보기
-              </button>
-            </>
-          ) : (
-            <p className="text-text-tertiary text-sm">{t("noPosts")}</p>
-          )}
-        </div>
-      ) : viewMode === "card" ? (
-        /* ── Card View ── */
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {posts.map((post) => (
-            <Link
-              key={post.id}
-              href={`/posts/${post.slug}`}
-              className="group rounded-xl border border-border-color overflow-hidden hover:border-border-light hover:shadow-lg hover:shadow-black/20 transition-all duration-200 bg-bg-secondary"
-            >
-              <div className="relative w-full overflow-hidden" style={{ aspectRatio: "1280 / 720" }}>
-                <Image
-                  src={post.coverImage || "/images/default-thumbnail.png"}
-                  alt=""
-                  fill
-                  sizes="(max-width: 640px) 100vw, 50vw"
-                  className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
-                />
-              </div>
-              <div className="px-4 sm:px-5 py-4 sm:py-5">
-                {post.category && (
-                  <span className="block text-[12px] font-semibold text-accent mb-1.5">
-                    {getCatName(post.category)}
-                  </span>
-                )}
-                <h2 className="text-[16px] sm:text-[18px] font-bold text-text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-1.5 sm:mb-2">
-                  {getTitle(post)}
-                </h2>
-                {getExcerpt(post) && (
-                  <p className="text-[12px] sm:text-[13px] text-text-tertiary line-clamp-2 leading-relaxed mb-2.5 sm:mb-3">
-                    {getExcerpt(post)}
+      <div
+        className={
+          hasAside
+            ? "grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-10 lg:gap-14"
+            : ""
+        }
+      >
+        <div className="min-w-0">
+          {/* Header */}
+          <div className="flex items-end justify-between gap-4 mb-5 sm:mb-7">
+            <div className="min-w-0">
+              {isSearching ? (
+                <>
+                  <div className="flex items-center gap-2 mb-1">
+                    <HiOutlineMagnifyingGlass size={18} className="text-accent shrink-0" />
+                    <h1 className="text-[22px] sm:text-[28px] font-bold tracking-tight text-text-primary truncate">
+                      &lsquo;{query}&rsquo;
+                    </h1>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-text-tertiary text-xs sm:text-sm">
+                      {pagination.total === 0
+                        ? "검색 결과가 없습니다"
+                        : `검색 결과 ${pagination.total}개`}
+                    </p>
+                    <button
+                      onClick={clearSearch}
+                      className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border border-border-color text-text-tertiary hover:text-accent hover:border-accent transition-colors"
+                    >
+                      <HiOutlineXMark size={11} />
+                      검색 지우기
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-[24px] sm:text-[30px] font-bold tracking-tight text-text-primary">
+                    {t("allPosts")}
+                  </h1>
+                  <p className="mt-1 text-text-tertiary text-xs sm:text-sm">
+                    {t("totalPosts", { count: pagination.total })}
                   </p>
-                )}
-                <div className="flex items-center justify-between text-[11px] sm:text-[12px] text-text-tertiary">
-                  <span>
-                    {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
-                  </span>
-                  {viewCounts[post.slug] !== undefined && (
-                    <span className="inline-flex items-center gap-1 text-accent/80">
-                      <HiOutlineEye size={13} />
-                      {viewCounts[post.slug].toLocaleString()}
+                </>
+              )}
+            </div>
+
+            <div className="shrink-0 flex items-center gap-1 bg-bg-tertiary rounded-lg p-1 border border-border-color">
+              <button
+                onClick={() => setViewMode("card")}
+                className={`p-1.5 rounded-md transition-colors ${
+                  viewMode === "card"
+                    ? "bg-accent text-white"
+                    : "text-text-tertiary hover:text-text-secondary"
+                }`}
+                title="Article view"
+              >
+                <HiOutlineViewGrid size={16} />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`p-1.5 rounded-md transition-colors ${
+                  viewMode === "list"
+                    ? "bg-accent text-white"
+                    : "text-text-tertiary hover:text-text-secondary"
+                }`}
+                title="Compact view"
+              >
+                <HiOutlineViewList size={16} />
+              </button>
+            </div>
+          </div>
+
+          {posts.length === 0 ? (
+            <div className="text-center py-20 border border-dashed border-border-color rounded-xl">
+              {isSearching ? (
+                <>
+                  <HiOutlineMagnifyingGlass
+                    size={32}
+                    className="mx-auto mb-3 text-text-tertiary opacity-40"
+                  />
+                  <p className="text-text-secondary text-sm font-medium mb-1">
+                    &lsquo;{query}&rsquo;에 대한 결과가 없습니다
+                  </p>
+                  <p className="text-text-tertiary text-xs mb-4">
+                    다른 검색어를 시도해 보세요
+                  </p>
+                  <button
+                    onClick={clearSearch}
+                    className="text-xs text-accent hover:underline"
+                  >
+                    전체 글 보기
+                  </button>
+                </>
+              ) : (
+                <p className="text-text-tertiary text-sm">{t("noPosts")}</p>
+              )}
+            </div>
+          ) : viewMode === "card" ? (
+            /* ── 토스식 아티클 행: 왼쪽 텍스트, 오른쪽 썸네일 ── */
+            <div className="border-t border-border-color">
+              {posts.map((post) => (
+                <Link
+                  key={post.id}
+                  href={`/posts/${post.slug}`}
+                  className="group flex gap-4 sm:gap-8 py-6 sm:py-8 border-b border-border-color"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-1.5 mb-2 sm:mb-3">
+                      {post.category && (
+                        <span className="text-[12px] sm:text-[13px] font-medium px-2.5 py-1 rounded-md bg-accent-muted text-accent">
+                          {getCatName(post.category)}
+                        </span>
+                      )}
+                      <span className="text-[12px] sm:text-[13px] px-2.5 py-1 rounded-md bg-bg-tertiary text-text-tertiary">
+                        {format(new Date(post.createdAt), "yyyy.MM.dd", {
+                          locale: dateLocale,
+                        })}
+                      </span>
+                    </div>
+
+                    <h2 className="text-[17px] sm:text-[20px] font-bold text-text-primary group-hover:text-accent transition-colors leading-snug line-clamp-2">
+                      {getTitle(post)}
+                    </h2>
+
+                    {getExcerpt(post) && (
+                      <p className="mt-2 text-[14px] sm:text-[15px] text-text-tertiary leading-relaxed line-clamp-2">
+                        {getExcerpt(post)}
+                      </p>
+                    )}
+
+                    {viewCounts[post.slug] !== undefined && (
+                      <span className="mt-2.5 inline-flex items-center gap-1 text-[12px] text-text-tertiary">
+                        <HiOutlineEye size={13} />
+                        {viewCounts[post.slug].toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="shrink-0 w-[104px] sm:w-[220px]">
+                    <div
+                      className="relative w-full rounded-xl overflow-hidden bg-bg-tertiary"
+                      style={{ aspectRatio: "16 / 9" }}
+                    >
+                      <Image
+                        src={post.coverImage || "/images/default-thumbnail.png"}
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 104px, 220px"
+                        className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                      />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            /* ── 압축 목록 ── */
+            <div className="border border-border-color rounded-lg divide-y divide-border-color overflow-hidden">
+              {posts.map((post) => (
+                <Link
+                  key={post.id}
+                  href={`/posts/${post.slug}`}
+                  className="group flex items-center gap-2.5 sm:gap-4 px-3 sm:px-4 py-3 sm:py-3.5 hover:bg-bg-hover transition-colors overflow-hidden"
+                >
+                  <div className="relative w-12 h-8 sm:w-20 sm:h-12 shrink-0">
+                    <Image
+                      src={post.coverImage || "/images/default-thumbnail.png"}
+                      alt=""
+                      fill
+                      sizes="80px"
+                      className="rounded object-cover border border-border-color"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <h2 className="text-[13px] sm:text-[14px] font-medium text-text-primary group-hover:text-accent transition-colors truncate">
+                      {getTitle(post)}
+                    </h2>
+                    <p className="text-[11px] sm:text-[12px] text-text-tertiary mt-0.5 truncate">
+                      {getExcerpt(post) ||
+                        format(new Date(post.createdAt), "yyyy.MM.dd", {
+                          locale: dateLocale,
+                        })}
+                    </p>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-3 shrink-0">
+                    {post.category && (
+                      <span className="text-[11px] px-2 py-0.5 rounded bg-bg-tertiary text-text-tertiary border border-border-color">
+                        {getCatName(post.category)}
+                      </span>
+                    )}
+                    {viewCounts[post.slug] !== undefined && (
+                      <span className="inline-flex items-center gap-1 text-[11px] text-text-tertiary">
+                        <HiOutlineEye size={12} />
+                        {viewCounts[post.slug].toLocaleString()}
+                      </span>
+                    )}
+                    <span className="text-[12px] text-text-tertiary whitespace-nowrap">
+                      {format(new Date(post.createdAt), "yyyy.MM.dd", {
+                        locale: dateLocale,
+                      })}
                     </span>
-                  )}
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        /* ── List View ── */
-        <div className="border border-border-color rounded-lg divide-y divide-border-color overflow-hidden">
-          {posts.map((post) => (
-            <Link
-              key={post.id}
-              href={`/posts/${post.slug}`}
-              className="group flex items-center gap-2.5 sm:gap-4 px-3 sm:px-4 py-3 sm:py-3.5 hover:bg-bg-hover transition-colors overflow-hidden"
-            >
-              <div className="relative w-12 h-8 sm:w-20 sm:h-12 shrink-0">
-                <Image
-                  src={post.coverImage || "/images/default-thumbnail.png"}
-                  alt=""
-                  fill
-                  sizes="80px"
-                  className="rounded object-cover border border-border-color"
-                />
-              </div>
-              <div className="flex-1 min-w-0 overflow-hidden">
-                <h2 className="text-[13px] sm:text-[14px] font-medium text-text-primary group-hover:text-accent transition-colors truncate">
-                  {getTitle(post)}
-                </h2>
-                <p className="text-[11px] sm:text-[12px] text-text-tertiary mt-0.5 truncate">
-                  {getExcerpt(post) ||
-                    format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
-                </p>
-              </div>
-              <div className="hidden sm:flex items-center gap-3 shrink-0">
-                {post.category && (
-                  <span className="text-[11px] px-2 py-0.5 rounded bg-bg-tertiary text-text-tertiary border border-border-color">
-                    {getCatName(post.category)}
-                  </span>
-                )}
-                {viewCounts[post.slug] !== undefined && (
-                  <span className="inline-flex items-center gap-1 text-[11px] text-accent/80">
-                    <HiOutlineEye size={12} />
-                    {viewCounts[post.slug].toLocaleString()}
-                  </span>
-                )}
-                <span className="text-[12px] text-text-tertiary whitespace-nowrap">
-                  {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
-                </span>
-              </div>
-              <HiOutlineArrowRight
-                size={14}
-                className="text-text-tertiary group-hover:text-accent shrink-0 transition-colors hidden sm:block"
-              />
-            </Link>
-          ))}
-        </div>
-      )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
 
-      {/* ── Pagination ── */}
-      {pagination.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-8">
-          <button
-            onClick={() => goToPage(pagination.page - 1)}
-            disabled={pagination.page <= 1}
-            className="p-2 rounded-md border border-border-color text-text-tertiary hover:bg-bg-hover disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          >
-            <HiChevronLeft size={16} />
-          </button>
-          {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => goToPage(p)}
-              className={`w-8 h-8 rounded-md text-[13px] font-medium transition-colors ${
-                p === pagination.page
-                  ? "bg-accent text-white"
-                  : "border border-border-color text-text-tertiary hover:bg-bg-hover"
-              }`}
-            >
-              {p}
-            </button>
-          ))}
-          <button
-            onClick={() => goToPage(pagination.page + 1)}
-            disabled={pagination.page >= pagination.totalPages}
-            className="p-2 rounded-md border border-border-color text-text-tertiary hover:bg-bg-hover disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          >
-            <HiChevronRight size={16} />
-          </button>
+          {/* ── Pagination ── */}
+          {pagination.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-8">
+              <button
+                onClick={() => goToPage(pagination.page - 1)}
+                disabled={pagination.page <= 1}
+                className="p-2 rounded-md border border-border-color text-text-tertiary hover:bg-bg-hover disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <HiChevronLeft size={16} />
+              </button>
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => goToPage(p)}
+                  className={`w-8 h-8 rounded-md text-[13px] font-medium transition-colors ${
+                    p === pagination.page
+                      ? "bg-accent text-white"
+                      : "border border-border-color text-text-tertiary hover:bg-bg-hover"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => goToPage(pagination.page + 1)}
+                disabled={pagination.page >= pagination.totalPages}
+                className="p-2 rounded-md border border-border-color text-text-tertiary hover:bg-bg-hover disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <HiChevronRight size={16} />
+              </button>
+            </div>
+          )}
         </div>
-      )}
 
-      <HighlightSections popular={extras.popular} guestbook={extras.guestbook} />
+        {hasAside && (
+          <aside className="space-y-5 lg:sticky lg:top-28 self-start">
+            <PopularCard posts={extras.popular} />
+            <GuestbookCard entries={extras.guestbook} />
+          </aside>
+        )}
+      </div>
     </div>
   );
 }
