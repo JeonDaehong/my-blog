@@ -13,7 +13,7 @@ const translations = {
     navigation: "네비게이션",
     categories: "카테고리",
     settings: "설정",
-    extras: "즐길거리",
+    extras: "기타",
     guestbook: "방명록",
     games: "웹게임",
     search: "검색...",
@@ -32,7 +32,7 @@ const translations = {
 
     // Post
     backToList: "목록으로 돌아가기",
-    backToHome: "홈으로",
+    backToAllPosts: "전체 글로",
     totalPosts: "총 {count}개의 글",
     postsInCategory: "{count}개의 글",
     noCategoryPosts: "이 카테고리에 글이 없습니다",
@@ -85,7 +85,7 @@ const translations = {
     navigation: "Navigation",
     categories: "Categories",
     settings: "Settings",
-    extras: "Extras",
+    extras: "Others",
     guestbook: "Guestbook",
     games: "Games",
     search: "Search...",
@@ -102,7 +102,7 @@ const translations = {
     noPostsDesc: "Create your first post from the admin page",
 
     backToList: "Back to list",
-    backToHome: "Home",
+    backToAllPosts: "All posts",
     totalPosts: "{count} posts",
     postsInCategory: "{count} posts",
     noCategoryPosts: "No posts in this category",

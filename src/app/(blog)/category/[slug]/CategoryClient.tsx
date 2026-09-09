@@ -30,8 +30,8 @@ export default function CategoryClient({ category }: { category: any }) {
 
   return (
     <div>
-      <Link href="/" className="inline-flex items-center gap-1.5 text-[13px] text-text-tertiary hover:text-accent mb-6 transition-colors">
-        <HiOutlineArrowLeft size={14} /> {t("backToHome")}
+      <Link href="/posts" className="inline-flex items-center gap-1.5 text-[13px] text-text-tertiary hover:text-accent mb-6 transition-colors">
+        <HiOutlineArrowLeft size={14} /> {t("backToAllPosts")}
       </Link>
 
       <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1 text-text-primary">{catName}</h1>

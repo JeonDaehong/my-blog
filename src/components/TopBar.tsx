@@ -11,7 +11,6 @@ import {
   HiOutlineDocumentText,
   HiOutlineFolder,
 } from "react-icons/hi2";
-import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -141,13 +140,8 @@ export default function TopBar() {
   return (
     <>
       <header className="sticky top-0 z-20 h-14 flex items-center justify-between px-4 sm:px-6 border-b border-border-color bg-bg-primary/80 backdrop-blur-md">
-        <div className="flex items-center gap-3 ml-10 lg:ml-0">
-          <nav className="hidden sm:flex items-center gap-1 text-[13px] text-text-tertiary">
-            <Link href="/" className="hover:text-text-primary transition-colors">
-              {t("home")}
-            </Link>
-          </nav>
-        </div>
+        {/* 좌측은 모바일 햄버거 버튼 자리로 비워 둔다 (우측 컨트롤 정렬 유지) */}
+        <div className="ml-10 lg:ml-0" />
 
         <div className="flex items-center gap-1">
           {/* Theme toggle */}
