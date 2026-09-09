@@ -61,6 +61,18 @@ export default function RootLayout({
       lang="ko"
       className={`${inter.variable} ${notoSansKR.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
+      <head>
+        {/*
+          기본값이 라이트이므로, 다크를 선택한 방문자가 흰 화면을 한 번 보고
+          어두워지는 깜빡임이 생긴다. 페인트 전에 저장된 테마를 먼저 적용한다.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light"){document.documentElement.setAttribute("data-theme",t)}}catch(e){}',
+          }}
+        />
+      </head>
       <body className="min-h-full font-sans">
         <ThemeProvider>
           <Suspense fallback={null}>

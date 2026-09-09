@@ -82,11 +82,11 @@ export default function LandingPage() {
       {/* Gradient blob */}
       <div
         className="absolute bottom-[-20%] right-[-10%] w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] lg:w-[700px] lg:h-[700px] rounded-full blur-[80px] sm:blur-[120px] pointer-events-none"
-        style={{ background: `radial-gradient(circle, rgba(234,88,12,${isLight ? 0.12 : 0.35}) 0%, rgba(251,191,36,${isLight ? 0.06 : 0.15}) 40%, transparent 70%)` }}
+        style={{ background: `radial-gradient(circle, rgba(49,130,246,${isLight ? 0.12 : 0.35}) 0%, rgba(120,180,255,${isLight ? 0.06 : 0.15}) 40%, transparent 70%)` }}
       />
       <div
         className="absolute top-[-10%] left-[-5%] w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] lg:w-[400px] lg:h-[400px] rounded-full blur-[60px] sm:blur-[100px] pointer-events-none"
-        style={{ background: `radial-gradient(circle, rgba(234,88,12,${isLight ? 0.03 : 0.08}) 0%, transparent 70%)` }}
+        style={{ background: `radial-gradient(circle, rgba(49,130,246,${isLight ? 0.03 : 0.08}) 0%, transparent 70%)` }}
       />
 
       {/* Nav */}
@@ -132,7 +132,7 @@ export default function LandingPage() {
           >
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tighter leading-[1.1] mb-6" style={{ fontFamily: "var(--font-korean), sans-serif" }}>
               {displayText}
-              <span className={`inline-block w-[3px] sm:w-[5px] h-[0.75em] bg-orange-500 ml-1 align-baseline rounded-sm ${typingDone ? "animate-pulse" : ""}`} />
+              <span className={`inline-block w-[3px] sm:w-[5px] h-[0.75em] bg-accent ml-1 align-baseline rounded-sm ${typingDone ? "animate-pulse" : ""}`} />
             </h1>
             <p className="text-text-tertiary text-sm sm:text-base max-w-sm leading-relaxed mb-8">
               {t.desc}
@@ -140,7 +140,7 @@ export default function LandingPage() {
             <div className="flex flex-wrap gap-3 mb-8">
               <Link
                 href={LINKS.blog}
-                className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-orange-500 text-white font-semibold text-sm hover:bg-orange-400 transition-colors"
+                className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-white font-semibold text-sm hover:bg-accent-hover transition-colors"
               >
                 <HiOutlineBookOpen size={18} />
                 {t.blog}
@@ -180,7 +180,7 @@ export default function LandingPage() {
               mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
             }`}
           >
-            <div className="rounded-3xl overflow-hidden border border-border-color shadow-2xl shadow-orange-500/5">
+            <div className="rounded-3xl overflow-hidden border border-border-color shadow-2xl shadow-blue-500/5">
               <Image
                 src="/images/main_1.jpeg"
                 alt="전대홍 - 오픈소스 컨퍼런스 발표"
@@ -213,7 +213,7 @@ export default function LandingPage() {
             {views && (
               <>
                 <span className="flex items-center gap-1.5 text-xs text-text-tertiary">
-                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500/60" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500/60" />
                   Total
                   <span className="text-text-secondary font-semibold tabular-nums">{views.total.toLocaleString()}</span>
                 </span>

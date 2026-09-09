@@ -78,7 +78,7 @@ export default function PostClient({
       )}
 
       <header className="mb-6 sm:mb-10 pb-4 sm:pb-6 border-b border-border-color">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight mb-3 sm:mb-4 text-text-primary leading-snug">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 sm:mb-4 text-text-primary leading-snug">
           {title}
         </h1>
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-[12px] sm:text-[13px] text-text-tertiary">
