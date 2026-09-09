@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-
-const SITE_URL = "https://daehong.dev";
+import { SITE_URL } from "@/lib/site";
 
 export async function GET() {
   const posts = await prisma.post.findMany({

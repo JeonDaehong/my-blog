@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono, Noto_Sans_KR } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
+import { SITE_URL } from "@/lib/site";
 import NavigationProgress from "@/components/NavigationProgress";
 
 const inter = Inter({
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     template: "%s | 대홍의 데이터 기록",
   },
   description: "데이터 엔지니어링, 백엔드, 오픈소스를 기록하는 기술 블로그",
-  metadataBase: new URL("https://daehong.dev"),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     title: "대홍의 데이터 기록",
     description: "데이터 엔지니어링, 백엔드, 오픈소스를 기록하는 기술 블로그",
