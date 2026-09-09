@@ -232,12 +232,7 @@ export function CommentsCard({ comments }: { comments: CommentPreview[] }) {
       <ul className="space-y-4">
         {comments.map((comment) => (
           <li key={comment.id}>
-            <a
-              href={comment.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-start gap-2.5"
-            >
+            <Link href={comment.href} className="group flex items-start gap-2.5">
               {comment.avatar ? (
                 <Image
                   src={comment.avatar}
@@ -258,9 +253,9 @@ export function CommentsCard({ comments }: { comments: CommentPreview[] }) {
                   {comment.author} ·{" "}
                   {format(new Date(comment.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
                 </p>
-                <p className="mt-0.5 text-[11px] text-accent truncate">{comment.postTitle}</p>
+                <p className="mt-0.5 text-[11px] text-accent truncate">{comment.label}</p>
               </div>
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

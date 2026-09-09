@@ -3,6 +3,7 @@ import { JetBrains_Mono } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
+import { I18nProvider } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 import NavigationProgress from "@/components/NavigationProgress";
 
@@ -71,10 +72,12 @@ export default function RootLayout({
       </head>
       <body className="min-h-full font-sans">
         <ThemeProvider>
-          <Suspense fallback={null}>
-            <NavigationProgress />
-          </Suspense>
-          {children}
+          <I18nProvider>
+            <Suspense fallback={null}>
+              <NavigationProgress />
+            </Suspense>
+            {children}
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

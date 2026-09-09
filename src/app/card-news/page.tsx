@@ -12,6 +12,7 @@ import {
   HiOutlineMoon,
 } from "react-icons/hi2";
 import { useTheme } from "@/components/ThemeProvider";
+import { useI18n } from "@/lib/i18n";
 
 /* ─────────────────────────────────────────────
    데이터 구조: 대카테고리 > 소카테고리 > 카드들
@@ -324,7 +325,8 @@ type View =
 export default function CardNewsPage() {
   const [view, setView] = useState<View>({ step: "bigCategories" });
   const [modalCards, setModalCards] = useState<Card[] | null>(null);
-  const [lang, setLang] = useState<"ko" | "en">("en");
+  // 언어는 헤더 토글과 같은 값을 쓰도록 전역 컨텍스트에서 받는다.
+  const { locale: lang, setLocale: setLang } = useI18n();
   const { theme, toggleTheme } = useTheme();
   const t = TEXT[lang];
 

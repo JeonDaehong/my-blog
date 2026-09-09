@@ -15,6 +15,7 @@ import {
 } from "react-icons/hi2";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { useTheme } from "@/components/ThemeProvider";
+import { useI18n } from "@/lib/i18n";
 
 const LINKS = {
   blog: "/posts",
@@ -47,7 +48,8 @@ const TEXT = {
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
-  const [lang, setLang] = useState<"ko" | "en">("en");
+  // 언어는 헤더 토글과 같은 값을 쓰도록 전역 컨텍스트에서 받는다.
+  const { locale: lang, setLocale: setLang } = useI18n();
   const [displayText, setDisplayText] = useState("");
   const [typingDone, setTypingDone] = useState(false);
   const [views, setViews] = useState<{ total: number; today: number } | null>(null);

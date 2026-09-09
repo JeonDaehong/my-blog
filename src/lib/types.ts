@@ -100,9 +100,11 @@ export type CommentPreview = {
   author: string;
   avatar: string | null;
   body: string;
-  url: string;
   createdAt: string;
-  postTitle: string;
+  /** 댓글이 달린 사이트 내부 경로 */
+  href: string;
+  /** 경로 대신 보여줄 사람이 읽는 제목 */
+  label: string;
 };
 
 /** /posts 좌측에 붙는 부가 섹션 데이터. 검색 중이거나 2페이지 이후에는 비운다. */

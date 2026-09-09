@@ -1,6 +1,5 @@
 "use client";
 
-import { I18nProvider } from "@/lib/i18n";
 import TopBar from "./TopBar";
 
 type Category = {
@@ -19,7 +18,7 @@ export default function BlogLayoutClient({
   categories: Category[];
 }) {
   return (
-    <I18nProvider>
+    <>
       <a href="#main-content" className="skip-to-content">
         Skip to content
       </a>
@@ -32,6 +31,6 @@ export default function BlogLayoutClient({
           {children}
         </main>
       </div>
-    </I18nProvider>
+    </>
   );
 }

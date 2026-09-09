@@ -1,8 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
-import type { PostSummary, PaginationMeta, PostsExtras } from "@/lib/types";
+import type {
+  PostSummary,
+  PaginationMeta,
+  PostsExtras,
+  CommentPreview,
+} from "@/lib/types";
 import { postSummarySelect } from "@/lib/queries";
 import { fetchRecentComments } from "@/lib/giscus";
+import type { RawComment } from "@/lib/giscus";
 import PostsClient from "./PostsClient";
 
 export const revalidate = 60;
@@ -33,12 +39,53 @@ function serialize(post: {
 }
 
 /**
- * 추천·인기·방명록 섹션. 첫 화면에서만 보여주고, 실패해도 목록 자체는 뜨도록
- * 빈 값으로 떨어뜨린다. 인기 글은 PageView 집계를 실제로 읽는다.
+ * Giscus는 pathname으로 토론을 만들기 때문에 제목이 "posts/some-slug" 같은
+ * 경로다. 그대로 노출하면 읽기 나쁘니 실제 글 제목으로 바꾸고, 링크도
+ * GitHub이 아니라 사이트 안쪽을 가리키게 한다.
+ */
+async function resolveComments(raw: RawComment[]): Promise<CommentPreview[]> {
+  if (raw.length === 0) return [];
+
+  const slugs = raw
+    .filter((c) => c.pathname.startsWith("posts/"))
+    .map((c) => decodeURIComponent(c.pathname.slice("posts/".length)));
+
+  const titleBySlug = new Map<string, string>();
+  if (slugs.length > 0) {
+    const posts = await prisma.post.findMany({
+      where: { slug: { in: slugs } },
+      select: { slug: true, title: true },
+    });
+    for (const post of posts) titleBySlug.set(post.slug, post.title);
+  }
+
+  return raw.map((comment) => {
+    if (comment.pathname.startsWith("posts/")) {
+      const slug = decodeURIComponent(comment.pathname.slice("posts/".length));
+      return {
+        ...comment,
+        href: `/posts/${slug}`,
+        label: titleBySlug.get(slug) ?? slug,
+      };
+    }
+    if (comment.pathname === "guestbook") {
+      return { ...comment, href: "/guestbook", label: "방명록" };
+    }
+    return {
+      ...comment,
+      href: `/${comment.pathname}`,
+      label: comment.pathname,
+    };
+  });
+}
+
+/**
+ * 추천·인기·방명록·댓글 섹션. 첫 화면에서만 보여주고, 실패해도 목록 자체는
+ * 뜨도록 빈 값으로 떨어뜨린다. 인기 글은 PageView 집계를 실제로 읽는다.
  */
 async function loadExtras(): Promise<PostsExtras> {
   try {
-    const [featuredRaw, viewGroups, guestbookRaw, comments] = await Promise.all([
+    const [featuredRaw, viewGroups, guestbookRaw, rawComments] = await Promise.all([
       prisma.post.findMany({
         where: { published: true },
         orderBy: { createdAt: "desc" },
@@ -84,7 +131,7 @@ async function loadExtras(): Promise<PostsExtras> {
         ...entry,
         createdAt: entry.createdAt.toISOString(),
       })),
-      comments,
+      comments: await resolveComments(rawComments),
     };
   } catch (err) {
     console.error("[PostsPage] Failed to load extras:", err);

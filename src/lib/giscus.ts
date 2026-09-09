@@ -1,7 +1,16 @@
-import type { CommentPreview } from "@/lib/types";
-
 const REPO_OWNER = "JeonDaehong";
 const REPO_NAME = "my-blog";
+
+/** Giscus는 pathname 매핑이라 토론 제목이 곧 경로다. 제목 변환은 호출부에서 한다. */
+export type RawComment = {
+  id: string;
+  author: string;
+  avatar: string | null;
+  body: string;
+  createdAt: string;
+  /** 토론 제목 = 댓글이 달린 페이지의 경로 (예: "posts/some-slug", "guestbook") */
+  pathname: string;
+};
 
 type GraphQLResponse = {
   data?: {
@@ -9,12 +18,10 @@ type GraphQLResponse = {
       discussions?: {
         nodes?: Array<{
           title: string;
-          url: string;
           comments?: {
             nodes?: Array<{
               id: string;
               body: string;
-              url: string;
               createdAt: string;
               author?: { login?: string; avatarUrl?: string } | null;
             }> | null;
@@ -29,15 +36,13 @@ type GraphQLResponse = {
 const QUERY = `
   query RecentComments($owner: String!, $name: String!) {
     repository(owner: $owner, name: $name) {
-      discussions(first: 15, orderBy: { field: UPDATED_AT, direction: DESC }) {
+      discussions(first: 20, orderBy: { field: UPDATED_AT, direction: DESC }) {
         nodes {
           title
-          url
           comments(last: 5) {
             nodes {
               id
               body
-              url
               createdAt
               author { login avatarUrl }
             }
@@ -49,11 +54,11 @@ const QUERY = `
 `;
 
 /**
- * 댓글은 Giscus(GitHub Discussions)에 있고, Discussions 조회는 GraphQL이라
- * 토큰이 필요하다. GITHUB_TOKEN이 없으면 조용히 빈 배열을 돌려주고,
+ * 댓글은 Giscus(GitHub Discussions)에 있고, Discussions는 GraphQL로만 읽을 수
+ * 있어 토큰이 필요하다. GITHUB_TOKEN이 없으면 조용히 빈 배열을 돌려주고
  * 화면에서는 섹션 자체가 사라진다.
  */
-export async function fetchRecentComments(limit = 3): Promise<CommentPreview[]> {
+export async function fetchRecentComments(limit = 3): Promise<RawComment[]> {
   const token = process.env.GITHUB_TOKEN;
   if (!token) return [];
 
@@ -82,17 +87,18 @@ export async function fetchRecentComments(limit = 3): Promise<CommentPreview[]> 
       return [];
     }
 
-    const comments: CommentPreview[] = [];
+    const comments: RawComment[] = [];
     for (const discussion of json.data?.repository?.discussions?.nodes ?? []) {
       for (const comment of discussion.comments?.nodes ?? []) {
+        const body = comment.body.replace(/\s+/g, " ").trim();
+        if (!body) continue;
         comments.push({
           id: comment.id,
           author: comment.author?.login ?? "anonymous",
           avatar: comment.author?.avatarUrl ?? null,
-          body: comment.body.replace(/\s+/g, " ").trim(),
-          url: comment.url,
+          body,
           createdAt: comment.createdAt,
-          postTitle: discussion.title,
+          pathname: discussion.title.replace(/^\/+/, ""),
         });
       }
     }
