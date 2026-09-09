@@ -230,16 +230,19 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                     )}
                   </div>
 
-                  <div className="shrink-0 w-[104px] sm:w-[220px]">
+                  {/*
+                    좁은 화면에서는 고정 폭이 너무 작아 보여서 화면 비율로 잡고,
+                    self-stretch로 행 높이를 채워 텍스트 옆에 떠 보이지 않게 한다.
+                  */}
+                  <div className="shrink-0 self-stretch w-[38%] max-w-[150px] sm:w-[220px] sm:max-w-none">
                     <div
-                      className="relative w-full rounded-xl overflow-hidden bg-bg-tertiary"
-                      style={{ aspectRatio: "16 / 9" }}
+                      className="relative w-full h-full min-h-[86px] sm:min-h-[124px] rounded-xl overflow-hidden bg-bg-tertiary"
                     >
                       <Image
                         src={post.coverImage || "/images/default-thumbnail.png"}
                         alt=""
                         fill
-                        sizes="(max-width: 640px) 104px, 220px"
+                        sizes="(max-width: 640px) 40vw, 220px"
                         className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
                       />
                     </div>
