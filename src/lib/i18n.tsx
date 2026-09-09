@@ -21,6 +21,9 @@ const translations = {
     adminDesc: "글 작성, 카테고리 관리",
     latestPosts: "최신 글",
     viewAll: "전체보기",
+    featured: "추천 아티클",
+    popularPosts: "인기 있는 글",
+    recentGuestbook: "최근 방명록",
     noPosts: "아직 작성된 글이 없습니다",
     noPostsDesc: "관리자 페이지에서 첫 글을 작성해 보세요",
 
@@ -86,6 +89,9 @@ const translations = {
     adminDesc: "Write posts, manage categories",
     latestPosts: "Latest Posts",
     viewAll: "View all",
+    featured: "Featured",
+    popularPosts: "Popular",
+    recentGuestbook: "Recent guestbook",
     noPosts: "No posts yet",
     noPostsDesc: "Create your first post from the admin page",
 

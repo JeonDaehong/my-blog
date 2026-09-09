@@ -79,3 +79,25 @@ export type PostDetail = {
   category: CategoryBasic | null;
   hasContentEn: boolean;
 };
+
+export type PopularPost = {
+  slug: string;
+  title: string;
+  titleEn: string | null;
+  views: number;
+};
+
+export type GuestbookPreview = {
+  id: string;
+  nickname: string;
+  message: string;
+  emoji: string;
+  createdAt: string;
+};
+
+/** /posts 상단·하단에 붙는 부가 섹션 데이터. 검색 중이거나 2페이지 이후에는 비운다. */
+export type PostsExtras = {
+  featured: PostSummary[];
+  popular: PopularPost[];
+  guestbook: GuestbookPreview[];
+};

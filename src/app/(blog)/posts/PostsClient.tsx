@@ -16,7 +16,8 @@ import {
 import { HiOutlineViewGrid, HiOutlineViewList } from "react-icons/hi";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
-import type { PostSummary, PaginationMeta } from "@/lib/types";
+import type { PostSummary, PaginationMeta, PostsExtras } from "@/lib/types";
+import { FeaturedRow, HighlightSections } from "@/components/PostsHighlights";
 
 type ViewMode = "card" | "list";
 
@@ -24,9 +25,10 @@ type Props = {
   posts: PostSummary[];
   pagination: PaginationMeta;
   query?: string | null;
+  extras: PostsExtras;
 };
 
-export default function PostsClient({ posts, pagination, query }: Props) {
+export default function PostsClient({ posts, pagination, query, extras }: Props) {
   const router = useRouter();
   const { locale, t } = useI18n();
   const dateLocale = locale === "ko" ? ko : enUS;
@@ -82,6 +84,8 @@ export default function PostsClient({ posts, pagination, query }: Props) {
 
   return (
     <div>
+      <FeaturedRow posts={extras.featured} />
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6 sm:mb-8">
         <div>
@@ -296,6 +300,8 @@ export default function PostsClient({ posts, pagination, query }: Props) {
           </button>
         </div>
       )}
+
+      <HighlightSections popular={extras.popular} guestbook={extras.guestbook} />
     </div>
   );
 }
