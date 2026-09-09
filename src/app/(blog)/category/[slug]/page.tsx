@@ -8,6 +8,16 @@ export const revalidate = 60;
 
 type Props = { params: { slug: string } };
 
+export async function generateStaticParams() {
+  try {
+    const categories = await prisma.category.findMany({ select: { slug: true } });
+    return categories.map((category) => ({ slug: category.slug }));
+  } catch (err) {
+    console.error("[generateStaticParams] 카테고리 조회 실패:", err);
+    return [];
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = decodeURIComponent(params.slug);
   const category = await prisma.category.findUnique({ where: { slug } });
