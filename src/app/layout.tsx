@@ -1,24 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Noto_Sans_KR } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { SITE_URL } from "@/lib/site";
 import NavigationProgress from "@/components/NavigationProgress";
 
-const inter = Inter({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const notoSansKR = Noto_Sans_KR({
-  variable: "--font-korean",
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-  display: "swap",
-  preload: true,
-});
+/**
+ * Pretendard (SIL OFL 1.1) — 동적 서브셋.
+ * 가변 폰트 전체는 2MB라 한글 사이트에 부담이라, 브라우저가 실제 쓰는
+ * 유니코드 구간만 30KB 내외로 받아가는 dynamic-subset 배포본을 쓴다.
+ */
+const PRETENDARD_CSS =
+  "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
@@ -59,9 +53,11 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${inter.variable} ${notoSansKR.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${jetbrainsMono.variable} h-full antialiased`}
     >
       <head>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={PRETENDARD_CSS} />
         {/*
           기본값이 라이트이므로, 다크를 선택한 방문자가 흰 화면을 한 번 보고
           어두워지는 깜빡임이 생긴다. 페인트 전에 저장된 테마를 먼저 적용한다.

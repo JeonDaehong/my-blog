@@ -4,6 +4,11 @@
 
 /* Light theme (default) — Toss 계열 그레이 스케일 + 블루 액센트 */
 :root {
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  /* 랜딩 제목이 참조하는 변수. 이제 본문과 같은 서체를 쓴다. */
+  --font-korean: var(--font-sans);
+
   --bg-primary: #ffffff;
   --bg-secondary: #f9fafb;
   --bg-tertiary: #f2f4f6;
