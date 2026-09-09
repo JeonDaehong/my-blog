@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import Image from "next/image";
 import { useI18n } from "@/lib/i18n";
 import { useTheme } from "@/components/ThemeProvider";
 import {
@@ -12,7 +14,7 @@ import {
   HiOutlineFolder,
 } from "react-icons/hi2";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { format } from "date-fns";
 
 type SearchResult = {
@@ -26,8 +28,16 @@ type SearchResult = {
   category: { name: string; nameEn: string | null } | null;
 };
 
-export default function TopBar() {
+type NavCategory = {
+  id: string;
+  name: string;
+  nameEn?: string | null;
+  slug: string;
+};
+
+export default function TopBar({ categories }: { categories: NavCategory[] }) {
   const { locale, setLocale, t } = useI18n();
+  const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -137,13 +147,50 @@ export default function TopBar() {
   const showResults = searchOpen && query.trim().length >= 2;
   const hasResults = results.length > 0;
 
+  // "전체"는 글 목록과 개별 글 모두에서 활성으로 둬서 위치 감각을 유지한다.
+  const navTabs = [
+    {
+      href: "/posts",
+      label: t("allPosts"),
+      active: pathname === "/posts" || pathname.startsWith("/posts/"),
+    },
+    ...categories.map((category) => ({
+      href: `/category/${category.slug}`,
+      label: locale === "en" && category.nameEn ? category.nameEn : category.name,
+      active: pathname === `/category/${category.slug}`,
+    })),
+  ];
+
   return (
     <>
-      <header className="sticky top-0 z-20 h-14 flex items-center justify-between px-4 sm:px-6 border-b border-border-color bg-bg-primary/80 backdrop-blur-md">
-        {/* 좌측은 모바일 햄버거 버튼 자리로 비워 둔다 (우측 컨트롤 정렬 유지) */}
-        <div className="ml-10 lg:ml-0" />
+      <header className="sticky top-0 z-20 border-b border-border-color bg-bg-primary/80 backdrop-blur-md">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="h-14 flex items-center justify-between gap-3">
+            <Link href="/" className="flex items-center gap-2.5 shrink-0">
+              <Image
+                src="/images/img.jpg"
+                alt=""
+                width={28}
+                height={28}
+                className="w-7 h-7 rounded-md object-cover"
+              />
+              <span className="hidden sm:inline font-semibold text-[15px] text-text-primary tracking-tight">
+                Daehong Blog
+              </span>
+            </Link>
 
         <div className="flex items-center gap-1">
+          <Link
+            href="/guestbook"
+            className={`px-2 sm:px-2.5 py-1.5 rounded-md text-[13px] whitespace-nowrap transition-colors ${
+              pathname === "/guestbook"
+                ? "text-accent font-medium"
+                : "text-text-tertiary hover:text-text-primary hover:bg-bg-hover"
+            }`}
+          >
+            {t("guestbook")}
+          </Link>
+
           {/* Theme toggle */}
           <button
             onClick={toggleTheme}
@@ -172,6 +219,25 @@ export default function TopBar() {
               /
             </kbd>
           </button>
+        </div>
+          </div>
+
+          {/* 카테고리 탭 — 사이드바를 대신하는 주 내비게이션 */}
+          <nav className="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            {navTabs.map((tab) => (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className={`shrink-0 whitespace-nowrap border-b-2 pb-2.5 pt-0.5 text-[14px] transition-colors ${
+                  tab.active
+                    ? "border-accent text-accent font-semibold"
+                    : "border-transparent text-text-tertiary hover:text-text-primary"
+                }`}
+              >
+                {tab.label}
+              </Link>
+            ))}
+          </nav>
         </div>
       </header>
 

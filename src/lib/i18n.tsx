@@ -9,12 +9,7 @@ const translations = {
     // Nav
     allPosts: "전체 글",
     admin: "관리자",
-    navigation: "네비게이션",
-    categories: "카테고리",
-    settings: "설정",
-    extras: "기타",
     guestbook: "방명록",
-    games: "웹게임",
     search: "검색...",
 
     // Home
@@ -80,12 +75,7 @@ const translations = {
   en: {
     allPosts: "All Posts",
     admin: "Admin",
-    navigation: "Navigation",
-    categories: "Categories",
-    settings: "Settings",
-    extras: "Others",
     guestbook: "Guestbook",
-    games: "Games",
     search: "Search...",
 
     welcome: "Welcome",

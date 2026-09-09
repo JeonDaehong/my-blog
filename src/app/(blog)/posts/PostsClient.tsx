@@ -182,14 +182,14 @@ export default function PostsClient({ posts, pagination, query }: Props) {
                   sizes="(max-width: 640px) 100vw, 50vw"
                   className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
                 />
+              </div>
+              <div className="px-4 sm:px-5 py-4 sm:py-5">
                 {post.category && (
-                  <span className="absolute top-3 left-3 text-[11px] px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white/90 border border-white/10 font-medium">
+                  <span className="block text-[12px] font-semibold text-accent mb-1.5">
                     {getCatName(post.category)}
                   </span>
                 )}
-              </div>
-              <div className="px-3 sm:px-4 py-3 sm:py-4">
-                <h2 className="text-[14px] sm:text-[15px] font-semibold text-text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-1.5 sm:mb-2">
+                <h2 className="text-[16px] sm:text-[18px] font-bold text-text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-1.5 sm:mb-2">
                   {getTitle(post)}
                 </h2>
                 {getExcerpt(post) && (

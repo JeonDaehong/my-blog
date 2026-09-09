@@ -1,7 +1,6 @@
 "use client";
 
 import { I18nProvider } from "@/lib/i18n";
-import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 
 type Category = {
@@ -24,14 +23,14 @@ export default function BlogLayoutClient({
       <a href="#main-content" className="skip-to-content">
         Skip to content
       </a>
-      <div className="flex min-h-screen">
-        <Sidebar categories={categories} />
-        <div className="flex-1 lg:pl-[260px]">
-          <TopBar />
-          <main id="main-content" className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
-            {children}
-          </main>
-        </div>
+      <div className="min-h-screen">
+        <TopBar categories={categories} />
+        <main
+          id="main-content"
+          className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10"
+        >
+          {children}
+        </main>
       </div>
     </I18nProvider>
   );

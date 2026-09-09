@@ -66,8 +66,8 @@ export default function CategoryClient({ category }: { category: any }) {
               </div>
 
               {/* Content */}
-              <div className="px-3 sm:px-4 py-3 sm:py-4">
-                <h2 className="text-[14px] sm:text-[15px] font-semibold text-text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-1.5 sm:mb-2">
+              <div className="px-4 sm:px-5 py-4 sm:py-5">
+                <h2 className="text-[16px] sm:text-[18px] font-bold text-text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-1.5 sm:mb-2">
                   {getTitle(post)}
                 </h2>
                 {getExcerpt(post) && (
