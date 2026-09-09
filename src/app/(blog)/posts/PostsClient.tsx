@@ -19,8 +19,8 @@ import type { PostSummary, PaginationMeta, PostsExtras } from "@/lib/types";
 import {
   FeaturedHero,
   PopularCard,
-  GuestbookCard,
   CommentsCard,
+  CardNewsCard,
 } from "@/components/PostsHighlights";
 
 type ViewMode = "card" | "list";
@@ -85,8 +85,8 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
   const isSearching = !!query;
   const hasAside =
     extras.popular.length > 0 ||
-    extras.guestbook.length > 0 ||
-    extras.comments.length > 0;
+    extras.comments.length > 0 ||
+    extras.cardNews.length > 0;
 
   return (
     <div>
@@ -337,7 +337,7 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
           <aside className="space-y-5 lg:sticky lg:top-28 self-start">
             <PopularCard posts={extras.popular} />
             <CommentsCard comments={extras.comments} />
-            <GuestbookCard entries={extras.guestbook} />
+            <CardNewsCard cards={extras.cardNews} />
           </aside>
         )}
       </div>

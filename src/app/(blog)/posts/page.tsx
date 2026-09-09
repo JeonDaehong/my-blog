@@ -8,6 +8,7 @@ import type {
 } from "@/lib/types";
 import { postSummarySelect } from "@/lib/queries";
 import { fetchRecentComments } from "@/lib/giscus";
+import { getRecentCards } from "@/lib/card-news";
 import type { RawComment } from "@/lib/giscus";
 import PostsClient from "./PostsClient";
 
@@ -17,8 +18,8 @@ const POSTS_PER_PAGE = 10;
 const EMPTY_EXTRAS: PostsExtras = {
   featured: [],
   popular: [],
-  guestbook: [],
   comments: [],
+  cardNews: [],
 };
 
 function serialize(post: {
@@ -80,12 +81,12 @@ async function resolveComments(raw: RawComment[]): Promise<CommentPreview[]> {
 }
 
 /**
- * 추천·인기·방명록·댓글 섹션. 첫 화면에서만 보여주고, 실패해도 목록 자체는
+ * 추천·인기·댓글·카드뉴스 섹션. 첫 화면에서만 보여주고, 실패해도 목록 자체는
  * 뜨도록 빈 값으로 떨어뜨린다. 인기 글은 PageView 집계를 실제로 읽는다.
  */
 async function loadExtras(): Promise<PostsExtras> {
   try {
-    const [featuredRaw, viewGroups, guestbookRaw, rawComments] = await Promise.all([
+    const [featuredRaw, viewGroups, rawComments] = await Promise.all([
       prisma.post.findMany({
         where: { published: true },
         orderBy: { createdAt: "desc" },
@@ -97,11 +98,6 @@ async function loadExtras(): Promise<PostsExtras> {
         _count: { path: true },
         orderBy: { _count: { path: "desc" } },
         take: 20,
-      }),
-      prisma.guestbookEntry.findMany({
-        orderBy: { createdAt: "desc" },
-        take: 3,
-        select: { id: true, nickname: true, message: true, emoji: true, createdAt: true },
       }),
       fetchRecentComments(3),
     ]);
@@ -127,11 +123,8 @@ async function loadExtras(): Promise<PostsExtras> {
         .map((post) => ({ ...post, views: viewsBySlug.get(post.slug) ?? 0 }))
         .sort((a, b) => b.views - a.views)
         .slice(0, 3),
-      guestbook: guestbookRaw.map((entry) => ({
-        ...entry,
-        createdAt: entry.createdAt.toISOString(),
-      })),
       comments: await resolveComments(rawComments),
+      cardNews: getRecentCards(3),
     };
   } catch (err) {
     console.error("[PostsPage] Failed to load extras:", err);

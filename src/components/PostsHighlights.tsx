@@ -7,12 +7,8 @@ import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { useI18n } from "@/lib/i18n";
-import type {
-  PostSummary,
-  PopularPost,
-  GuestbookPreview,
-  CommentPreview,
-} from "@/lib/types";
+import type { PostSummary, PopularPost, CommentPreview } from "@/lib/types";
+import type { CardNewsPreview } from "@/lib/card-news";
 
 const AUTO_ADVANCE_MS = 5000;
 
@@ -186,17 +182,16 @@ export function PopularCard({ posts }: { posts: PopularPost[] }) {
   );
 }
 
-export function GuestbookCard({ entries }: { entries: GuestbookPreview[] }) {
+export function CardNewsCard({ cards }: { cards: CardNewsPreview[] }) {
   const { locale, t } = useI18n();
-  const dateLocale = locale === "ko" ? ko : enUS;
-  if (entries.length === 0) return null;
+  if (cards.length === 0) return null;
 
   return (
     <SidebarCard
-      title={t("recentGuestbook")}
+      title={t("recentCardNews")}
       action={
         <Link
-          href="/guestbook"
+          href="/card-news"
           className="text-[12px] text-text-tertiary hover:text-accent transition-colors"
         >
           {t("viewAll")}
@@ -204,17 +199,27 @@ export function GuestbookCard({ entries }: { entries: GuestbookPreview[] }) {
       }
     >
       <ul className="space-y-4">
-        {entries.map((entry) => (
-          <li key={entry.id} className="flex items-start gap-2.5">
-            <span className="shrink-0 text-base leading-none mt-0.5">{entry.emoji}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] text-text-secondary leading-relaxed line-clamp-2 break-words">
-                {entry.message}
-              </p>
-              <p className="mt-1 text-[12px] text-text-tertiary truncate">
-                {entry.nickname} · {format(new Date(entry.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
-              </p>
-            </div>
+        {cards.map((card) => (
+          <li key={card.id}>
+            <Link href="/card-news" className="group flex items-start gap-2.5">
+              <span
+                className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-[15px] border"
+                style={{
+                  background: `${card.accent}14`,
+                  borderColor: `${card.accent}33`,
+                }}
+              >
+                {card.icon}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-text-primary group-hover:text-accent transition-colors leading-snug line-clamp-2">
+                  {locale === "en" && card.titleEn ? card.titleEn : card.title}
+                </p>
+                <p className="mt-1 text-[12px] text-text-tertiary truncate">
+                  {locale === "en" && card.topicEn ? card.topicEn : card.topic}
+                </p>
+              </div>
+            </Link>
           </li>
         ))}
       </ul>

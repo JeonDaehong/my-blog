@@ -1,3 +1,5 @@
+import type { CardNewsPreview } from "@/lib/card-news";
+
 export type CategoryBasic = {
   id: string;
   name: string;
@@ -87,13 +89,6 @@ export type PopularPost = {
   views: number;
 };
 
-export type GuestbookPreview = {
-  id: string;
-  nickname: string;
-  message: string;
-  emoji: string;
-  createdAt: string;
-};
 
 export type CommentPreview = {
   id: string;
@@ -111,6 +106,6 @@ export type CommentPreview = {
 export type PostsExtras = {
   featured: PostSummary[];
   popular: PopularPost[];
-  guestbook: GuestbookPreview[];
   comments: CommentPreview[];
+  cardNews: CardNewsPreview[];
 };
