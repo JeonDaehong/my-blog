@@ -2,7 +2,8 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import type { PostWithCategory } from "@/lib/types";
+import type { PostDetail } from "@/lib/types";
+import { renderMarkdown } from "@/lib/markdown";
 import PostClient from "./PostClient";
 
 export const revalidate = 60;
@@ -52,14 +53,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function JsonLd({ post }: { post: PostWithCategory }) {
+type PostRecord = NonNullable<Awaited<ReturnType<typeof getPost>>>;
+
+function JsonLd({ post }: { post: PostRecord }) {
   const data = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
     description: post.excerpt || post.title,
-    datePublished: post.createdAt,
-    dateModified: post.updatedAt || post.createdAt,
+    datePublished: post.createdAt.toISOString(),
+    dateModified: (post.updatedAt || post.createdAt).toISOString(),
     author: { "@type": "Person", name: "Daehong Jeon" },
     ...(post.coverImage && { image: post.coverImage }),
   };
@@ -71,16 +74,23 @@ function JsonLd({ post }: { post: PostWithCategory }) {
   );
 }
 
-function serializePost(post: Awaited<ReturnType<typeof prisma.post.findUnique>> & { category: Awaited<ReturnType<typeof prisma.category.findUnique>> | null }): PostWithCategory {
+/** 본문(content/contentEn)은 서버에서 이미 HTML로 렌더하므로 클라이언트로 보내지 않는다. */
+function toPostDetail(post: PostRecord): PostDetail {
   return {
-    ...post!,
-    createdAt: post!.createdAt.toISOString(),
-    updatedAt: post!.updatedAt.toISOString(),
-    category: post!.category
+    id: post.id,
+    title: post.title,
+    titleEn: post.titleEn,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    excerptEn: post.excerptEn,
+    coverImage: post.coverImage,
+    createdAt: post.createdAt.toISOString(),
+    hasContentEn: Boolean(post.contentEn),
+    category: post.category
       ? {
-          ...post!.category,
-          createdAt: post!.category.createdAt.toISOString(),
-          updatedAt: post!.category.updatedAt.toISOString(),
+          ...post.category,
+          createdAt: post.category.createdAt.toISOString(),
+          updatedAt: post.category.updatedAt.toISOString(),
         }
       : null,
   };
@@ -92,26 +102,28 @@ export default async function PostPage({ params }: Props) {
 
   if (!post) notFound();
 
-  const serializedPost = serializePost(post);
-
-  const [prevPost, nextPost] = await Promise.all([
-    prisma.post.findFirst({
-      where: { published: true, createdAt: { lt: post.createdAt } },
-      orderBy: { createdAt: "desc" },
-      select: { slug: true, title: true },
-    }),
-    prisma.post.findFirst({
-      where: { published: true, createdAt: { gt: post.createdAt } },
-      orderBy: { createdAt: "asc" },
-      select: { slug: true, title: true },
-    }),
+  const [rendered, [prevPost, nextPost]] = await Promise.all([
+    renderMarkdown(post.content),
+    Promise.all([
+      prisma.post.findFirst({
+        where: { published: true, createdAt: { lt: post.createdAt } },
+        orderBy: { createdAt: "desc" },
+        select: { slug: true, title: true },
+      }),
+      prisma.post.findFirst({
+        where: { published: true, createdAt: { gt: post.createdAt } },
+        orderBy: { createdAt: "asc" },
+        select: { slug: true, title: true },
+      }),
+    ]),
   ]);
 
   return (
     <>
-      <JsonLd post={serializedPost} />
+      <JsonLd post={post} />
       <PostClient
-        post={serializedPost}
+        post={toPostDetail(post)}
+        rendered={rendered}
         prevPost={prevPost ? { slug: prevPost.slug, title: prevPost.title } : null}
         nextPost={nextPost ? { slug: nextPost.slug, title: nextPost.title } : null}
       />

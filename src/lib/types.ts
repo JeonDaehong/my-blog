@@ -52,3 +52,30 @@ export type PaginatedPosts = {
   posts: PostSummary[];
   pagination: PaginationMeta;
 };
+
+export type TocItem = {
+  id: string;
+  text: string;
+  level: number;
+};
+
+/** 서버에서 미리 렌더한 본문. 원본 마크다운은 클라이언트로 보내지 않는다. */
+export type RenderedMarkdown = {
+  html: string;
+  toc: TocItem[];
+  readingTime: number;
+};
+
+/** 글 상세 화면이 쓰는 메타데이터. content/contentEn은 제외한다. */
+export type PostDetail = {
+  id: string;
+  title: string;
+  titleEn: string | null;
+  slug: string;
+  excerpt: string | null;
+  excerptEn: string | null;
+  coverImage: string | null;
+  createdAt: string;
+  category: CategoryBasic | null;
+  hasContentEn: boolean;
+};

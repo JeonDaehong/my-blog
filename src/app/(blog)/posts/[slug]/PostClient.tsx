@@ -7,44 +7,56 @@ import Link from "next/link";
 import Image from "next/image";
 import { HiOutlineArrowLeft, HiOutlineArrowRight, HiOutlineCalendar, HiOutlineFolder, HiOutlineEye, HiOutlineClock } from "react-icons/hi2";
 import { useI18n } from "@/lib/i18n";
-import MarkdownRenderer from "@/components/MarkdownRenderer";
+import PostBody from "@/components/PostBody";
 import TableOfContents from "@/components/TableOfContents";
 import Giscus from "@/components/Giscus";
-import type { PostWithCategory } from "@/lib/types";
+import type { PostDetail, RenderedMarkdown } from "@/lib/types";
 
 type AdjacentPost = { slug: string; title: string } | null;
 
-function getReadingTime(content: string): number {
-  const words = content.replace(/[#*`~\[\]()!>|-]/g, "").trim().split(/\s+/).length;
-  return Math.max(1, Math.round(words / 200));
-}
-
 export default function PostClient({
   post,
+  rendered,
   prevPost,
   nextPost,
 }: {
-  post: PostWithCategory;
+  post: PostDetail;
+  rendered: RenderedMarkdown;
   prevPost?: AdjacentPost;
   nextPost?: AdjacentPost;
 }) {
   const { locale, t } = useI18n();
   const [viewCount, setViewCount] = useState<number | null>(null);
+  const [englishBody, setEnglishBody] = useState<RenderedMarkdown | null>(null);
 
   useEffect(() => {
     const path = `/posts/${post.slug}`;
     fetch("/api/views", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path }) }).catch(() => {});
     fetch(`/api/views?path=${encodeURIComponent(path)}`).then(r => r.json()).then(d => setViewCount(d.total)).catch(() => {});
   }, [post.slug]);
+
+  // 영어 본문은 실제로 전환했을 때만 받아온다. 기본 화면에서는 한국어만 내려간다.
+  useEffect(() => {
+    if (locale !== "en" || !post.hasContentEn || englishBody) return;
+    let cancelled = false;
+    fetch(`/api/posts/${post.id}/content?locale=en`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: RenderedMarkdown | null) => {
+        if (!cancelled && data) setEnglishBody(data);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [locale, post.id, post.hasContentEn, englishBody]);
+
   const dateLocale = locale === "ko" ? ko : enUS;
   const dateFmt = locale === "ko" ? "yyyy년 M월 d일" : "MMMM d, yyyy";
 
   const title = locale === "en" && post.titleEn ? post.titleEn : post.title;
-  const content = locale === "en" && post.contentEn ? post.contentEn : post.content;
+  // 아직 못 받았거나 영어 본문이 없으면 한국어를 그대로 보여준다.
+  const body = locale === "en" && englishBody ? englishBody : rendered;
   const catName = post.category
     ? (locale === "en" && post.category.nameEn ? post.category.nameEn : post.category.name)
     : null;
-  const readingTime = getReadingTime(content);
 
   return (
     <article>
@@ -82,7 +94,7 @@ export default function PostClient({
           )}
           <span className="flex items-center gap-1.5">
             <HiOutlineClock size={14} />
-            {readingTime}{locale === "ko" ? "분 읽기" : " min read"}
+            {body.readingTime}{locale === "ko" ? "분 읽기" : " min read"}
           </span>
           {viewCount !== null && (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-muted text-accent text-[12px] font-medium">
@@ -95,7 +107,7 @@ export default function PostClient({
 
       <div className="flex gap-6 lg:gap-10">
         <div className="flex-1 min-w-0 overflow-hidden">
-          <MarkdownRenderer content={content} />
+          <PostBody html={body.html} />
 
           {/* 이전/다음 글 네비게이션 */}
           {(prevPost || nextPost) && (
@@ -133,7 +145,7 @@ export default function PostClient({
 
           <Giscus />
         </div>
-        <TableOfContents content={content} />
+        <TableOfContents toc={body.toc} />
       </div>
     </article>
   );

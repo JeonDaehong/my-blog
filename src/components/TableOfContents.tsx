@@ -1,39 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { HiOutlineListBullet, HiOutlineXMark } from "react-icons/hi2";
-
-type TocItem = {
-  id: string;
-  text: string;
-  level: number;
-};
-
-function extractToc(markdown: string): TocItem[] {
-  const lines = markdown.split("\n");
-  const toc: TocItem[] = [];
-
-  let inCodeBlock = false;
-  for (const line of lines) {
-    if (line.trim().startsWith("```")) {
-      inCodeBlock = !inCodeBlock;
-      continue;
-    }
-    if (inCodeBlock) continue;
-
-    const match = line.match(/^(#{1,3})\s+(.+)$/);
-    if (match) {
-      const level = match[1].length;
-      const text = match[2].replace(/[`*_~\[\]]/g, "").trim();
-      const id = text
-        .toLowerCase()
-        .replace(/[^a-z0-9가-힣ㄱ-ㅎㅏ-ㅣ\s-]/g, "")
-        .replace(/\s+/g, "-");
-      toc.push({ id, text, level });
-    }
-  }
-  return toc;
-}
+import type { TocItem } from "@/lib/types";
 
 function TocList({
   toc,
@@ -81,10 +50,9 @@ function TocList({
   );
 }
 
-export default function TableOfContents({ content }: { content: string }) {
+export default function TableOfContents({ toc }: { toc: TocItem[] }) {
   const [activeId, setActiveId] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const toc = useMemo(() => extractToc(content), [content]);
 
   useEffect(() => {
     if (toc.length === 0) return;
