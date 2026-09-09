@@ -12,6 +12,7 @@ import {
   HiOutlineXMark,
   HiOutlineDocumentText,
   HiOutlineFolder,
+  HiChevronDown,
 } from "react-icons/hi2";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -25,6 +26,7 @@ type SearchResult = {
   excerpt: string | null;
   excerptEn: string | null;
   createdAt: string;
+  coverImage: string | null;
   category: { name: string; nameEn: string | null } | null;
 };
 
@@ -33,6 +35,7 @@ type NavCategory = {
   name: string;
   nameEn?: string | null;
   slug: string;
+  _count?: { posts: number };
 };
 
 export default function TopBar({ categories }: { categories: NavCategory[] }) {
@@ -40,6 +43,8 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [catOpen, setCatOpen] = useState(false);
+  const catRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -63,6 +68,21 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  // 카테고리 메뉴: 바깥 클릭으로 닫기
+  useEffect(() => {
+    if (!catOpen) return;
+    function onPointerDown(e: MouseEvent) {
+      if (!catRef.current?.contains(e.target as Node)) setCatOpen(false);
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [catOpen]);
+
+  // 페이지가 바뀌면 열려 있던 메뉴는 닫는다
+  useEffect(() => {
+    setCatOpen(false);
+  }, [pathname]);
 
   // 검색창 열릴 때 input 포커스
   useEffect(() => {
@@ -147,19 +167,44 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
   const showResults = searchOpen && query.trim().length >= 2;
   const hasResults = results.length > 0;
 
-  // "전체"는 글 목록과 개별 글 모두에서 활성으로 둬서 위치 감각을 유지한다.
-  const navTabs = [
-    {
-      href: "/posts",
-      label: t("allPosts"),
-      active: pathname === "/posts" || pathname.startsWith("/posts/"),
-    },
-    ...categories.map((category) => ({
-      href: `/category/${category.slug}`,
-      label: locale === "en" && category.nameEn ? category.nameEn : category.name,
-      active: pathname === `/category/${category.slug}`,
-    })),
-  ];
+  // "전체 글"은 개별 글에서도 활성으로 둬서 위치 감각을 유지한다.
+  const allPostsActive = pathname === "/posts" || pathname.startsWith("/posts/");
+  const categoryItems = categories.map((category) => ({
+    href: `/category/${category.slug}`,
+    label: locale === "en" && category.nameEn ? category.nameEn : category.name,
+    count: category._count?.posts,
+    active: pathname === `/category/${category.slug}`,
+  }));
+  const activeCategory = categoryItems.find((item) => item.active);
+
+  const categoryMenu = (
+    <div
+      className="absolute left-0 lg:right-0 lg:left-auto top-full mt-2 w-56 rounded-xl border border-border-color bg-bg-primary shadow-lg overflow-hidden z-30"
+    >
+      <ul className="py-1.5">
+        {categoryItems.map((item) => (
+          <li key={item.href}>
+            <Link
+              href={item.href}
+              onClick={() => setCatOpen(false)}
+              className={`flex items-center justify-between gap-3 px-4 py-2 text-[14px] transition-colors ${
+                item.active
+                  ? "text-accent font-semibold bg-accent-muted"
+                  : "text-text-secondary hover:text-text-primary hover:bg-bg-hover"
+              }`}
+            >
+              <span className="truncate">{item.label}</span>
+              {item.count !== undefined && (
+                <span className="shrink-0 text-[12px] text-text-tertiary tabular-nums">
+                  {item.count}
+                </span>
+              )}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 
   return (
     <>
@@ -179,21 +224,40 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
               </span>
             </Link>
 
-            {/* 넓은 화면에서는 토스처럼 한 줄 텍스트 내비로 둔다 */}
+            {/* 카테고리는 목록을 펼쳐 두는 대신 하나의 메뉴로 묶는다 */}
             <nav className="hidden lg:flex items-center gap-7 ml-auto mr-3">
-              {navTabs.map((tab) => (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  className={`text-[15px] whitespace-nowrap transition-colors ${
-                    tab.active
-                      ? "text-accent font-semibold"
-                      : "text-text-secondary hover:text-text-primary"
-                  }`}
-                >
-                  {tab.label}
-                </Link>
-              ))}
+              <Link
+                href="/posts"
+                className={`text-[15px] whitespace-nowrap transition-colors ${
+                  allPostsActive
+                    ? "text-accent font-semibold"
+                    : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                {t("allPosts")}
+              </Link>
+
+              {categoryItems.length > 0 && (
+                <div className="relative" ref={catRef}>
+                  <button
+                    onClick={() => setCatOpen((v) => !v)}
+                    aria-expanded={catOpen}
+                    aria-haspopup="true"
+                    className={`flex items-center gap-1 text-[15px] whitespace-nowrap transition-colors ${
+                      activeCategory
+                        ? "text-accent font-semibold"
+                        : "text-text-secondary hover:text-text-primary"
+                    }`}
+                  >
+                    {activeCategory ? activeCategory.label : t("categoriesMenu")}
+                    <HiChevronDown
+                      size={15}
+                      className={`transition-transform ${catOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                  {catOpen && categoryMenu}
+                </div>
+              )}
             </nav>
 
         <div className="flex items-center gap-1.5">
@@ -237,160 +301,203 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
         </div>
           </div>
 
-          {/* 좁은 화면에서는 가로 스크롤 알약으로 내려 보낸다 */}
-          <nav className="lg:hidden flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2.5">
-            {navTabs.map((tab) => (
-              <Link
-                key={tab.href}
-                href={tab.href}
-                className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-[13px] transition-colors ${
-                  tab.active
-                    ? "bg-accent text-white font-medium"
-                    : "bg-bg-tertiary text-text-secondary"
-                }`}
-              >
-                {tab.label}
-              </Link>
-            ))}
+          {/* 좁은 화면에서도 같은 구성 — 전체 글과 카테고리 메뉴 */}
+          <nav className="lg:hidden flex items-center gap-2 pb-2.5">
+            <Link
+              href="/posts"
+              className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-[13px] transition-colors ${
+                allPostsActive
+                  ? "bg-accent text-white font-medium"
+                  : "bg-bg-tertiary text-text-secondary"
+              }`}
+            >
+              {t("allPosts")}
+            </Link>
+
+            {categoryItems.length > 0 && (
+              <div className="relative" ref={catRef}>
+                <button
+                  onClick={() => setCatOpen((v) => !v)}
+                  aria-expanded={catOpen}
+                  className={`flex items-center gap-1 shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-[13px] transition-colors ${
+                    activeCategory
+                      ? "bg-accent text-white font-medium"
+                      : "bg-bg-tertiary text-text-secondary"
+                  }`}
+                >
+                  {activeCategory ? activeCategory.label : t("categoriesMenu")}
+                  <HiChevronDown
+                    size={14}
+                    className={`transition-transform ${catOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {catOpen && categoryMenu}
+              </div>
+            )}
           </nav>
         </div>
       </header>
 
-      {/* Search overlay */}
+      {/* 전체 화면 검색 */}
       {searchOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] sm:pt-[20vh] px-4 bg-black/50 backdrop-blur-sm"
-          onClick={close}
-        >
-          <div
-            className="w-full max-w-xl bg-bg-secondary border border-border-color rounded-2xl shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Input row */}
+        <div className="fixed inset-0 z-50 bg-bg-primary overflow-y-auto">
+          <div className="max-w-3xl mx-auto px-5 sm:px-6 py-5 sm:py-8">
+            <div className="flex items-center justify-between mb-6 sm:mb-9">
+              <span className="text-[15px] font-semibold text-text-primary">
+                {t("search")}
+              </span>
+              <button
+                onClick={close}
+                aria-label="닫기"
+                className="p-2 rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
+              >
+                <HiOutlineXMark size={22} />
+              </button>
+            </div>
+
             <form onSubmit={handleSubmit}>
-              <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border-color">
+              <div className="relative">
                 <HiOutlineMagnifyingGlass
-                  size={18}
-                  className={`shrink-0 transition-colors ${loading ? "text-accent animate-pulse" : "text-text-tertiary"}`}
+                  size={20}
+                  className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
+                    loading ? "text-accent animate-pulse" : "text-text-tertiary"
+                  }`}
                 />
                 <input
                   ref={inputRef}
                   type="text"
-                  placeholder="검색어를 입력하세요..."
+                  placeholder="제목, 내용으로 검색"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="flex-1 bg-transparent text-text-primary text-sm outline-none placeholder:text-text-tertiary"
+                  className="w-full h-14 sm:h-16 pl-12 pr-12 rounded-xl border border-border-color bg-bg-secondary text-text-primary text-[15px] sm:text-[16px] outline-none transition-colors placeholder:text-text-tertiary focus:border-accent focus:bg-bg-primary"
                 />
-                {query ? (
+                {query && (
                   <button
                     type="button"
-                    onClick={() => { setQuery(""); setResults([]); inputRef.current?.focus(); }}
-                    className="p-1 rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
+                    onClick={() => {
+                      setQuery("");
+                      setResults([]);
+                      inputRef.current?.focus();
+                    }}
+                    aria-label="지우기"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
                   >
-                    <HiOutlineXMark size={16} />
+                    <HiOutlineXMark size={18} />
                   </button>
-                ) : (
-                  <kbd
-                    onClick={close}
-                    className="text-[11px] px-1.5 py-0.5 rounded bg-bg-tertiary border border-border-color text-text-tertiary cursor-pointer hover:bg-bg-hover font-mono"
-                  >
-                    ESC
-                  </kbd>
                 )}
               </div>
             </form>
 
-            {/* Results */}
-            {showResults && (
-              <div className="max-h-[360px] overflow-y-auto">
-                {loading && results.length === 0 ? (
-                  <div className="flex items-center justify-center py-10 text-text-tertiary text-sm">
-                    <span className="animate-pulse">검색 중...</span>
+            {!showResults && (
+              <div className="mt-7">
+                {categoryItems.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {categoryItems.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={close}
+                        className="px-3 py-1.5 rounded-full bg-bg-tertiary text-[13px] text-text-secondary hover:text-text-primary transition-colors"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
                   </div>
+                )}
+                <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2">
+                  <span className="flex items-center gap-1.5 text-[12px] text-text-tertiary">
+                    <kbd className="px-1.5 py-0.5 rounded border border-border-color bg-bg-secondary text-[11px] font-mono">↵</kbd>
+                    전체 검색
+                  </span>
+                  <span className="flex items-center gap-1.5 text-[12px] text-text-tertiary">
+                    <kbd className="px-1.5 py-0.5 rounded border border-border-color bg-bg-secondary text-[11px] font-mono">↑↓</kbd>
+                    이동
+                  </span>
+                  <span className="flex items-center gap-1.5 text-[12px] text-text-tertiary">
+                    <kbd className="px-1.5 py-0.5 rounded border border-border-color bg-bg-secondary text-[11px] font-mono">ESC</kbd>
+                    닫기
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {showResults && (
+              <div className="mt-8">
+                {loading && results.length === 0 ? (
+                  <p className="py-14 text-center text-text-tertiary text-sm animate-pulse">
+                    검색 중...
+                  </p>
                 ) : hasResults ? (
-                  <>
-                    <ul className="py-1">
-                      {results.map((post, i) => (
-                        <li key={post.id}>
-                          <button
-                            type="button"
-                            onClick={() => { router.push(`/posts/${post.slug}`); close(); }}
-                            onMouseEnter={() => setSelectedIndex(i)}
-                            className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors ${
-                              selectedIndex === i ? "bg-bg-hover" : "hover:bg-bg-hover"
-                            }`}
-                          >
-                            <HiOutlineDocumentText
-                              size={16}
-                              className="shrink-0 mt-0.5 text-text-tertiary"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-[13px] font-medium text-text-primary truncate">
-                                {getTitle(post)}
+                  <ul className="border-t border-border-color">
+                    {results.map((post, i) => (
+                      <li key={post.id} className="border-b border-border-color">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            router.push(`/posts/${post.slug}`);
+                            close();
+                          }}
+                          onMouseEnter={() => setSelectedIndex(i)}
+                          className={`w-full text-left flex gap-4 sm:gap-6 px-2 -mx-2 py-5 sm:py-6 rounded-lg transition-colors ${
+                            selectedIndex === i ? "bg-bg-hover" : "hover:bg-bg-hover"
+                          }`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[15px] sm:text-[17px] font-bold text-text-primary leading-snug line-clamp-2">
+                              {getTitle(post)}
+                            </p>
+                            {getExcerpt(post) && (
+                              <p className="mt-1.5 text-[13px] sm:text-[14px] text-text-tertiary leading-relaxed line-clamp-2">
+                                {getExcerpt(post)}
                               </p>
-                              {getExcerpt(post) && (
-                                <p className="text-[11px] text-text-tertiary truncate mt-0.5">
-                                  {getExcerpt(post)}
-                                </p>
-                              )}
-                            </div>
-                            <div className="shrink-0 flex flex-col items-end gap-1">
+                            )}
+                            <p className="mt-2 flex items-center gap-2 text-[12px] text-text-tertiary">
                               {getCatName(post.category) && (
-                                <span className="flex items-center gap-1 text-[10px] text-text-tertiary">
-                                  <HiOutlineFolder size={10} />
+                                <span className="inline-flex items-center gap-1 text-accent">
+                                  <HiOutlineFolder size={11} />
                                   {getCatName(post.category)}
                                 </span>
                               )}
-                              <span className="text-[10px] text-text-tertiary opacity-60">
-                                {format(new Date(post.createdAt), "yyyy.MM.dd")}
-                              </span>
+                              <span>{format(new Date(post.createdAt), "yyyy.MM.dd")}</span>
+                            </p>
+                          </div>
+                          {post.coverImage && (
+                            <div className="shrink-0 w-[92px] sm:w-[150px]">
+                              <div
+                                className="relative w-full rounded-lg overflow-hidden bg-bg-tertiary"
+                                style={{ aspectRatio: "16 / 9" }}
+                              >
+                                <Image
+                                  src={post.coverImage}
+                                  alt=""
+                                  fill
+                                  sizes="150px"
+                                  className="object-cover"
+                                />
+                              </div>
                             </div>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                    {/* 전체 검색 결과 보기 */}
-                    <div className="border-t border-border-color">
-                      <button
-                        type="button"
-                        onClick={() => { router.push(`/posts?q=${encodeURIComponent(query.trim())}`); close(); }}
-                        className="w-full flex items-center justify-between px-4 py-3 text-[12px] text-text-tertiary hover:text-accent hover:bg-bg-hover transition-colors"
-                      >
-                        <span>
-                          &lsquo;{query}&rsquo; 전체 검색 결과 보기
-                        </span>
-                        <span className="text-[11px] opacity-60">↵</span>
-                      </button>
-                    </div>
-                  </>
+                          )}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 ) : (
-                  <div className="flex flex-col items-center justify-center py-10 text-center">
-                    <HiOutlineMagnifyingGlass size={28} className="text-text-tertiary opacity-30 mb-2" />
+                  <div className="py-14 text-center">
+                    <HiOutlineDocumentText
+                      size={30}
+                      className="mx-auto mb-3 text-text-tertiary opacity-40"
+                    />
                     <p className="text-text-secondary text-sm">
                       &lsquo;{query}&rsquo;에 대한 결과가 없습니다
                     </p>
-                    <p className="text-text-tertiary text-xs mt-1">다른 검색어를 시도해 보세요</p>
+                    <p className="text-text-tertiary text-xs mt-1">
+                      다른 검색어를 시도해 보세요
+                    </p>
                   </div>
                 )}
               </div>
             )}
-
-            {/* Footer hint */}
-            <div className="flex items-center gap-4 px-4 py-2.5 border-t border-border-color bg-bg-tertiary/50">
-              <span className="flex items-center gap-1.5 text-[11px] text-text-tertiary">
-                <kbd className="px-1 py-0.5 rounded border border-border-color bg-bg-secondary text-[10px] font-mono">↵</kbd>
-                전체 검색
-              </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-text-tertiary">
-                <kbd className="px-1 py-0.5 rounded border border-border-color bg-bg-secondary text-[10px] font-mono">↑↓</kbd>
-                이동
-              </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-text-tertiary">
-                <kbd className="px-1 py-0.5 rounded border border-border-color bg-bg-secondary text-[10px] font-mono">ESC</kbd>
-                닫기
-              </span>
-            </div>
           </div>
         </div>
       )}

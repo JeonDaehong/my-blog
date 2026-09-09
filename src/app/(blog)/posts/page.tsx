@@ -2,12 +2,18 @@ import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import type { PostSummary, PaginationMeta, PostsExtras } from "@/lib/types";
 import { postSummarySelect } from "@/lib/queries";
+import { fetchRecentComments } from "@/lib/giscus";
 import PostsClient from "./PostsClient";
 
 export const revalidate = 60;
 
 const POSTS_PER_PAGE = 10;
-const EMPTY_EXTRAS: PostsExtras = { featured: [], popular: [], guestbook: [] };
+const EMPTY_EXTRAS: PostsExtras = {
+  featured: [],
+  popular: [],
+  guestbook: [],
+  comments: [],
+};
 
 function serialize(post: {
   createdAt: Date;
@@ -32,7 +38,7 @@ function serialize(post: {
  */
 async function loadExtras(): Promise<PostsExtras> {
   try {
-    const [featuredRaw, viewGroups, guestbookRaw] = await Promise.all([
+    const [featuredRaw, viewGroups, guestbookRaw, comments] = await Promise.all([
       prisma.post.findMany({
         where: { published: true },
         orderBy: { createdAt: "desc" },
@@ -50,6 +56,7 @@ async function loadExtras(): Promise<PostsExtras> {
         take: 3,
         select: { id: true, nickname: true, message: true, emoji: true, createdAt: true },
       }),
+      fetchRecentComments(3),
     ]);
 
     const POST_PATH_PREFIX = "/posts/";
@@ -77,6 +84,7 @@ async function loadExtras(): Promise<PostsExtras> {
         ...entry,
         createdAt: entry.createdAt.toISOString(),
       })),
+      comments,
     };
   } catch (err) {
     console.error("[PostsPage] Failed to load extras:", err);

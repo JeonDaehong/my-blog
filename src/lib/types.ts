@@ -95,9 +95,20 @@ export type GuestbookPreview = {
   createdAt: string;
 };
 
-/** /posts 상단·하단에 붙는 부가 섹션 데이터. 검색 중이거나 2페이지 이후에는 비운다. */
+export type CommentPreview = {
+  id: string;
+  author: string;
+  avatar: string | null;
+  body: string;
+  url: string;
+  createdAt: string;
+  postTitle: string;
+};
+
+/** /posts 좌측에 붙는 부가 섹션 데이터. 검색 중이거나 2페이지 이후에는 비운다. */
 export type PostsExtras = {
   featured: PostSummary[];
   popular: PopularPost[];
   guestbook: GuestbookPreview[];
+  comments: CommentPreview[];
 };

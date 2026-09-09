@@ -7,7 +7,12 @@ import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { useI18n } from "@/lib/i18n";
-import type { PostSummary, PopularPost, GuestbookPreview } from "@/lib/types";
+import type {
+  PostSummary,
+  PopularPost,
+  GuestbookPreview,
+  CommentPreview,
+} from "@/lib/types";
 
 const AUTO_ADVANCE_MS = 5000;
 
@@ -210,6 +215,52 @@ export function GuestbookCard({ entries }: { entries: GuestbookPreview[] }) {
                 {entry.nickname} · {format(new Date(entry.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
               </p>
             </div>
+          </li>
+        ))}
+      </ul>
+    </SidebarCard>
+  );
+}
+
+export function CommentsCard({ comments }: { comments: CommentPreview[] }) {
+  const { locale, t } = useI18n();
+  const dateLocale = locale === "ko" ? ko : enUS;
+  if (comments.length === 0) return null;
+
+  return (
+    <SidebarCard title={t("recentComments")}>
+      <ul className="space-y-4">
+        {comments.map((comment) => (
+          <li key={comment.id}>
+            <a
+              href={comment.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-start gap-2.5"
+            >
+              {comment.avatar ? (
+                <Image
+                  src={comment.avatar}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="shrink-0 w-6 h-6 rounded-full mt-0.5"
+                  unoptimized
+                />
+              ) : (
+                <span className="shrink-0 w-6 h-6 rounded-full bg-bg-tertiary mt-0.5" />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] text-text-secondary leading-relaxed line-clamp-2 break-words group-hover:text-text-primary transition-colors">
+                  {comment.body}
+                </p>
+                <p className="mt-1 text-[12px] text-text-tertiary truncate">
+                  {comment.author} ·{" "}
+                  {format(new Date(comment.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
+                </p>
+                <p className="mt-0.5 text-[11px] text-accent truncate">{comment.postTitle}</p>
+              </div>
+            </a>
           </li>
         ))}
       </ul>

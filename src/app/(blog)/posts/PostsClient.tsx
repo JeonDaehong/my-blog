@@ -20,6 +20,7 @@ import {
   FeaturedHero,
   PopularCard,
   GuestbookCard,
+  CommentsCard,
 } from "@/components/PostsHighlights";
 
 type ViewMode = "card" | "list";
@@ -82,7 +83,10 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
   }
 
   const isSearching = !!query;
-  const hasAside = extras.popular.length > 0 || extras.guestbook.length > 0;
+  const hasAside =
+    extras.popular.length > 0 ||
+    extras.guestbook.length > 0 ||
+    extras.comments.length > 0;
 
   return (
     <div>
@@ -91,11 +95,19 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
       <div
         className={
           hasAside
-            ? "grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-10 lg:gap-14"
+            ? "grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] gap-10 lg:gap-14"
             : ""
         }
       >
-        <div className="min-w-0">
+        {hasAside && (
+          <aside className="order-2 lg:order-1 space-y-5 lg:sticky lg:top-28 self-start">
+            <PopularCard posts={extras.popular} />
+            <CommentsCard comments={extras.comments} />
+            <GuestbookCard entries={extras.guestbook} />
+          </aside>
+        )}
+
+        <div className="order-1 lg:order-2 min-w-0">
           {/* Header */}
           <div className="flex items-end justify-between gap-4 mb-5 sm:mb-7">
             <div className="min-w-0">
@@ -328,13 +340,6 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
             </div>
           )}
         </div>
-
-        {hasAside && (
-          <aside className="space-y-5 lg:sticky lg:top-28 self-start">
-            <PopularCard posts={extras.popular} />
-            <GuestbookCard entries={extras.guestbook} />
-          </aside>
-        )}
       </div>
     </div>
   );

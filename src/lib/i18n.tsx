@@ -24,6 +24,8 @@ const translations = {
     featured: "추천 아티클",
     popularPosts: "인기 있는 글",
     recentGuestbook: "최근 방명록",
+    recentComments: "최근 댓글",
+    categoriesMenu: "카테고리",
     noPosts: "아직 작성된 글이 없습니다",
     noPostsDesc: "관리자 페이지에서 첫 글을 작성해 보세요",
 
@@ -92,6 +94,8 @@ const translations = {
     featured: "Featured",
     popularPosts: "Popular",
     recentGuestbook: "Recent guestbook",
+    recentComments: "Recent comments",
+    categoriesMenu: "Categories",
     noPosts: "No posts yet",
     noPostsDesc: "Create your first post from the admin page",
 
