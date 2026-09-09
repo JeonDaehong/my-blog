@@ -2,82 +2,132 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { useI18n } from "@/lib/i18n";
 import type { PostSummary, PopularPost, GuestbookPreview } from "@/lib/types";
 
+const AUTO_ADVANCE_MS = 5000;
+
 /**
- * 토스 테크 상단의 큰 히어로. 좌측에 제목과 요약, 우측에 큰 이미지를 두고
- * 화살표로 추천 글 사이를 넘긴다. 좁은 화면에서는 이미지가 위로 올라간다.
+ * 상단 추천 영역. 슬라이드 트랙을 통째로 밀어서 넘기고, 5초마다 자동으로
+ * 다음 글로 넘어간다. 마우스를 올리거나 포커스가 들어오면 멈추고,
+ * 화살표를 누르면 타이머를 다시 센다.
  */
 export function FeaturedHero({ posts }: { posts: PostSummary[] }) {
   const { locale } = useI18n();
   const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  if (posts.length === 0) return null;
+  const total = posts.length;
+  const hasMultiple = total > 1;
 
-  const post = posts[Math.min(index, posts.length - 1)];
-  const title = locale === "en" && post.titleEn ? post.titleEn : post.title;
-  const excerpt = locale === "en" && post.excerptEn ? post.excerptEn : post.excerpt;
-  const hasMultiple = posts.length > 1;
+  const go = useCallback(
+    (next: number) => setIndex(((next % total) + total) % total),
+    [total]
+  );
+
+  useEffect(() => {
+    if (!hasMultiple || paused) return;
+    // 모션을 줄이도록 설정한 사용자에게는 자동 전환을 걸지 않는다.
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+    timerRef.current = setInterval(
+      () => setIndex((i) => (i + 1) % total),
+      AUTO_ADVANCE_MS
+    );
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [hasMultiple, paused, total, index]);
+
+  if (total === 0) return null;
+
+  const title = (post: PostSummary) =>
+    locale === "en" && post.titleEn ? post.titleEn : post.title;
+  const excerpt = (post: PostSummary) =>
+    locale === "en" && post.excerptEn ? post.excerptEn : post.excerpt;
 
   return (
-    <section className="py-8 sm:py-14 lg:py-16">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-14 items-center">
-        <div className="order-2 lg:order-1">
-          <Link href={`/posts/${post.slug}`} className="group block">
-            <h2 className="text-[26px] sm:text-[36px] lg:text-[40px] font-bold text-text-primary leading-[1.25] tracking-tight group-hover:text-accent transition-colors">
-              {title}
-            </h2>
-            {excerpt && (
-              <p className="mt-3 sm:mt-4 text-[15px] sm:text-[17px] text-text-tertiary leading-relaxed line-clamp-2">
-                {excerpt}
-              </p>
-            )}
-          </Link>
-
-          {hasMultiple && (
-            <div className="flex items-center gap-2.5 mt-6 sm:mt-10">
-              <button
-                onClick={() => setIndex((i) => (i - 1 + posts.length) % posts.length)}
-                aria-label="이전 추천 글"
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-border-color flex items-center justify-center text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
-              >
-                <HiChevronLeft size={18} />
-              </button>
-              <button
-                onClick={() => setIndex((i) => (i + 1) % posts.length)}
-                aria-label="다음 추천 글"
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-border-color flex items-center justify-center text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
-              >
-                <HiChevronRight size={18} />
-              </button>
-              <span className="ml-1 text-[12px] tabular-nums text-text-tertiary">
-                {(index % posts.length) + 1} / {posts.length}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <Link
-          href={`/posts/${post.slug}`}
-          className="order-1 lg:order-2 block rounded-2xl overflow-hidden bg-bg-tertiary"
+    <section
+      className="py-8 sm:py-14 lg:py-16"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+      aria-roledescription="carousel"
+    >
+      <div className="overflow-hidden">
+        <div
+          className="flex transition-transform duration-500 ease-out"
+          style={{ transform: `translateX(-${index * 100}%)` }}
         >
-          <div className="relative w-full" style={{ aspectRatio: "16 / 10" }}>
-            <Image
-              src={post.coverImage || "/images/default-thumbnail.png"}
-              alt=""
-              fill
-              sizes="(max-width: 1024px) 100vw, 520px"
-              priority
-              className="object-cover"
-            />
-          </div>
-        </Link>
+          {posts.map((post, i) => (
+            <div
+              key={post.id}
+              className="w-full shrink-0"
+              aria-hidden={i !== index}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-14 items-center">
+                <div className="order-2 lg:order-1">
+                  <Link href={`/posts/${post.slug}`} className="group block">
+                    <h2 className="text-[26px] sm:text-[36px] lg:text-[40px] font-bold text-text-primary leading-[1.25] tracking-tight group-hover:text-accent transition-colors">
+                      {title(post)}
+                    </h2>
+                    {excerpt(post) && (
+                      <p className="mt-3 sm:mt-4 text-[15px] sm:text-[17px] text-text-tertiary leading-relaxed line-clamp-2">
+                        {excerpt(post)}
+                      </p>
+                    )}
+                  </Link>
+                </div>
+
+                <Link
+                  href={`/posts/${post.slug}`}
+                  className="group order-1 lg:order-2 block rounded-2xl overflow-hidden bg-bg-tertiary"
+                >
+                  <div className="relative w-full" style={{ aspectRatio: "16 / 10" }}>
+                    <Image
+                      src={post.coverImage || "/images/default-thumbnail.png"}
+                      alt=""
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 520px"
+                      priority={i === 0}
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+                    />
+                  </div>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {hasMultiple && (
+        <div className="lg:w-1/2 lg:pr-7 mt-6 sm:mt-8 flex items-center gap-2.5">
+          <button
+            onClick={() => go(index - 1)}
+            aria-label="이전 추천 글"
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-border-color flex items-center justify-center text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
+          >
+            <HiChevronLeft size={18} />
+          </button>
+          <button
+            onClick={() => go(index + 1)}
+            aria-label="다음 추천 글"
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-border-color flex items-center justify-center text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
+          >
+            <HiChevronRight size={18} />
+          </button>
+        </div>
+      )}
     </section>
   );
 }
