@@ -127,6 +127,8 @@ const TEXT = {
     prev: "이전",
     next: "다음",
     viewAll: "모두 보기",
+    topics: "개 주제",
+    cards: "장",
   },
   en: {
     home: "Home",
@@ -135,6 +137,8 @@ const TEXT = {
     prev: "Prev",
     next: "Next",
     viewAll: "View all",
+    topics: " topics",
+    cards: " cards",
   },
 };
 
@@ -185,13 +189,13 @@ function CardModal({
         </button>
 
         <div
-          className="rounded-2xl border overflow-hidden"
+          className="rounded-2xl border overflow-hidden flex flex-col max-h-[85vh]"
           style={{ borderColor: `${card.accent}33` }}
         >
-          <div className="h-1" style={{ background: card.accent }} />
+          <div className="h-1 shrink-0" style={{ background: card.accent }} />
 
           <div
-            className="p-6 sm:p-8 bg-bg-secondary"
+            className="p-6 sm:p-8 bg-bg-secondary flex-1 overflow-y-auto"
             style={{ background: `${card.accent}08` }}
           >
             <div className="flex items-center mb-5">
@@ -202,13 +206,13 @@ function CardModal({
               {title}
             </h3>
 
-            <div className="text-[13px] sm:text-[14px] leading-relaxed text-text-secondary whitespace-pre-line min-h-[100px]">
+            <div className="text-[13px] sm:text-[14px] leading-relaxed text-text-secondary whitespace-pre-line min-h-[80px] sm:min-h-[100px]">
               {body}
             </div>
           </div>
 
           <div
-            className="flex items-center justify-between px-6 sm:px-8 py-3.5 border-t bg-bg-primary"
+            className="flex items-center justify-between px-4 sm:px-8 py-3.5 border-t bg-bg-primary shrink-0"
             style={{ borderColor: `${card.accent}20` }}
           >
             <button
@@ -333,63 +337,123 @@ export default function CardNewsPage() {
         {/* ── Step 1: 대카테고리 목록 ── */}
         {view.step === "bigCategories" && (
           <div className="space-y-3 animate-in">
-            {CARD_NEWS_DATA.map((bigCat) => (
-              <button
-                key={bigCat.name}
-                onClick={() =>
-                  setView({ step: "subCategories", bigCat })
-                }
-                className="w-full text-left rounded-xl border border-border-color bg-bg-secondary hover:border-border-light hover:bg-bg-tertiary transition-all duration-200 px-5 py-5 group"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{bigCat.icon}</span>
-                    <h2 className="text-base font-bold text-text-primary">
-                      {getName(bigCat)}
-                    </h2>
+            {CARD_NEWS_DATA.map((bigCat) => {
+              const cardCount = bigCat.subCategories.reduce(
+                (sum, sub) => sum + sub.cards.length,
+                0
+              );
+              return (
+                <button
+                  key={bigCat.name}
+                  onClick={() => setView({ step: "subCategories", bigCat })}
+                  className="w-full text-left rounded-xl border border-border-color bg-bg-secondary hover:border-border-light hover:bg-bg-hover transition-all duration-200 px-4 sm:px-5 py-4 sm:py-5 group"
+                >
+                  <div className="flex gap-3 sm:gap-4">
+                    <span className="shrink-0 w-11 h-11 rounded-xl bg-bg-tertiary border border-border-color flex items-center justify-center text-2xl">
+                      {bigCat.icon}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
+                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-accent-muted text-accent">
+                          {bigCat.subCategories.length}
+                          {t.topics}
+                        </span>
+                        <span className="text-[11px] text-text-tertiary">
+                          {cardCount}
+                          {t.cards}
+                        </span>
+                      </div>
+                      <h2 className="text-[15px] sm:text-[17px] font-bold text-text-primary group-hover:text-accent transition-colors">
+                        {getName(bigCat)}
+                      </h2>
+                      <p className="text-[12px] sm:text-[13px] text-text-tertiary leading-relaxed mt-1 line-clamp-2">
+                        {bigCat.subCategories.map(getName).join(" · ")}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 mt-2.5">
+                        {bigCat.subCategories.slice(0, 4).map((sub) => (
+                          <span
+                            key={sub.name}
+                            className="text-[11px] text-text-tertiary bg-bg-tertiary border border-border-color rounded px-1.5 py-0.5"
+                          >
+                            #{getName(sub)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <HiOutlineChevronRight
+                      size={16}
+                      className="shrink-0 self-center text-text-tertiary group-hover:text-accent transition-colors"
+                    />
                   </div>
-                  <HiOutlineChevronRight
-                    size={16}
-                    className="text-text-tertiary group-hover:text-text-secondary transition-colors"
-                  />
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         )}
 
         {/* ── Step 2: 소카테고리 목록 ── */}
         {view.step === "subCategories" && (
           <div className="space-y-3 animate-in">
-            {view.bigCat.subCategories.map((subCat) => (
-              <button
-                key={subCat.name}
-                onClick={() =>
-                  setView({
-                    step: "thumbnail",
-                    bigCat: view.bigCat,
-                    subCat,
-                  })
-                }
-                className="w-full text-left rounded-xl border border-border-color bg-bg-secondary hover:border-border-light hover:bg-bg-tertiary transition-all duration-200 px-5 py-4 group"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{subCat.icon}</span>
+            {view.bigCat.subCategories.map((subCat) => {
+              const first = subCat.cards[0];
+              const summary =
+                lang === "en" && first?.bodyEn ? first.bodyEn : first?.body ?? "";
+              return (
+                <button
+                  key={subCat.name}
+                  onClick={() =>
+                    setView({ step: "thumbnail", bigCat: view.bigCat, subCat })
+                  }
+                  className="w-full text-left rounded-xl border border-border-color bg-bg-secondary hover:border-border-light hover:bg-bg-hover transition-all duration-200 px-4 sm:px-5 py-4 sm:py-5 group"
+                >
+                  <div className="flex gap-3 sm:gap-4">
                     <span
-                      className="text-[15px] font-semibold"
-                      style={{ color: subCat.accent }}
+                      className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-2xl border"
+                      style={{
+                        background: `${subCat.accent}14`,
+                        borderColor: `${subCat.accent}33`,
+                      }}
                     >
-                      {getName(subCat)}
+                      {subCat.icon}
                     </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
+                        <span
+                          className="text-[11px] font-medium px-2 py-0.5 rounded-full"
+                          style={{ background: `${subCat.accent}1f`, color: subCat.accent }}
+                        >
+                          {getName(view.bigCat)}
+                        </span>
+                        <span className="text-[11px] text-text-tertiary">
+                          {subCat.cards.length}
+                          {t.cards}
+                        </span>
+                      </div>
+                      <h2 className="text-[15px] sm:text-[17px] font-bold text-text-primary group-hover:text-accent transition-colors">
+                        {getName(subCat)}
+                      </h2>
+                      <p className="text-[12px] sm:text-[13px] text-text-tertiary leading-relaxed mt-1 line-clamp-2 whitespace-pre-line">
+                        {summary}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 mt-2.5">
+                        {subCat.cards.slice(0, 3).map((card) => (
+                          <span
+                            key={card.title}
+                            className="text-[11px] text-text-tertiary bg-bg-tertiary border border-border-color rounded px-1.5 py-0.5 max-w-[150px] sm:max-w-none truncate"
+                          >
+                            #{lang === "en" && card.titleEn ? card.titleEn : card.title}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <HiOutlineChevronRight
+                      size={16}
+                      className="shrink-0 self-center text-text-tertiary group-hover:text-accent transition-colors"
+                    />
                   </div>
-                  <HiOutlineChevronRight
-                    size={16}
-                    className="text-text-tertiary group-hover:text-text-secondary transition-colors"
-                  />
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         )}
 
