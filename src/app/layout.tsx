@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
+/*
+  본문을 서버에서 렌더하도록 바꾸면서 highlight.js 테마가 딸려오지 않게 됐다.
+  rehype-highlight가 hljs-* 클래스는 붙여 주지만 색을 입히는 건 이 CSS라,
+  없으면 코드 블록이 통째로 한 가지 색으로 보인다. 글 페이지와 관리자
+  미리보기가 같은 테마를 쓰도록 루트에서 한 번 불러온다.
+*/
+import "highlight.js/styles/github-dark-dimmed.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { I18nProvider } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
