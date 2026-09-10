@@ -196,7 +196,7 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                 <Link
                   key={post.id}
                   href={`/posts/${post.slug}`}
-                  className="group flex gap-4 sm:gap-8 py-6 sm:py-8 border-b border-border-color"
+                  className="group flex items-center gap-4 sm:gap-8 py-6 sm:py-8 border-b border-border-color"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-1.5 mb-2 sm:mb-3">
@@ -236,8 +236,12 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                     글 제목·요약 길이에 따라 달라져서 같은 글도 한국어와 영어에서
                     잘리는 정도가 달랐다. 커버 이미지 비율(1.91:1)로 고정해 언어와
                     무관하게 같은 그림이 나오게 한다.
+
+                    대신 글 칸 높이는 제목 줄 수에 따라 변한다. 영어 제목은 두 줄이
+                    되는 일이 많아 위쪽만 맞추면 아래 여백만 커져 보이므로, 행을
+                    가운데 정렬(items-center)해 남는 높이를 위아래로 나눈다.
                   */}
-                  <div className="shrink-0 self-start w-[38%] max-w-[150px] sm:w-[220px] sm:max-w-none">
+                  <div className="shrink-0 w-[38%] max-w-[150px] sm:w-[220px] sm:max-w-none">
                     <div
                       className="relative w-full aspect-[1.91] rounded-xl overflow-hidden bg-bg-tertiary"
                     >
