@@ -65,14 +65,21 @@ export default function PostClient({
       </Link>
 
       {post.coverImage && (
-        <div className="relative w-full h-40 sm:h-56 lg:h-72 mb-6 sm:mb-8">
+        /*
+          고정 높이 + object-cover라 커버가 위아래로 잘렸다. 폭만 맞추고 높이는
+          이미지 비율대로 두어 전체가 보이게 한다. width/height는 로드 전 자리만
+          잡아 주는 값이고, 실제 비율은 로드된 이미지가 결정한다. 세로로 긴
+          이미지가 화면을 다 먹지 않도록 max-height만 걸어 둔다.
+        */
+        <div className="mb-6 sm:mb-8">
           <Image
             src={post.coverImage}
             alt={title}
-            fill
+            width={1600}
+            height={900}
             sizes="(max-width: 1024px) 100vw, 720px"
             priority
-            className="object-cover rounded-lg border border-border-color"
+            className="w-full h-auto max-h-[70vh] object-contain rounded-lg border border-border-color"
           />
         </div>
       )}

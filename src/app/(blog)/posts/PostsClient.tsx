@@ -231,12 +231,15 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                   </div>
 
                   {/*
-                    좁은 화면에서는 고정 폭이 너무 작아 보여서 화면 비율로 잡고,
-                    self-stretch로 행 높이를 채워 텍스트 옆에 떠 보이지 않게 한다.
+                    좁은 화면에서는 고정 폭이 너무 작아 보여서 화면 비율로 잡는다.
+                    예전에는 self-stretch로 행 높이를 채웠는데, 그러면 썸네일 비율이
+                    글 제목·요약 길이에 따라 달라져서 같은 글도 한국어와 영어에서
+                    잘리는 정도가 달랐다. 커버 이미지 비율(1.91:1)로 고정해 언어와
+                    무관하게 같은 그림이 나오게 한다.
                   */}
-                  <div className="shrink-0 self-stretch w-[38%] max-w-[150px] sm:w-[220px] sm:max-w-none">
+                  <div className="shrink-0 self-start w-[38%] max-w-[150px] sm:w-[220px] sm:max-w-none">
                     <div
-                      className="relative w-full h-full min-h-[86px] sm:min-h-[124px] rounded-xl overflow-hidden bg-bg-tertiary"
+                      className="relative w-full aspect-[1.91] rounded-xl overflow-hidden bg-bg-tertiary"
                     >
                       <Image
                         src={post.coverImage || "/images/default-thumbnail.png"}
