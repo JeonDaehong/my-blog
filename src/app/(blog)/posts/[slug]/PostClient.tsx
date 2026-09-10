@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
 import Link from "next/link";
 import Image from "next/image";
-import { HiOutlineArrowLeft, HiOutlineArrowRight, HiOutlineCalendar, HiOutlineFolder, HiOutlineEye, HiOutlineClock } from "react-icons/hi2";
+import { HiOutlineArrowLeft, HiOutlineArrowRight, HiOutlineCalendar, HiOutlineFolder, HiOutlineEye } from "react-icons/hi2";
 import { useI18n } from "@/lib/i18n";
 import PostBody from "@/components/PostBody";
 import TableOfContents from "@/components/TableOfContents";
@@ -99,10 +99,6 @@ export default function PostClient({
               {catName}
             </Link>
           )}
-          <span className="flex items-center gap-1.5">
-            <HiOutlineClock size={14} />
-            {body.readingTime}{locale === "ko" ? "분 읽기" : " min read"}
-          </span>
           {viewCount !== null && (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-muted text-accent text-[12px] font-medium">
               <HiOutlineEye size={14} />

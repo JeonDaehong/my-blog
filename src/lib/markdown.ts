@@ -20,11 +20,6 @@ export function headingId(text: string): string {
     .replace(/\s+/g, "-");
 }
 
-function getReadingTime(content: string): number {
-  const words = content.replace(/[#*`~\[\]()!>|-]/g, "").trim().split(/\s+/).length;
-  return Math.max(1, Math.round(words / 200));
-}
-
 function isWrapped(parent: unknown): boolean {
   const el = parent as Element | undefined;
   const className = el?.properties?.className;
@@ -109,5 +104,5 @@ export async function renderMarkdown(content: string): Promise<RenderedMarkdown>
     .use(rehypeStringify)
     .process(content);
 
-  return { html: String(file), toc, readingTime: getReadingTime(content) };
+  return { html: String(file), toc };
 }

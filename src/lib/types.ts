@@ -65,7 +65,6 @@ export type TocItem = {
 export type RenderedMarkdown = {
   html: string;
   toc: TocItem[];
-  readingTime: number;
 };
 
 /** 글 상세 화면이 쓰는 메타데이터. content/contentEn은 제외한다. */

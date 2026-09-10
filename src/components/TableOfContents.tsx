@@ -1,8 +1,66 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { HiOutlineListBullet, HiOutlineXMark } from "react-icons/hi2";
+import { useEffect, useMemo, useState } from "react";
+import { HiOutlineListBullet, HiOutlineXMark, HiChevronRight } from "react-icons/hi2";
 import type { TocItem } from "@/lib/types";
+
+/** 상위 제목(h1·h2) 하나와 그 아래 붙는 h3들. */
+type TocGroup = { item: TocItem; children: TocItem[] };
+
+/**
+ * 긴 글은 제목이 스무 개를 넘어가 목록이 화면보다 길어졌다. h3는 접어 두고
+ * 지금 읽는 섹션의 것만 펼쳐 목록 길이를 상위 제목 수 근처로 묶어 둔다.
+ */
+function group(toc: TocItem[]): TocGroup[] {
+  const groups: TocGroup[] = [];
+  for (const item of toc) {
+    const parent = groups[groups.length - 1];
+    // 앞에 상위 제목이 없는 h3는 접을 곳이 없으니 그대로 한 줄을 차지한다.
+    if (item.level <= 2 || !parent) groups.push({ item, children: [] });
+    else parent.children.push(item);
+  }
+  return groups;
+}
+
+function TocLink({
+  item,
+  isActive,
+  onItemClick,
+  trailing,
+}: {
+  item: TocItem;
+  isActive: boolean;
+  onItemClick?: (id: string) => void;
+  trailing?: React.ReactNode;
+}) {
+  return (
+    <a
+      href={`#${item.id}`}
+      onClick={(e) => {
+        e.preventDefault();
+        const el = document.getElementById(item.id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          onItemClick?.(item.id);
+        }
+      }}
+      className={`
+        group flex items-center gap-2 py-1 pr-2 rounded-md text-[12px] leading-snug transition-all duration-150
+        ${item.level === 1 ? "pl-2" : item.level === 2 ? "pl-5" : "pl-8"}
+        ${isActive
+          ? "text-accent bg-accent-muted font-medium"
+          : "text-text-tertiary hover:text-text-secondary hover:bg-bg-hover"
+        }
+      `}
+    >
+      {isActive && <span className="w-1 h-1 rounded-full bg-accent shrink-0" />}
+      <span className={`${isActive ? "" : "pl-3"} break-words min-w-0 flex-1`}>
+        {item.text}
+      </span>
+      {trailing}
+    </a>
+  );
+}
 
 function TocList({
   toc,
@@ -13,36 +71,44 @@ function TocList({
   activeId: string;
   onItemClick?: (id: string) => void;
 }) {
+  const groups = useMemo(() => group(toc), [toc]);
+
   return (
     <ul className="space-y-0.5">
-      {toc.map((item) => {
-        const isActive = activeId === item.id;
+      {groups.map(({ item, children }) => {
+        const open =
+          item.id === activeId || children.some((child) => child.id === activeId);
         return (
           <li key={item.id}>
-            <a
-              href={`#${item.id}`}
-              onClick={(e) => {
-                e.preventDefault();
-                const el = document.getElementById(item.id);
-                if (el) {
-                  el.scrollIntoView({ behavior: "smooth", block: "start" });
-                  onItemClick?.(item.id);
-                }
-              }}
-              className={`
-                group flex items-center gap-2 py-1 pr-2 rounded-md text-[12px] leading-snug transition-all duration-150
-                ${item.level === 1 ? "pl-2" : item.level === 2 ? "pl-5" : "pl-8"}
-                ${isActive
-                  ? "text-accent bg-accent-muted font-medium"
-                  : "text-text-tertiary hover:text-text-secondary hover:bg-bg-hover"
-                }
-              `}
-            >
-              {isActive && (
-                <span className="w-1 h-1 rounded-full bg-accent shrink-0" />
-              )}
-              <span className={`${isActive ? "" : "pl-3"} break-words min-w-0`}>{item.text}</span>
-            </a>
+            <TocLink
+              item={item}
+              isActive={item.id === activeId}
+              onItemClick={onItemClick}
+              trailing={
+                children.length > 0 ? (
+                  <HiChevronRight
+                    size={12}
+                    aria-hidden
+                    className={`shrink-0 transition-transform duration-150 ${
+                      open ? "rotate-90" : ""
+                    }`}
+                  />
+                ) : null
+              }
+            />
+            {open && children.length > 0 && (
+              <ul className="space-y-0.5">
+                {children.map((child) => (
+                  <li key={child.id}>
+                    <TocLink
+                      item={child}
+                      isActive={child.id === activeId}
+                      onItemClick={onItemClick}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         );
       })}
@@ -79,7 +145,8 @@ export default function TableOfContents({ toc }: { toc: TocItem[] }) {
   return (
     <>
       {/* Desktop TOC */}
-      <nav className="hidden xl:block w-60 shrink-0 sticky top-20 self-start rounded-xl border border-border-color bg-bg-secondary p-4">
+      {/* 접어도 넘칠 만큼 긴 글이 있으므로 화면 높이를 넘기면 목록 안에서 스크롤한다 */}
+      <nav className="hidden xl:block w-60 shrink-0 sticky top-20 self-start max-h-[calc(100vh-7rem)] overflow-y-auto rounded-xl border border-border-color bg-bg-secondary p-4">
         <div className="flex items-center gap-2 mb-3">
           <HiOutlineListBullet size={13} className="text-accent shrink-0" />
           <span className="text-[11px] font-semibold text-text-secondary uppercase tracking-widest">

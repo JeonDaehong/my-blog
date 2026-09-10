@@ -13,8 +13,9 @@ import {
   HiOutlineSun,
   HiOutlineMoon,
 } from "react-icons/hi2";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 import { useTheme } from "@/components/ThemeProvider";
+import SiteFooter from "@/components/SiteFooter";
 import { useI18n } from "@/lib/i18n";
 
 const LINKS = {
@@ -52,7 +53,6 @@ export default function LandingPage() {
   const { locale: lang, setLocale: setLang } = useI18n();
   const [displayText, setDisplayText] = useState("");
   const [typingDone, setTypingDone] = useState(false);
-  const [views, setViews] = useState<{ total: number; today: number } | null>(null);
   const { theme, toggleTheme } = useTheme();
   const t = TEXT[lang];
   const isLight = theme === "light";
@@ -60,7 +60,6 @@ export default function LandingPage() {
   useEffect(() => {
     setMounted(true);
     fetch("/api/views", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/" }) }).catch(() => {});
-    fetch("/api/views").then(r => r.json()).then(setViews).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -196,40 +195,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Bottom bar */}
-      <div className="relative z-10 border-t border-border-color">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
-            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 text-text-tertiary hover:text-text-secondary transition-colors">
-              <FaGithub size={16} />
-              <span className="text-xs">GitHub</span>
-              <HiArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-            <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 text-text-tertiary hover:text-text-secondary transition-colors">
-              <FaLinkedin size={16} />
-              <span className="text-xs">LinkedIn</span>
-              <HiArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-          </div>
-          <div className="flex items-center gap-4">
-            {views && (
-              <>
-                <span className="flex items-center gap-1.5 text-xs text-text-tertiary">
-                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500/60" />
-                  Total
-                  <span className="text-text-secondary font-semibold tabular-nums">{views.total.toLocaleString()}</span>
-                </span>
-                <span className="flex items-center gap-1.5 text-xs text-text-tertiary">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
-                  Today
-                  <span className="text-text-secondary font-semibold tabular-nums">{views.today.toLocaleString()}</span>
-                </span>
-              </>
-            )}
-            <p className="text-[11px] text-text-tertiary opacity-40">© 2026 Daehong</p>
-          </div>
-        </div>
-      </div>
+      <SiteFooter className="relative z-10" innerClassName="max-w-6xl mx-auto px-6 sm:px-10" />
     </div>
   );
 }

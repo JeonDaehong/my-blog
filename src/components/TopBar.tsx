@@ -38,6 +38,72 @@ type NavCategory = {
   _count?: { posts: number };
 };
 
+/** 검색 결과와 최신 글 목록이 같은 모양을 쓰도록 행 하나를 따로 뺀다. */
+function PostRow({
+  post,
+  title,
+  excerpt,
+  categoryName,
+  highlighted,
+  onHover,
+  onSelect,
+}: {
+  post: SearchResult;
+  title: string;
+  excerpt: string | null;
+  categoryName: string | null;
+  highlighted?: boolean;
+  onHover?: () => void;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      onMouseEnter={onHover}
+      className={`w-full text-left flex gap-4 sm:gap-6 px-2 -mx-2 py-5 sm:py-6 rounded-lg transition-colors ${
+        highlighted ? "bg-bg-hover" : "hover:bg-bg-hover"
+      }`}
+    >
+      <div className="flex-1 min-w-0">
+        <p className="text-[15px] sm:text-[17px] font-bold text-text-primary leading-snug line-clamp-2">
+          {title}
+        </p>
+        {excerpt && (
+          <p className="mt-1.5 text-[13px] sm:text-[14px] text-text-tertiary leading-relaxed line-clamp-2">
+            {excerpt}
+          </p>
+        )}
+        <p className="mt-2 flex items-center gap-2 text-[12px] text-text-tertiary">
+          {categoryName && (
+            <span className="inline-flex items-center gap-1 text-accent">
+              <HiOutlineFolder size={11} />
+              {categoryName}
+            </span>
+          )}
+          <span>{format(new Date(post.createdAt), "yyyy.MM.dd")}</span>
+        </p>
+      </div>
+      {post.coverImage && (
+        <div className="shrink-0 w-[92px] sm:w-[150px]">
+          <div
+            className="relative w-full rounded-lg overflow-hidden bg-bg-tertiary"
+            style={{ aspectRatio: "16 / 9" }}
+          >
+            <Image
+              src={post.coverImage}
+              alt=""
+              fill
+              sizes="150px"
+              className="object-cover"
+            />
+          </div>
+        </div>
+      )}
+    </button>
+  );
+}
+
 export default function TopBar({ categories }: { categories: NavCategory[] }) {
   const { locale, setLocale, t } = useI18n();
   const pathname = usePathname();
@@ -47,6 +113,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
   const catRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [recent, setRecent] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const router = useRouter();
@@ -90,6 +157,24 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [searchOpen]);
+
+  /*
+    검색어가 없을 때 보여줄 최신 글. 검색창을 실제로 연 다음에 한 번만 받아와서
+    모든 페이지에 이 요청이 얹히지 않게 한다.
+  */
+  useEffect(() => {
+    if (!searchOpen || recent.length > 0) return;
+    let cancelled = false;
+    fetch("/api/posts?limit=3")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.posts) setRecent(data.posts);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [searchOpen, recent.length]);
 
   // 디바운스 실시간 검색
   const fetchResults = useCallback((q: string) => {
@@ -208,7 +293,8 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-border-color bg-bg-primary/80 backdrop-blur-md">
+      {/* 반투명 + blur이라 본문이 비쳐 보였다. 불투명한 배경으로 고정한다. */}
+      <header className="sticky top-0 z-20 border-b border-border-color bg-bg-primary">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="h-16 flex items-center justify-between gap-3">
             <Link href="/" className="flex items-center gap-2.5 shrink-0">
@@ -418,6 +504,31 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
                     ))}
                   </div>
                 )}
+
+                {/* 아직 아무것도 안 쳤을 때는 최신 글을 보여준다 */}
+                {recent.length > 0 && (
+                  <div className="mt-8">
+                    <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-widest">
+                      {t("latestPosts")}
+                    </p>
+                    <ul className="mt-2 border-t border-border-color">
+                      {recent.map((post) => (
+                        <li key={post.id} className="border-b border-border-color">
+                          <PostRow
+                            post={post}
+                            title={getTitle(post)}
+                            excerpt={getExcerpt(post)}
+                            categoryName={getCatName(post.category)}
+                            onSelect={() => {
+                              router.push(`/posts/${post.slug}`);
+                              close();
+                            }}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 
@@ -431,53 +542,18 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
                   <ul className="border-t border-border-color">
                     {results.map((post, i) => (
                       <li key={post.id} className="border-b border-border-color">
-                        <button
-                          type="button"
-                          onClick={() => {
+                        <PostRow
+                          post={post}
+                          highlighted={selectedIndex === i}
+                          onHover={() => setSelectedIndex(i)}
+                          onSelect={() => {
                             router.push(`/posts/${post.slug}`);
                             close();
                           }}
-                          onMouseEnter={() => setSelectedIndex(i)}
-                          className={`w-full text-left flex gap-4 sm:gap-6 px-2 -mx-2 py-5 sm:py-6 rounded-lg transition-colors ${
-                            selectedIndex === i ? "bg-bg-hover" : "hover:bg-bg-hover"
-                          }`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[15px] sm:text-[17px] font-bold text-text-primary leading-snug line-clamp-2">
-                              {getTitle(post)}
-                            </p>
-                            {getExcerpt(post) && (
-                              <p className="mt-1.5 text-[13px] sm:text-[14px] text-text-tertiary leading-relaxed line-clamp-2">
-                                {getExcerpt(post)}
-                              </p>
-                            )}
-                            <p className="mt-2 flex items-center gap-2 text-[12px] text-text-tertiary">
-                              {getCatName(post.category) && (
-                                <span className="inline-flex items-center gap-1 text-accent">
-                                  <HiOutlineFolder size={11} />
-                                  {getCatName(post.category)}
-                                </span>
-                              )}
-                              <span>{format(new Date(post.createdAt), "yyyy.MM.dd")}</span>
-                            </p>
-                          </div>
-                          {post.coverImage && (
-                            <div className="shrink-0 w-[92px] sm:w-[150px]">
-                              <div
-                                className="relative w-full rounded-lg overflow-hidden bg-bg-tertiary"
-                                style={{ aspectRatio: "16 / 9" }}
-                              >
-                                <Image
-                                  src={post.coverImage}
-                                  alt=""
-                                  fill
-                                  sizes="150px"
-                                  className="object-cover"
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </button>
+                          title={getTitle(post)}
+                          excerpt={getExcerpt(post)}
+                          categoryName={getCatName(post.category)}
+                        />
                       </li>
                     ))}
                   </ul>

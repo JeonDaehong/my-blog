@@ -13,6 +13,7 @@ import {
   HiOutlineMoon,
 } from "react-icons/hi2";
 import { useTheme } from "@/components/ThemeProvider";
+import SiteFooter from "@/components/SiteFooter";
 import { useI18n } from "@/lib/i18n";
 import {
   CARD_NEWS_DATA,
@@ -312,8 +313,8 @@ function CardNewsView() {
         : null;
 
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+    <div className="min-h-screen bg-bg-primary text-text-primary flex flex-col">
+      <div className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-12">
         {/* 상단 네비게이션 */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -527,6 +528,8 @@ function CardNewsView() {
           </div>
         )}
       </div>
+
+      <SiteFooter innerClassName="max-w-4xl mx-auto px-4 sm:px-6" />
 
       {/* 모달 */}
       {modal && (

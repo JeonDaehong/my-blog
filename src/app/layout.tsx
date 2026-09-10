@@ -49,7 +49,6 @@ export const metadata: Metadata = {
     siteName: "대홍의 데이터 기록",
   },
   robots: { index: true, follow: true },
-  icons: { icon: "/favicon.ico" },
   alternates: { types: { "application/rss+xml": "/feed" } },
 };
 
