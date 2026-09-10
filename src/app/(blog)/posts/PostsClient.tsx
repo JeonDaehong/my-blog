@@ -16,6 +16,7 @@ import { HiOutlineViewGrid, HiOutlineViewList } from "react-icons/hi";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import type { PostSummary, PaginationMeta, PostsExtras } from "@/lib/types";
+import { postsPageHref } from "@/lib/posts-nav";
 import {
   FeaturedHero,
   PopularCard,
@@ -72,10 +73,7 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
     locale === "en" && cat.nameEn ? cat.nameEn : cat.name;
 
   function goToPage(p: number) {
-    const params = new URLSearchParams();
-    if (p > 1) params.set("page", String(p));
-    if (query) params.set("q", query);
-    router.push(`/posts${params.size ? `?${params}` : ""}`);
+    router.push(postsPageHref(p, query));
   }
 
   function clearSearch() {
