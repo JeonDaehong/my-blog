@@ -1,5 +1,5 @@
 /**
- * 카드뉴스 데이터. 페이지와 사이드바 미리보기가 함께 쓰기 때문에
+ * Tech Study Cards 데이터. 페이지와 사이드바 미리보기가 함께 쓰기 때문에
  * "use client" 없는 별도 모듈로 둔다. 서버에서 import하면 클라이언트
  * 번들에는 실리지 않는다.
  */
@@ -110,17 +110,41 @@ export type CardNewsPreview = {
   topicEn: string | null;
   icon: string;
   accent: string;
+  /** 해당 카드가 바로 열리는 딥링크 */
+  href: string;
 };
+
+/**
+ * 소주제 이름과 카드 번호로 카드 한 장을 가리키는 링크.
+ * /card-news 가 이 쿼리를 읽어 해당 위치로 이동한 뒤 팝업까지 띄운다.
+ */
+export function cardHref(topic: string, index: number): string {
+  return `/card-news?topic=${encodeURIComponent(topic)}&card=${index}`;
+}
+
+/** 링크로 들어왔을 때 topic 이름이 가리키는 대/소 카테고리를 되찾는다. */
+export function findTopic(
+  topic: string
+): { bigCat: BigCategory; subCat: SubCategory } | null {
+  for (const bigCat of CARD_NEWS_DATA) {
+    for (const subCat of bigCat.subCategories) {
+      if (subCat.name === topic) return { bigCat, subCat };
+    }
+  }
+  return null;
+}
 
 /**
  * 카드에는 작성일이 없다. 데이터에 적힌 순서를 최신순으로 보고 앞에서부터
  * 잘라 쓴다. 날짜가 생기면 여기만 바꾸면 된다.
+ *
+ * 목록에는 카테고리나 대주제가 아니라 실제로 읽을 카드(최하위 항목)만 담는다.
  */
 export function getRecentCards(limit = 3): CardNewsPreview[] {
   const cards: CardNewsPreview[] = [];
   for (const bigCat of CARD_NEWS_DATA) {
     for (const subCat of bigCat.subCategories) {
-      for (const card of subCat.cards) {
+      subCat.cards.forEach((card, index) => {
         cards.push({
           id: `${subCat.name}-${card.title}`,
           title: card.title,
@@ -129,8 +153,9 @@ export function getRecentCards(limit = 3): CardNewsPreview[] {
           topicEn: subCat.nameEn ?? null,
           icon: card.icon,
           accent: card.accent,
+          href: cardHref(subCat.name, index),
         });
-      }
+      });
     }
   }
   return cards.slice(0, limit);

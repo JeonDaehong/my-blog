@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
   HiOutlineArrowLeft,
   HiOutlineChevronLeft,
@@ -15,6 +16,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import { useI18n } from "@/lib/i18n";
 import {
   CARD_NEWS_DATA,
+  findTopic,
   type Card,
   type SubCategory,
   type BigCategory,
@@ -33,7 +35,7 @@ const TEXT = {
   ko: {
     home: "홈으로",
     back: "뒤로",
-    title: "카드뉴스",
+    title: "Tech Study Cards",
     prev: "이전",
     next: "다음",
     viewAll: "모두 보기",
@@ -45,7 +47,7 @@ const TEXT = {
   en: {
     home: "Home",
     back: "Back",
-    title: "Card News",
+    title: "Tech Study Cards",
     prev: "Prev",
     next: "Next",
     viewAll: "View all",
@@ -62,14 +64,16 @@ const TEXT = {
 
 function CardModal({
   cards,
+  startIndex,
   lang,
   onClose,
 }: {
   cards: Card[];
+  startIndex: number;
   lang: "ko" | "en";
   onClose: () => void;
 }) {
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(startIndex);
   const dialogRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
@@ -231,9 +235,58 @@ type View =
   | { step: "subCategories"; bigCat: BigCategory }
   | { step: "thumbnail"; bigCat: BigCategory; subCat: SubCategory };
 
-export default function CardNewsPage() {
-  const [view, setView] = useState<View>({ step: "bigCategories" });
-  const [modalCards, setModalCards] = useState<Card[] | null>(null);
+type ModalState = { cards: Card[]; index: number };
+
+function CardNewsView() {
+  const searchParams = useSearchParams();
+
+  /*
+    ?topic=<소주제>&card=<번호> 로 들어오면 해당 소주제 화면으로 바로 이동하고
+    그 카드가 펼쳐진 팝업까지 띄운다. 목록에서 카드를 누르면 이 링크로 온다.
+  */
+  const deepLink = useMemo(() => {
+    const topic = searchParams.get("topic");
+    if (!topic) return null;
+    const found = findTopic(topic);
+    if (!found) return null;
+    const raw = Number(searchParams.get("card"));
+    const index =
+      Number.isInteger(raw) && raw >= 0 && raw < found.subCat.cards.length
+        ? raw
+        : 0;
+    return { ...found, index };
+  }, [searchParams]);
+
+  const [view, setView] = useState<View>(() =>
+    deepLink
+      ? { step: "thumbnail", bigCat: deepLink.bigCat, subCat: deepLink.subCat }
+      : { step: "bigCategories" }
+  );
+  const [modal, setModal] = useState<ModalState | null>(() =>
+    deepLink ? { cards: deepLink.subCat.cards, index: deepLink.index } : null
+  );
+  // 팝업을 닫아도 방금 보던 카드가 어디였는지 남겨 둔다.
+  const [lastOpened, setLastOpened] = useState<number | null>(
+    deepLink ? deepLink.index : null
+  );
+
+  useEffect(() => {
+    if (!deepLink) return;
+    setView({ step: "thumbnail", bigCat: deepLink.bigCat, subCat: deepLink.subCat });
+    setModal({ cards: deepLink.subCat.cards, index: deepLink.index });
+    setLastOpened(deepLink.index);
+  }, [deepLink]);
+
+  const openCard = (cards: Card[], index: number) => {
+    setModal({ cards, index });
+    setLastOpened(index);
+  };
+
+  // 링크로 들어온 카드가 화면 밖이면 팝업을 닫았을 때 보이도록 끌어온다.
+  const scrollToLastOpened = useCallback((node: HTMLButtonElement | null) => {
+    node?.scrollIntoView({ block: "center" });
+  }, []);
+
   // 언어는 헤더 토글과 같은 값을 쓰도록 전역 컨텍스트에서 받는다.
   const { locale: lang, setLocale: setLang } = useI18n();
   const { theme, toggleTheme } = useTheme();
@@ -244,6 +297,7 @@ export default function CardNewsPage() {
 
   const goBack = () => {
     if (view.step === "thumbnail") {
+      setLastOpened(null);
       setView({ step: "subCategories", bigCat: view.bigCat });
     } else if (view.step === "subCategories") {
       setView({ step: "bigCategories" });
@@ -371,9 +425,10 @@ export default function CardNewsPage() {
               return (
                 <button
                   key={subCat.name}
-                  onClick={() =>
-                    setView({ step: "thumbnail", bigCat: view.bigCat, subCat })
-                  }
+                  onClick={() => {
+                    setLastOpened(null);
+                    setView({ step: "thumbnail", bigCat: view.bigCat, subCat });
+                  }}
                   className="w-full text-left rounded-xl border border-border-color bg-bg-secondary hover:border-border-light hover:bg-bg-hover transition-all duration-200 px-4 sm:px-5 py-4 sm:py-5 group"
                 >
                   <div className="flex gap-3 sm:gap-4">
@@ -427,58 +482,72 @@ export default function CardNewsPage() {
           </div>
         )}
 
-        {/* ── Step 3: 대표 썸네일 카드 1개 ── */}
+        {/* ── Step 3: 이 주제의 카드 전부 ── */}
         {view.step === "thumbnail" && (
-          <div className="animate-in">
-            {(() => {
-              const firstCard = view.subCat.cards[0];
-              const cardTitle = lang === "en" && firstCard.titleEn ? firstCard.titleEn : firstCard.title;
-              const cardBody = lang === "en" && firstCard.bodyEn ? firstCard.bodyEn : firstCard.body;
+          <div className="animate-in grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {view.subCat.cards.map((card, index) => {
+              const cardTitle = lang === "en" && card.titleEn ? card.titleEn : card.title;
+              const cardBody = lang === "en" && card.bodyEn ? card.bodyEn : card.body;
+              const isLast = lastOpened === index;
               return (
                 <button
-                  onClick={() => setModalCards(view.subCat.cards)}
-                  className="group text-left w-full max-w-md rounded-2xl border overflow-hidden hover:shadow-xl hover:shadow-black/30 transition-all duration-200"
-                  style={{ borderColor: `${view.subCat.accent}30` }}
+                  key={card.title}
+                  ref={isLast ? scrollToLastOpened : undefined}
+                  onClick={() => openCard(view.subCat.cards, index)}
+                  className="group text-left rounded-2xl border overflow-hidden hover:shadow-lg hover:shadow-black/10 transition-all duration-200"
+                  style={{
+                    borderColor: `${card.accent}30`,
+                    // 팝업을 닫았을 때 방금 읽던 카드가 어디였는지 보이게 한다.
+                    boxShadow: isLast ? `0 0 0 2px ${card.accent}` : undefined,
+                  }}
                 >
+                  <div className="h-1.5" style={{ background: card.accent }} />
                   <div
-                    className="h-1.5"
-                    style={{ background: view.subCat.accent }}
-                  />
-                  <div
-                    className="px-6 py-6"
-                    style={{ background: `${view.subCat.accent}08` }}
+                    className="px-5 py-5 h-full"
+                    style={{ background: `${card.accent}08` }}
                   >
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-3xl">{firstCard.icon}</span>
-                      <p className="text-[15px] font-bold text-text-primary group-hover:text-accent transition-colors">
-                        {cardTitle}
-                      </p>
-                    </div>
-
-                    <p className="text-[13px] text-text-secondary leading-relaxed line-clamp-3 mb-4">
-                      {cardBody}
-                    </p>
-
-                    <div className="flex items-center justify-end">
-                      <span
-                        className="inline-flex items-center gap-1 text-[12px] font-medium group-hover:gap-2 transition-all"
-                        style={{ color: view.subCat.accent }}
-                      >
-                        {t.viewAll} <HiOutlineChevronRight size={14} />
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="text-3xl leading-none">{card.icon}</span>
+                      <span className="text-[11px] font-semibold tabular-nums text-text-tertiary">
+                        {index + 1} / {view.subCat.cards.length}
                       </span>
                     </div>
+
+                    <p className="text-[15px] font-bold text-text-primary group-hover:text-accent transition-colors leading-snug mb-2">
+                      {cardTitle}
+                    </p>
+
+                    <p className="text-[13px] text-text-secondary leading-relaxed line-clamp-3 whitespace-pre-line">
+                      {cardBody}
+                    </p>
                   </div>
                 </button>
               );
-            })()}
+            })}
           </div>
         )}
       </div>
 
       {/* 모달 */}
-      {modalCards && (
-        <CardModal cards={modalCards} lang={lang} onClose={() => setModalCards(null)} />
+      {modal && (
+        <CardModal
+          // 다른 카드를 누르면 그 카드부터 다시 열리도록 모달을 새로 마운트한다.
+          key={modal.index}
+          cards={modal.cards}
+          startIndex={modal.index}
+          lang={lang}
+          onClose={() => setModal(null)}
+        />
       )}
     </div>
+  );
+}
+
+export default function CardNewsPage() {
+  // useSearchParams는 Suspense 경계 안에서만 프리렌더된다.
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-bg-primary" />}>
+      <CardNewsView />
+    </Suspense>
   );
 }

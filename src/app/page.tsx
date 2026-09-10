@@ -30,19 +30,19 @@ const TEXT = {
     title: "대홍의 데이터 기록",
     desc: "하루에 한 걸음씩 꾸준히 성장하는 엔지니어",
     blog: "블로그 읽기",
-    cardNews: "카드뉴스 읽기",
+    cardNews: "Tech Study Cards 읽기",
     sponsor: "후원하기",
     navBlog: "블로그",
-    navCardNews: "카드뉴스",
+    navCardNews: "Tech Study Cards",
   },
   en: {
     title: "Daehong's Data Log",
     desc: "An engineer who grows one step at a time, every single day.",
     blog: "Read Blog",
-    cardNews: "Read Card News",
+    cardNews: "Read Tech Study Cards",
     sponsor: "Sponsor",
     navBlog: "Blog",
-    navCardNews: "Card News",
+    navCardNews: "Tech Study Cards",
   },
 };
 
@@ -84,11 +84,11 @@ export default function LandingPage() {
       {/* Gradient blob */}
       <div
         className="absolute bottom-[-20%] right-[-10%] w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] lg:w-[700px] lg:h-[700px] rounded-full blur-[80px] sm:blur-[120px] pointer-events-none"
-        style={{ background: `radial-gradient(circle, rgba(49,130,246,${isLight ? 0.12 : 0.35}) 0%, rgba(120,180,255,${isLight ? 0.06 : 0.15}) 40%, transparent 70%)` }}
+        style={{ background: `radial-gradient(circle, rgba(234,88,12,${isLight ? 0.12 : 0.35}) 0%, rgba(251,191,36,${isLight ? 0.06 : 0.15}) 40%, transparent 70%)` }}
       />
       <div
         className="absolute top-[-10%] left-[-5%] w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] lg:w-[400px] lg:h-[400px] rounded-full blur-[60px] sm:blur-[100px] pointer-events-none"
-        style={{ background: `radial-gradient(circle, rgba(49,130,246,${isLight ? 0.03 : 0.08}) 0%, transparent 70%)` }}
+        style={{ background: `radial-gradient(circle, rgba(234,88,12,${isLight ? 0.03 : 0.08}) 0%, transparent 70%)` }}
       />
 
       {/* Nav */}
@@ -160,7 +160,7 @@ export default function LandingPage() {
             <div className="flex flex-wrap gap-2">
               {[
                 { label: lang === "ko" ? "데이터 엔지니어" : "Data Engineer", color: "bg-blue-500", tooltip: "Hadoop · Spark · Airflow · Kafka · Kubernetes · Iceberg" },
-                { label: lang === "ko" ? "백엔드 엔지니어" : "Backend Engineer", color: "bg-violet-500", tooltip: "Java · Python · Spring" },
+                { label: lang === "ko" ? "데이터 플랫폼 엔지니어" : "Data Platform Engineer", color: "bg-violet-500", tooltip: "Kubernetes · Iceberg · Gravitino" },
                 { label: lang === "ko" ? "오픈소스 컨트리뷰터" : "OSS Contributor", color: "bg-emerald-500", tooltip: "Spring Kafka · Apache Iceberg · Gravitino" },
               ].map((c) => (
                 <span key={c.label} className="relative group inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bg-hover border border-border-color text-xs text-text-tertiary cursor-default">
@@ -182,7 +182,7 @@ export default function LandingPage() {
               mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
             }`}
           >
-            <div className="rounded-3xl overflow-hidden border border-border-color shadow-2xl shadow-blue-500/5">
+            <div className="rounded-3xl overflow-hidden border border-border-color shadow-2xl shadow-orange-500/5">
               <Image
                 src="/images/main_1.jpeg"
                 alt="전대홍 - 오픈소스 컨퍼런스 발표"
@@ -215,7 +215,7 @@ export default function LandingPage() {
             {views && (
               <>
                 <span className="flex items-center gap-1.5 text-xs text-text-tertiary">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500/60" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500/60" />
                   Total
                   <span className="text-text-secondary font-semibold tabular-nums">{views.total.toLocaleString()}</span>
                 </span>

@@ -279,19 +279,27 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                         })}
                     </p>
                   </div>
-                  <div className="hidden sm:flex items-center gap-3 shrink-0">
-                    {post.category && (
-                      <span className="text-[11px] px-2 py-0.5 rounded bg-bg-tertiary text-text-tertiary border border-border-color">
-                        {getCatName(post.category)}
-                      </span>
-                    )}
-                    {viewCounts[post.slug] !== undefined && (
-                      <span className="inline-flex items-center gap-1 text-[11px] text-text-tertiary">
-                        <HiOutlineEye size={12} />
-                        {viewCounts[post.slug].toLocaleString()}
-                      </span>
-                    )}
-                    <span className="text-[12px] text-text-tertiary whitespace-nowrap">
+                  {/*
+                    행마다 카테고리 이름 길이와 조회수 유무가 달라 flex로 두면
+                    줄이 어긋난다. 고정 폭 그리드로 열을 맞춘다.
+                  */}
+                  <div className="hidden sm:grid grid-cols-[120px_64px_80px] items-center gap-3 shrink-0">
+                    <span className="min-w-0">
+                      {post.category && (
+                        <span className="block truncate text-center text-[11px] px-2 py-0.5 rounded bg-bg-tertiary text-text-tertiary border border-border-color">
+                          {getCatName(post.category)}
+                        </span>
+                      )}
+                    </span>
+                    <span className="inline-flex items-center justify-end gap-1 text-[11px] text-text-tertiary tabular-nums">
+                      {viewCounts[post.slug] !== undefined && (
+                        <>
+                          <HiOutlineEye size={12} className="shrink-0" />
+                          {viewCounts[post.slug].toLocaleString()}
+                        </>
+                      )}
+                    </span>
+                    <span className="text-[12px] text-right text-text-tertiary tabular-nums whitespace-nowrap">
                       {format(new Date(post.createdAt), "yyyy.MM.dd", {
                         locale: dateLocale,
                       })}

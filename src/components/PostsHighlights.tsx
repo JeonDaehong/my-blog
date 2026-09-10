@@ -188,7 +188,7 @@ export function CardNewsCard({ cards }: { cards: CardNewsPreview[] }) {
 
   return (
     <SidebarCard
-      title={t("recentCardNews")}
+      title={t("techStudyCards")}
       action={
         <Link
           href="/card-news"
@@ -201,7 +201,7 @@ export function CardNewsCard({ cards }: { cards: CardNewsPreview[] }) {
       <ul className="space-y-4">
         {cards.map((card) => (
           <li key={card.id}>
-            <Link href="/card-news" className="group flex items-start gap-2.5">
+            <Link href={card.href} className="group flex items-start gap-2.5">
               <span
                 className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-[15px] border"
                 style={{

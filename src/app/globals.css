@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Light theme (default) — Toss 계열 그레이 스케일 + 블루 액센트 */
+/* Light theme (default) — 뉴트럴 그레이 스케일 + 시그니처 오렌지 액센트 */
 :root {
   --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
     system-ui, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
@@ -19,11 +19,11 @@
   --text-tertiary: #8b95a1;
   --border-color: #e5e8eb;
   --border-light: #d1d6db;
-  --accent: #3182f6;
-  --accent-hover: #1b64da;
-  --accent-muted: rgba(49, 130, 246, 0.1);
+  --accent: #e87040;
+  --accent-hover: #d56030;
+  --accent-muted: rgba(232, 112, 64, 0.1);
   --code-bg: #f2f4f6;
-  --link-color: #3182f6;
+  --link-color: #e87040;
 }
 
 /* Dark theme */
@@ -38,11 +38,11 @@
   --text-tertiary: #666666;
   --border-color: #2a2a2a;
   --border-light: #333333;
-  --accent: #4593fc;
-  --accent-hover: #6ba5ff;
-  --accent-muted: rgba(69, 147, 252, 0.15);
+  --accent: #e87040;
+  --accent-hover: #f08050;
+  --accent-muted: rgba(232, 112, 64, 0.15);
   --code-bg: #1e1e1e;
-  --link-color: #4593fc;
+  --link-color: #e87040;
 }
 
 html {

@@ -81,7 +81,7 @@ async function resolveComments(raw: RawComment[]): Promise<CommentPreview[]> {
 }
 
 /**
- * 추천·인기·댓글·카드뉴스 섹션. 첫 화면에서만 보여주고, 실패해도 목록 자체는
+ * 추천·인기·댓글·Tech Study Cards 섹션. 첫 화면에서만 보여주고, 실패해도 목록 자체는
  * 뜨도록 빈 값으로 떨어뜨린다. 인기 글은 PageView 집계를 실제로 읽는다.
  */
 async function loadExtras(): Promise<PostsExtras> {
