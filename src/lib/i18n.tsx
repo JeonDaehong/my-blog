@@ -23,7 +23,7 @@ const translations = {
     viewAll: "전체보기",
     featured: "추천 아티클",
     popularPosts: "인기 있는 글",
-    techStudyCards: "Tech Study Cards",
+    techStudyCards: "기술 공부 카드",
     recentComments: "최근 댓글",
     categoriesMenu: "카테고리",
     noPosts: "아직 작성된 글이 없습니다",

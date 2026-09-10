@@ -31,10 +31,10 @@ const TEXT = {
     title: "대홍의 데이터 기록",
     desc: "하루에 한 걸음씩 꾸준히 성장하는 엔지니어",
     blog: "블로그 읽기",
-    cardNews: "Tech Study Cards 읽기",
+    cardNews: "기술 공부 카드 읽기",
     sponsor: "후원하기",
     navBlog: "블로그",
-    navCardNews: "Tech Study Cards",
+    navCardNews: "기술 공부 카드",
   },
   en: {
     title: "Daehong's Data Log",

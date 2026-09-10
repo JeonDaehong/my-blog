@@ -36,7 +36,7 @@ const TEXT = {
   ko: {
     home: "홈으로",
     back: "뒤로",
-    title: "Tech Study Cards",
+    title: "기술 공부 카드",
     prev: "이전",
     next: "다음",
     viewAll: "모두 보기",
