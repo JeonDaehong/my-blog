@@ -9,6 +9,8 @@ datasource db {
 
 model Category {
   id          String   @id @default(cuid())
+  /// 이 카테고리가 속한 블로그. "tech" = 기술 블로그(/posts), "study" = 공부 블로그(/study)
+  blog        String   @default("tech")
   name        String   @unique
   nameEn      String?
   slug        String   @unique
@@ -18,6 +20,8 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   posts       Post[]
+
+  @@index([blog, order])
 }
 
 model Post {
@@ -31,6 +35,8 @@ model Post {
   excerptEn   String?
   coverImage  String?
   published   Boolean   @default(false)
+  /// 카테고리가 없는 글도 갈라져야 하므로 글 자체에 둔다
+  blog        String    @default("tech")
   categoryId  String?
   category    Category? @relation(fields: [categoryId], references: [id])
   createdAt   DateTime  @default(now())
@@ -38,6 +44,7 @@ model Post {
 
   @@index([categoryId])
   @@index([published, createdAt])
+  @@index([blog, published, createdAt])
 }
 
 model GuestbookEntry {

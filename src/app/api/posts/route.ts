@@ -97,14 +97,21 @@ export async function POST(req: NextRequest) {
       excerptEn: excerptEn || null,
       coverImage: body.coverImage || null,
       published: body.published ?? false,
+      blog: body.blog === "study" ? "study" : "tech",
       categoryId: body.categoryId || null,
     },
   });
 
   revalidatePath("/");
-  revalidatePath("/posts");
-  revalidatePath(`/posts/${slug}`);
-  revalidatePath("/category", "page");
+  if (post.blog === "study") {
+    revalidatePath("/study");
+    revalidatePath(`/study/${slug}`);
+    revalidatePath("/study/category", "page");
+  } else {
+    revalidatePath("/posts");
+    revalidatePath(`/posts/${slug}`);
+    revalidatePath("/category", "page");
+  }
 
   return NextResponse.json(post, { status: 201 });
 }

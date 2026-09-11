@@ -21,6 +21,7 @@ export default function WriteContent() {
   const [excerptEn, setExcerptEn] = useState("");
   const [coverImage, setCoverImage] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [blog, setBlog] = useState<"tech" | "study">("tech");
   const [published, setPublished] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [saving, setSaving] = useState(false);
@@ -30,7 +31,7 @@ export default function WriteContent() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch("/api/categories").then((r) => r.json()).then(setCategories);
+    fetch(`/api/categories?blog=${blog}`).then((r) => r.json()).then(setCategories);
     if (editId) {
       fetch(`/api/posts/${editId}`).then((r) => r.json()).then((post: any) => {
         if (post && post.id) {
@@ -39,11 +40,12 @@ export default function WriteContent() {
           setExcerpt(post.excerpt || ""); setExcerptEn(post.excerptEn || "");
           setCoverImage(post.coverImage || "");
           setCategoryId(post.categoryId || "");
+          setBlog(post.blog === "study" ? "study" : "tech");
           setPublished(post.published);
         }
       });
     }
-  }, [editId]);
+  }, [editId, blog]);
 
   async function uploadImage(file: File) {
     setUploading(true);
@@ -87,6 +89,7 @@ export default function WriteContent() {
       excerpt: excerpt || null, excerptEn: excerptEn || null,
       coverImage: coverImage || null,
       categoryId: categoryId || null,
+      blog,
       published: asDraft ? false : published,
     };
     try {
@@ -160,7 +163,12 @@ export default function WriteContent() {
             value={currentTitle} onChange={(e) => setCurrentTitle(e.target.value)}
             className="w-full text-xl sm:text-2xl font-bold px-0 py-2 border-0 border-b border-border-color bg-transparent text-text-primary focus:outline-none focus:border-accent placeholder:text-text-tertiary" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <select value={blog} onChange={(e) => { setBlog(e.target.value as "tech" | "study"); setCategoryId(""); }}
+              className="px-3 py-2 rounded-md border border-border-color bg-bg-secondary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent">
+              <option value="tech">기술 블로그</option>
+              <option value="study">공부 블로그</option>
+            </select>
             <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
               className="px-3 py-2 rounded-md border border-border-color bg-bg-secondary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent">
               <option value="">카테고리 선택</option>

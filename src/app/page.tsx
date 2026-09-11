@@ -20,7 +20,7 @@ import { useI18n } from "@/lib/i18n";
 
 const LINKS = {
   blog: "/posts",
-  cardNews: "/card-news",
+  study: "/study",
   github: "https://github.com/JeonDaehong",
   linkedin: "https://linkedin.com/in/daehong-jeon",
   sponsor: "https://buymeacoffee.com/daehong",
@@ -30,20 +30,20 @@ const TEXT = {
   ko: {
     title: "대홍의 데이터 기록",
     desc: "하루에 한 걸음씩 꾸준히 성장하는 엔지니어",
-    blog: "블로그 읽기",
-    cardNews: "기술 공부 카드 읽기",
+    blog: "기술 블로그 읽기",
+    study: "공부 블로그 읽기",
     sponsor: "후원하기",
-    navBlog: "블로그",
-    navCardNews: "기술 공부 카드",
+    navBlog: "기술 블로그",
+    navStudy: "공부 블로그",
   },
   en: {
     title: "Daehong's Data Log",
     desc: "An engineer who grows one step at a time, every single day.",
-    blog: "Read Blog",
-    cardNews: "Read Tech Study Cards",
+    blog: "Read Tech Blog",
+    study: "Read Study Blog",
     sponsor: "Sponsor",
-    navBlog: "Blog",
-    navCardNews: "Tech Study Cards",
+    navBlog: "Tech Blog",
+    navStudy: "Study Blog",
   },
 };
 
@@ -99,7 +99,7 @@ export default function LandingPage() {
           </Link>
           <div className="flex items-center gap-0.5 sm:gap-2">
             <Link href={LINKS.blog} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navBlog}</Link>
-            <Link href={LINKS.cardNews} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navCardNews}</Link>
+            <Link href={LINKS.study} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navStudy}</Link>
             <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors hidden sm:block">GitHub</a>
             <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="p-2 text-text-secondary hover:text-text-primary transition-colors sm:hidden">
               <FaGithub size={16} />
@@ -148,11 +148,11 @@ export default function LandingPage() {
                 <HiArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                href={LINKS.cardNews}
+                href={LINKS.study}
                 className="group inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border-color text-text-secondary font-medium text-sm hover:bg-bg-hover transition-colors"
               >
                 <HiOutlineNewspaper size={18} />
-                {t.cardNews}
+                {t.study}
                 <HiArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>

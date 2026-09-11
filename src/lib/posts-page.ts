@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { postSummarySelect } from "@/lib/queries";
 import { fetchRecentComments, type RawComment } from "@/lib/giscus";
-import { getRecentCards } from "@/lib/card-news";
 import type {
   PostSummary,
   PaginationMeta,
@@ -15,7 +14,6 @@ export const EMPTY_EXTRAS: PostsExtras = {
   featured: [],
   popular: [],
   comments: [],
-  cardNews: [],
 };
 
 function serialize(post: {
@@ -84,7 +82,7 @@ export async function loadExtras(): Promise<PostsExtras> {
   try {
     const [featuredRaw, viewGroups, rawComments] = await Promise.all([
       prisma.post.findMany({
-        where: { published: true },
+        where: { published: true, blog: "tech" },
         orderBy: { createdAt: "desc" },
         select: postSummarySelect,
         take: 5,
@@ -108,7 +106,7 @@ export async function loadExtras(): Promise<PostsExtras> {
 
     const popularPosts = viewsBySlug.size
       ? await prisma.post.findMany({
-          where: { published: true, slug: { in: [...viewsBySlug.keys()] } },
+          where: { published: true, blog: "tech", slug: { in: [...viewsBySlug.keys()] } },
           select: { slug: true, title: true, titleEn: true },
         })
       : [];
@@ -120,7 +118,6 @@ export async function loadExtras(): Promise<PostsExtras> {
         .sort((a, b) => b.views - a.views)
         .slice(0, 3),
       comments: await resolveComments(rawComments),
-      cardNews: getRecentCards(3),
     };
   } catch (err) {
     console.error("[posts] 부가 섹션을 불러오지 못했습니다:", err);
@@ -155,7 +152,7 @@ export async function loadPosts(page: number, q?: string | null): Promise<PostsP
         }
       : {};
 
-    const where = { published: true, ...searchFilter };
+    const where = { published: true, blog: "tech", ...searchFilter };
 
     const [rawPosts, total] = await Promise.all([
       prisma.post.findMany({

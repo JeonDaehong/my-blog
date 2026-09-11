@@ -9,6 +9,7 @@ export default async function BlogLayout({
   let categories: any[] = [];
   try {
     categories = await prisma.category.findMany({
+      where: { blog: "tech" },
       orderBy: { order: "asc" },
       include: { _count: { select: { posts: { where: { published: true } } } } },
     });

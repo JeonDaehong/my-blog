@@ -1,4 +1,3 @@
-import type { CardNewsPreview } from "@/lib/card-news";
 
 export type CategoryBasic = {
   id: string;
@@ -106,5 +105,4 @@ export type PostsExtras = {
   featured: PostSummary[];
   popular: PopularPost[];
   comments: CommentPreview[];
-  cardNews: CardNewsPreview[];
 };

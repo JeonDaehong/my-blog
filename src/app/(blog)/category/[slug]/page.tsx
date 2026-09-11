@@ -10,7 +10,7 @@ type Props = { params: { slug: string } };
 
 export async function generateStaticParams() {
   try {
-    const categories = await prisma.category.findMany({ select: { slug: true } });
+    const categories = await prisma.category.findMany({ where: { blog: "tech" }, select: { slug: true } });
     return categories.map((category) => ({ slug: category.slug }));
   } catch (err) {
     console.error("[generateStaticParams] 카테고리 조회 실패:", err);
@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CategoryPage({ params }: Props) {
   const slug = decodeURIComponent(params.slug);
-  const category = await prisma.category.findUnique({
-    where: { slug },
+  const category = await prisma.category.findFirst({
+    where: { slug, blog: "tech" },
     include: {
       posts: {
         where: { published: true },

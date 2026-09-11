@@ -4,8 +4,11 @@ import { isAuthenticated } from "@/lib/auth";
 import { translateToEnglish } from "@/lib/translate";
 import { generateSlug } from "@/lib/slug";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // ?blog=study 면 공부 블로그 카테고리만
+  const blog = req.nextUrl.searchParams.get("blog");
   const categories = await prisma.category.findMany({
+    where: blog ? { blog } : {},
     orderBy: { order: "asc" },
     include: { _count: { select: { posts: true } } },
   });
@@ -32,6 +35,7 @@ export async function POST(req: NextRequest) {
 
   const category = await prisma.category.create({
     data: {
+      blog: body.blog === "study" ? "study" : "tech",
       name: body.name,
       nameEn: nameEn || null,
       slug,

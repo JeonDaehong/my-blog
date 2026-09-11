@@ -16,7 +16,7 @@ type Props = { params: { slug: string } };
 export async function generateStaticParams() {
   try {
     const posts = await prisma.post.findMany({
-      where: { published: true },
+      where: { published: true, blog: "tech" },
       select: { slug: true },
     });
     return posts.map((post) => ({ slug: post.slug }));
@@ -30,7 +30,7 @@ export async function generateStaticParams() {
 
 // generateMetadata와 페이지 본문이 같은 글을 두 번 조회하지 않도록 렌더 단위로 캐싱한다.
 const getPost = cache((slug: string) =>
-  prisma.post.findUnique({ where: { slug, published: true }, include: { category: true } })
+  prisma.post.findFirst({ where: { slug, published: true, blog: "tech" }, include: { category: true } })
 );
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -106,12 +106,12 @@ export default async function PostPage({ params }: Props) {
     renderMarkdown(post.content),
     Promise.all([
       prisma.post.findFirst({
-        where: { published: true, createdAt: { lt: post.createdAt } },
+        where: { published: true, blog: "tech", createdAt: { lt: post.createdAt } },
         orderBy: { createdAt: "desc" },
         select: { slug: true, title: true },
       }),
       prisma.post.findFirst({
-        where: { published: true, createdAt: { gt: post.createdAt } },
+        where: { published: true, blog: "tech", createdAt: { gt: post.createdAt } },
         orderBy: { createdAt: "asc" },
         select: { slug: true, title: true },
       }),
