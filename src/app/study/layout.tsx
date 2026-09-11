@@ -27,6 +27,7 @@ export default async function StudyLayout({
             nameEn: c.nameEn,
             slug: c.slug,
             _count: { posts: c.count },
+            children: c.children,
           }))}
         />
         <main

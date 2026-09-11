@@ -36,6 +36,8 @@ type NavCategory = {
   nameEn?: string | null;
   slug: string;
   _count?: { posts: number };
+  /** 하위 카테고리. 있으면 메뉴에서 한 단 들여 함께 보여준다. */
+  children?: { id: string; name: string; slug: string; count?: number }[];
 };
 
 /** 검색 결과와 최신 글 목록이 같은 모양을 쓰도록 행 하나를 따로 뺀다. */
@@ -141,7 +143,8 @@ export default function TopBar({
   const { theme, toggleTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
-  const catRef = useRef<HTMLDivElement>(null);
+  const desktopCatRef = useRef<HTMLDivElement>(null);
+  const mobileCatRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [recent, setRecent] = useState<SearchResult[]>([]);
@@ -171,7 +174,10 @@ export default function TopBar({
   useEffect(() => {
     if (!catOpen) return;
     function onPointerDown(e: MouseEvent) {
-      if (!catRef.current?.contains(e.target as Node)) setCatOpen(false);
+      const target = e.target as Node;
+      const inside =
+        desktopCatRef.current?.contains(target) || mobileCatRef.current?.contains(target);
+      if (!inside) setCatOpen(false);
     }
     document.addEventListener("mousedown", onPointerDown);
     return () => document.removeEventListener("mousedown", onPointerDown);
@@ -291,6 +297,12 @@ export default function TopBar({
     label: locale === "en" && category.nameEn ? category.nameEn : category.name,
     count: category._count?.posts,
     active: pathname === `${scope.categoryPrefix}/${category.slug}`,
+    children: (category.children ?? []).map((child) => ({
+      href: `${scope.categoryPrefix}/${child.slug}`,
+      label: child.name,
+      count: child.count,
+      active: pathname === `${scope.categoryPrefix}/${child.slug}`,
+    })),
   }));
   const activeCategory = categoryItems.find((item) => item.active);
 
@@ -317,6 +329,31 @@ export default function TopBar({
                 </span>
               )}
             </Link>
+
+            {item.children.length > 0 && (
+              <ul className="pb-1">
+                {item.children.map((child) => (
+                  <li key={child.href}>
+                    <Link
+                      href={child.href}
+                      onClick={() => setCatOpen(false)}
+                      className={`flex items-center justify-between gap-3 pl-7 pr-4 py-1.5 text-[13px] transition-colors ${
+                        child.active
+                          ? "text-accent font-semibold bg-accent-muted"
+                          : "text-text-tertiary hover:text-text-primary hover:bg-bg-hover"
+                      }`}
+                    >
+                      <span className="truncate">{child.label}</span>
+                      {child.count !== undefined && child.count > 0 && (
+                        <span className="shrink-0 text-[12px] text-text-tertiary tabular-nums">
+                          {child.count}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ul>
@@ -356,7 +393,7 @@ export default function TopBar({
               </Link>
 
               {categoryItems.length > 0 && (
-                <div className="relative" ref={catRef}>
+                <div className="relative" ref={desktopCatRef}>
                   <button
                     onClick={() => setCatOpen((v) => !v)}
                     aria-expanded={catOpen}
@@ -433,7 +470,7 @@ export default function TopBar({
             </Link>
 
             {categoryItems.length > 0 && (
-              <div className="relative" ref={catRef}>
+              <div className="relative" ref={mobileCatRef}>
                 <button
                   onClick={() => setCatOpen((v) => !v)}
                   aria-expanded={catOpen}
