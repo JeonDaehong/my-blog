@@ -187,31 +187,26 @@ export function LatestCard({ posts }: { posts: PostSummary[] }) {
   if (posts.length === 0) return null;
 
   return (
-    <SidebarCard
-      title={t("latestPosts")}
-      action={
-        <Link
-          href="/posts"
-          className="text-[12px] text-text-tertiary hover:text-accent transition-colors"
-        >
-          {t("viewAll")}
-        </Link>
-      }
-    >
-      <ul className="space-y-4">
-        {posts.map((post) => (
+    <SidebarCard title={t("latestPosts")}>
+      <ol className="space-y-4">
+        {posts.map((post, i) => (
           <li key={post.slug}>
-            <Link href={`/posts/${post.slug}`} className="group block">
-              <span className="block text-[14px] font-semibold text-text-primary group-hover:text-accent transition-colors leading-snug line-clamp-2">
-                {locale === "en" && post.titleEn ? post.titleEn : post.title}
+            <Link href={`/posts/${post.slug}`} className="group flex gap-3">
+              <span className="shrink-0 w-4 text-[14px] font-bold text-accent tabular-nums leading-snug">
+                {i + 1}
               </span>
-              <span className="mt-1 block text-[12px] text-text-tertiary">
-                {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
+              <span className="flex-1 min-w-0">
+                <span className="block text-[14px] font-semibold text-text-primary group-hover:text-accent transition-colors leading-snug line-clamp-2">
+                  {locale === "en" && post.titleEn ? post.titleEn : post.title}
+                </span>
+                <span className="mt-1 block text-[12px] text-text-tertiary">
+                  {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
+                </span>
               </span>
             </Link>
           </li>
         ))}
-      </ul>
+      </ol>
     </SidebarCard>
   );
 }
