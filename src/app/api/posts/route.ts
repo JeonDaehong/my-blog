@@ -16,6 +16,8 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") ?? String(DEFAULT_LIMIT), 10)));
   const skip = (page - 1) * limit;
   const q = searchParams.get("q")?.trim() || null;
+  // 블로그가 갈렸으므로 목록·검색도 한쪽만 본다. 지정이 없으면 기술 블로그.
+  const blog = searchParams.get("blog") === "study" ? "study" : "tech";
 
   // Admin fetches all posts without pagination (for the admin dashboard list)
   if (isAdmin && searchParams.get("all") === "true") {
@@ -39,6 +41,7 @@ export async function GET(req: NextRequest) {
     : {};
 
   const where = {
+    blog,
     ...(isAdmin ? {} : { published: true }),
     ...searchFilter,
   };

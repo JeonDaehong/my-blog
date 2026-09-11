@@ -104,7 +104,45 @@ function PostRow({
   );
 }
 
-export default function TopBar({ categories }: { categories: NavCategory[] }) {
+type Scope = {
+  /** 글이 사는 블로그. 검색과 최신 글을 이 블로그로 좁힌다. */
+  blog: "tech" | "study";
+  brand: string;
+  listHref: string;
+  postPrefix: string;
+  categoryPrefix: string;
+  searchHref: string;
+  /** 반대편 블로그로 건너가는 링크 */
+  sibling: { href: string; label: string };
+};
+
+const TECH: Scope = {
+  blog: "tech",
+  brand: "Daehong Blog",
+  listHref: "/posts",
+  postPrefix: "/posts",
+  categoryPrefix: "/category",
+  searchHref: "/search",
+  sibling: { href: "/study", label: "공부 블로그" },
+};
+
+export const STUDY_SCOPE: Scope = {
+  blog: "study",
+  brand: "공부 블로그",
+  listHref: "/study",
+  postPrefix: "/study",
+  categoryPrefix: "/study/category",
+  searchHref: "/study/search",
+  sibling: { href: "/posts", label: "기술 블로그" },
+};
+
+export default function TopBar({
+  categories,
+  scope = TECH,
+}: {
+  categories: NavCategory[];
+  scope?: Scope;
+}) {
   const { locale, setLocale, t } = useI18n();
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
@@ -165,7 +203,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
   useEffect(() => {
     if (!searchOpen || recent.length > 0) return;
     let cancelled = false;
-    fetch("/api/posts?limit=3")
+    fetch(`/api/posts?limit=3&blog=${scope.blog}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!cancelled && data?.posts) setRecent(data.posts);
@@ -174,7 +212,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
     return () => {
       cancelled = true;
     };
-  }, [searchOpen, recent.length]);
+  }, [searchOpen, recent.length, scope.blog]);
 
   // 디바운스 실시간 검색
   const fetchResults = useCallback((q: string) => {
@@ -188,7 +226,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(
-          `/api/posts?q=${encodeURIComponent(q.trim())}&limit=6`
+          `/api/posts?q=${encodeURIComponent(q.trim())}&limit=6&blog=${scope.blog}`
         );
         const data = await res.json();
         setResults(data.posts ?? []);
@@ -198,7 +236,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
         setLoading(false);
       }
     }, 250);
-  }, []);
+  }, [scope.blog]);
 
   useEffect(() => {
     fetchResults(query);
@@ -216,7 +254,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+      router.push(`${scope.searchHref}?q=${encodeURIComponent(query.trim())}`);
       close();
     }
   }
@@ -232,7 +270,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
       e.preventDefault();
       const post = results[selectedIndex];
       if (post) {
-        router.push(`/posts/${post.slug}`);
+        router.push(`${scope.postPrefix}/${post.slug}`);
         close();
       }
     }
@@ -253,12 +291,13 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
   const hasResults = results.length > 0;
 
   // "전체 글"은 개별 글에서도 활성으로 둬서 위치 감각을 유지한다.
-  const allPostsActive = pathname === "/posts" || pathname.startsWith("/posts/");
+  const allPostsActive =
+    pathname === scope.listHref || pathname.startsWith(`${scope.postPrefix}/`);
   const categoryItems = categories.map((category) => ({
-    href: `/category/${category.slug}`,
+    href: `${scope.categoryPrefix}/${category.slug}`,
     label: locale === "en" && category.nameEn ? category.nameEn : category.name,
     count: category._count?.posts,
-    active: pathname === `/category/${category.slug}`,
+    active: pathname === `${scope.categoryPrefix}/${category.slug}`,
   }));
   const activeCategory = categoryItems.find((item) => item.active);
 
@@ -306,14 +345,14 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
                 className="w-7 h-7 rounded-md object-cover"
               />
               <span className="hidden sm:inline font-semibold text-[15px] text-text-primary tracking-tight">
-                Daehong Blog
+                {scope.brand}
               </span>
             </Link>
 
             {/* 카테고리는 목록을 펼쳐 두는 대신 하나의 메뉴로 묶는다 */}
             <nav className="hidden lg:flex items-center gap-7 ml-auto mr-3">
               <Link
-                href="/posts"
+                href={scope.listHref}
                 className={`text-[15px] whitespace-nowrap transition-colors ${
                   allPostsActive
                     ? "text-accent font-semibold"
@@ -358,6 +397,14 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
             {t("guestbook")}
           </Link>
 
+          {/* 반대편 블로그로 건너가는 길 */}
+          <Link
+            href={scope.sibling.href}
+            className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap bg-bg-tertiary text-text-secondary hover:text-text-primary transition-colors"
+          >
+            {scope.sibling.label}
+          </Link>
+
           {/* Theme toggle */}
           <button
             onClick={toggleTheme}
@@ -390,7 +437,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
           {/* 좁은 화면에서도 같은 구성 — 전체 글과 카테고리 메뉴 */}
           <nav className="lg:hidden flex items-center gap-2 pb-2.5">
             <Link
-              href="/posts"
+              href={scope.listHref}
               className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-[13px] transition-colors ${
                 allPostsActive
                   ? "bg-accent text-white font-medium"
@@ -442,7 +489,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
                   className="w-[30px] h-[30px] rounded-md object-cover"
                 />
                 <span className="font-semibold text-[16px] text-text-primary tracking-tight">
-                  Daehong Blog
+                  {scope.brand}
                 </span>
               </Link>
               <button
@@ -520,7 +567,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
                             excerpt={getExcerpt(post)}
                             categoryName={getCatName(post.category)}
                             onSelect={() => {
-                              router.push(`/posts/${post.slug}`);
+                              router.push(`${scope.postPrefix}/${post.slug}`);
                               close();
                             }}
                           />
@@ -547,7 +594,7 @@ export default function TopBar({ categories }: { categories: NavCategory[] }) {
                           highlighted={selectedIndex === i}
                           onHover={() => setSelectedIndex(i)}
                           onSelect={() => {
-                            router.push(`/posts/${post.slug}`);
+                            router.push(`${scope.postPrefix}/${post.slug}`);
                             close();
                           }}
                           title={getTitle(post)}
