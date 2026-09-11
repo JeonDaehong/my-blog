@@ -112,8 +112,6 @@ type Scope = {
   postPrefix: string;
   categoryPrefix: string;
   searchHref: string;
-  /** 반대편 블로그로 건너가는 링크 */
-  sibling: { href: string; label: string };
 };
 
 const TECH: Scope = {
@@ -123,7 +121,6 @@ const TECH: Scope = {
   postPrefix: "/posts",
   categoryPrefix: "/category",
   searchHref: "/search",
-  sibling: { href: "/study", label: "공부 블로그" },
 };
 
 export const STUDY_SCOPE: Scope = {
@@ -133,7 +130,6 @@ export const STUDY_SCOPE: Scope = {
   postPrefix: "/study",
   categoryPrefix: "/study/category",
   searchHref: "/study/search",
-  sibling: { href: "/posts", label: "기술 블로그" },
 };
 
 export default function TopBar({
@@ -395,14 +391,6 @@ export default function TopBar({
             }`}
           >
             {t("guestbook")}
-          </Link>
-
-          {/* 반대편 블로그로 건너가는 길 */}
-          <Link
-            href={scope.sibling.href}
-            className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap bg-bg-tertiary text-text-secondary hover:text-text-primary transition-colors"
-          >
-            {scope.sibling.label}
           </Link>
 
           {/* Theme toggle */}
