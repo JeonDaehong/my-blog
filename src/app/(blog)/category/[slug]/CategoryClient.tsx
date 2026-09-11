@@ -45,7 +45,7 @@ export default function CategoryClient({ category }: { category: any }) {
       </p>
 
       {category.posts.length === 0 ? (
-        <div className="text-center py-20 border border-dashed border-border-color rounded-lg">
+        <div className="text-center py-20">
           <p className="text-text-tertiary text-sm">{t("noCategoryPosts")}</p>
         </div>
       ) : (

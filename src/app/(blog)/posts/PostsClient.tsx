@@ -163,7 +163,7 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
           </div>
 
           {posts.length === 0 ? (
-            <div className="text-center py-20 border border-dashed border-border-color rounded-xl">
+            <div className="text-center py-20">
               {isSearching ? (
                 <>
                   <HiOutlineMagnifyingGlass
