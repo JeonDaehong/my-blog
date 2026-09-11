@@ -11,6 +11,8 @@ import PostBody from "@/components/PostBody";
 import Giscus from "@/components/Giscus";
 
 type StudyPost = {
+  id: string;
+  hasContentEn: boolean;
   slug: string;
   title: string;
   titleEn: string | null;
@@ -29,6 +31,7 @@ export default function StudyPostClient({
   const { locale, t } = useI18n();
   const pick = (koText: string, en?: string | null) => (locale === "en" && en ? en : koText);
   const [viewCount, setViewCount] = useState<number | null>(null);
+  const [englishHtml, setEnglishHtml] = useState<string | null>(null);
 
   useEffect(() => {
     const path = `/study/${post.slug}`;
@@ -42,6 +45,21 @@ export default function StudyPostClient({
       .then((d) => setViewCount(d.total))
       .catch(() => {});
   }, [post.slug]);
+
+  /* 영어 본문은 실제로 전환했을 때만 받아온다. 기본 화면에서는 한국어만 내려간다. */
+  useEffect(() => {
+    if (locale !== "en" || !post.hasContentEn || englishHtml) return;
+    let cancelled = false;
+    fetch(`/api/posts/${post.id}/content?locale=en`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.html) setEnglishHtml(data.html);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [locale, post.id, post.hasContentEn, englishHtml]);
 
   return (
     <article>
@@ -95,7 +113,7 @@ export default function StudyPostClient({
         </div>
       )}
 
-      <PostBody html={html} />
+      <PostBody html={locale === "en" && englishHtml ? englishHtml : html} />
 
       <Giscus />
     </article>

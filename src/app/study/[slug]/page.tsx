@@ -56,6 +56,8 @@ export default async function StudyPostPage({ params }: Props) {
   return (
     <StudyPostClient
       post={{
+        id: post.id,
+        hasContentEn: Boolean(post.contentEn),
         slug: post.slug,
         title: post.title,
         titleEn: post.titleEn,
