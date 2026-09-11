@@ -13,7 +13,7 @@ import {
   HiOutlineSun,
   HiOutlineMoon,
 } from "react-icons/hi2";
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { useTheme } from "@/components/ThemeProvider";
 import SiteFooter from "@/components/SiteFooter";
 import { useI18n } from "@/lib/i18n";
@@ -23,7 +23,6 @@ const LINKS = {
   study: "/study",
   github: "https://github.com/JeonDaehong",
   linkedin: "https://linkedin.com/in/daehong-jeon",
-  sponsor: "https://buymeacoffee.com/daehong",
 };
 
 const TEXT = {
@@ -32,7 +31,6 @@ const TEXT = {
     desc: "하루에 한 걸음씩 꾸준히 성장하는 엔지니어",
     blog: "기술 블로그 읽기",
     study: "공부 블로그 읽기",
-    sponsor: "후원하기",
     navBlog: "기술 블로그",
     navStudy: "공부 블로그",
   },
@@ -41,7 +39,6 @@ const TEXT = {
     desc: "An engineer who grows one step at a time, every single day.",
     blog: "Read Tech Blog",
     study: "Read Study Blog",
-    sponsor: "Sponsor",
     navBlog: "Tech Blog",
     navStudy: "Study Blog",
   },
@@ -95,14 +92,19 @@ export default function LandingPage() {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
             <Image src="/images/img.jpg" alt="" width={36} height={36} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-border-color" />
-            <span className="font-bold text-sm tracking-tight hidden sm:inline">Daehong</span>
+            <span className="font-bold text-sm tracking-tight hidden sm:inline">{"Daehong's Blog"}</span>
           </Link>
           <div className="flex items-center gap-0.5 sm:gap-2">
             <Link href={LINKS.blog} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navBlog}</Link>
             <Link href={LINKS.study} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navStudy}</Link>
             <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors hidden sm:block">GitHub</a>
-            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="p-2 text-text-secondary hover:text-text-primary transition-colors sm:hidden">
+            <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors hidden sm:block">LinkedIn</a>
+            {/* 좁은 화면에서는 글자 대신 아이콘만 */}
+            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="p-2 text-text-secondary hover:text-text-primary transition-colors sm:hidden">
               <FaGithub size={16} />
+            </a>
+            <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="p-2 text-text-secondary hover:text-text-primary transition-colors sm:hidden">
+              <FaLinkedin size={16} />
             </a>
             <button
               onClick={toggleTheme}
@@ -117,7 +119,6 @@ export default function LandingPage() {
               <HiOutlineGlobeAlt size={16} />
               {lang === "ko" ? "EN" : "KR"}
             </button>
-            <a href={LINKS.sponsor} target="_blank" rel="noopener noreferrer" className="ml-0.5 sm:ml-1 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-border-color hover:bg-text-primary hover:text-bg-primary transition-all whitespace-nowrap">{t.sponsor}</a>
           </div>
         </div>
       </nav>

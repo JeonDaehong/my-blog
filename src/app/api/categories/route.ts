@@ -9,8 +9,11 @@ export async function GET(req: NextRequest) {
   const blog = req.nextUrl.searchParams.get("blog");
   const categories = await prisma.category.findMany({
     where: blog ? { blog } : {},
-    orderBy: { order: "asc" },
-    include: { _count: { select: { posts: true } } },
+    orderBy: [{ parentId: "asc" }, { order: "asc" }],
+    include: {
+      _count: { select: { posts: true } },
+      parent: { select: { name: true } },
+    },
   });
   return NextResponse.json(categories);
 }

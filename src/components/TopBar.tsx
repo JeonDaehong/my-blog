@@ -338,7 +338,7 @@ export default function TopBar({
                 className="w-7 h-7 rounded-md object-cover"
               />
               <span className="hidden sm:inline font-semibold text-[15px] text-text-primary tracking-tight">
-                Daehong Blog
+                {"Daehong's Blog"}
               </span>
             </Link>
 
@@ -474,7 +474,7 @@ export default function TopBar({
                   className="w-[30px] h-[30px] rounded-md object-cover"
                 />
                 <span className="font-semibold text-[16px] text-text-primary tracking-tight">
-                  Daehong Blog
+                  {"Daehong's Blog"}
                 </span>
               </Link>
               <button

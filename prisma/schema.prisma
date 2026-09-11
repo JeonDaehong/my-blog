@@ -17,11 +17,16 @@ model Category {
   description   String?
   descriptionEn String?
   order       Int      @default(0)
+  /// 상위 카테고리. 비어 있으면 최상위다. (예: 개인 공부 > Spark)
+  parentId    String?
+  parent      Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryTree")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   posts       Post[]
 
   @@index([blog, order])
+  @@index([parentId])
 }
 
 model Post {

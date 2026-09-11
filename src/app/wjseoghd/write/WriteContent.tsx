@@ -6,7 +6,7 @@ import Link from "next/link";
 import { HiOutlineArrowLeft, HiOutlinePhoto, HiOutlineEye, HiOutlineGlobeAlt } from "react-icons/hi2";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 
-type Category = { id: string; name: string };
+type Category = { id: string; name: string; parent?: { name: string } | null };
 
 export default function WriteContent() {
   const router = useRouter();
@@ -172,7 +172,11 @@ export default function WriteContent() {
             <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
               className="px-3 py-2 rounded-md border border-border-color bg-bg-secondary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent">
               <option value="">카테고리 선택</option>
-              {categories.map((cat) => (<option key={cat.id} value={cat.id}>{cat.name}</option>))}
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.parent ? `${cat.parent.name} › ${cat.name}` : cat.name}
+                </option>
+              ))}
             </select>
             <input type="text" placeholder={lang === "ko" ? "요약 (목록에 표시)" : "Excerpt (English)"}
               value={currentExcerpt} onChange={(e) => setCurrentExcerpt(e.target.value)}
