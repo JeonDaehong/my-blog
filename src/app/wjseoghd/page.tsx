@@ -35,12 +35,36 @@ type Category = {
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [tab, setTab] = useState<"posts" | "categories">("posts");
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+
+  /*
+    쿠키가 이미 있으면 로그인 화면을 띄우지 않는다. 이게 없으면 세션이 살아 있어도
+    관리자 화면에 들어올 때마다, 글 수정에서 돌아올 때마다 비밀번호를 다시 물었다.
+  */
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/auth")
+      .then((res) => res.ok)
+      .catch(() => false)
+      .then((ok) => {
+        if (cancelled) return;
+        if (ok) {
+          setAuthenticated(true);
+          loadData();
+        }
+        setChecking(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function login() {
     setError("");
@@ -64,6 +88,14 @@ export default function AdminPage() {
   async function deletePost(id: string) { if (!confirm("정말 삭제하시겠습니까?")) return; await fetch(`/api/posts/${id}`, { method: "DELETE" }); loadData(); }
   async function togglePublish(post: Post) { await fetch(`/api/posts/${post.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...post, published: !post.published }) }); loadData(); }
   async function deleteCategory(id: string) { if (!confirm("정말 삭제하시겠습니까?")) return; await fetch(`/api/categories/${id}`, { method: "DELETE" }); loadData(); }
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <p className="text-text-tertiary text-sm">불러오는 중...</p>
+      </div>
+    );
+  }
 
   if (!authenticated) {
     return (

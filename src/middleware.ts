@@ -1,47 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
-function getSecret(): string {
-  return process.env.ADMIN_PASSWORD_HASH || process.env.ADMIN_PASSWORD || "fallback-secret";
-}
+/*
+  미들웨어는 Edge 런타임에서 돈다. 여기서 토큰 서명까지 확인하려면 로그인 API 와
+  똑같은 비밀키를 Edge 쪽에서도 읽어야 하는데, 그게 어긋나면 정상 로그인한 쿠키도
+  거절돼 관리자 화면이 무한히 로그인을 다시 묻는다.
 
-async function verifyToken(token: string): Promise<boolean> {
-  const idx = token.lastIndexOf(".");
-  if (idx === -1) return false;
-  const value = token.slice(0, idx);
-  const sig = token.slice(idx + 1);
-
-  const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(getSecret()),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-
-  const signedBuffer = await crypto.subtle.sign("HMAC", key, enc.encode(value));
-  const expected = Array.from(new Uint8Array(signedBuffer))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-  if (sig.length !== expected.length) return false;
-
-  // Constant-time byte comparison
-  let diff = 0;
-  for (let i = 0; i < sig.length; i++) {
-    diff |= sig.charCodeAt(i) ^ expected.charCodeAt(i);
-  }
-  return diff === 0;
-}
-
-export async function middleware(req: NextRequest) {
+  그래서 여기서는 쿠키가 아예 없는 요청만 되돌린다. 서명 검증은 로그인 API 와 같은
+  런타임인 /wjseoghd/write 페이지와, 쓰기 API 들이 각각 isAuthenticated() 로 한다.
+*/
+export function middleware(req: NextRequest) {
   const token = req.cookies.get("admin_session")?.value;
-  const isValid = token ? await verifyToken(token) : false;
-
-  if (!isValid) {
+  if (!token) {
     return NextResponse.redirect(new URL("/wjseoghd", req.url));
   }
-
   return NextResponse.next();
 }
 
