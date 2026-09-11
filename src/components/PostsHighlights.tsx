@@ -181,6 +181,41 @@ export function PopularCard({ posts }: { posts: PopularPost[] }) {
   );
 }
 
+export function LatestCard({ posts }: { posts: PostSummary[] }) {
+  const { locale, t } = useI18n();
+  const dateLocale = locale === "ko" ? ko : enUS;
+  if (posts.length === 0) return null;
+
+  return (
+    <SidebarCard
+      title={t("latestPosts")}
+      action={
+        <Link
+          href="/posts"
+          className="text-[12px] text-text-tertiary hover:text-accent transition-colors"
+        >
+          {t("viewAll")}
+        </Link>
+      }
+    >
+      <ul className="space-y-4">
+        {posts.map((post) => (
+          <li key={post.slug}>
+            <Link href={`/posts/${post.slug}`} className="group block">
+              <span className="block text-[14px] font-semibold text-text-primary group-hover:text-accent transition-colors leading-snug line-clamp-2">
+                {locale === "en" && post.titleEn ? post.titleEn : post.title}
+              </span>
+              <span className="mt-1 block text-[12px] text-text-tertiary">
+                {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </SidebarCard>
+  );
+}
+
 export function CommentsCard({ comments }: { comments: CommentPreview[] }) {
   const { locale, t } = useI18n();
   const dateLocale = locale === "ko" ? ko : enUS;

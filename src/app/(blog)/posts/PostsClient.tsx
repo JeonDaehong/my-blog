@@ -20,6 +20,7 @@ import { postsPageHref } from "@/lib/posts-nav";
 import {
   FeaturedHero,
   PopularCard,
+  LatestCard,
   CommentsCard,
 } from "@/components/PostsHighlights";
 
@@ -81,6 +82,7 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
 
   const isSearching = !!query;
   const hasAside =
+    extras.featured.length > 0 ||
     extras.popular.length > 0 ||
     extras.comments.length > 0;
 
@@ -350,6 +352,7 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
         {hasAside && (
           <aside className="space-y-5 lg:sticky lg:top-28 self-start">
             <PopularCard posts={extras.popular} />
+            <LatestCard posts={extras.featured.slice(0, 5)} />
             <CommentsCard comments={extras.comments} />
           </aside>
         )}
