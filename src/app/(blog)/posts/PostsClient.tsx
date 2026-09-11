@@ -112,15 +112,15 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                   <div className="flex items-center gap-2">
                     <p className="text-text-tertiary text-xs sm:text-sm">
                       {pagination.total === 0
-                        ? "검색 결과가 없습니다"
-                        : `검색 결과 ${pagination.total}개`}
+                        ? t("noSearchResults")
+                        : t("searchResultCount", { count: pagination.total })}
                     </p>
                     <button
                       onClick={clearSearch}
                       className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border border-border-color text-text-tertiary hover:text-accent hover:border-accent transition-colors"
                     >
                       <HiOutlineXMark size={11} />
-                      검색 지우기
+                      {t("clearSearch")}
                     </button>
                   </div>
                 </>
@@ -171,16 +171,16 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                     className="mx-auto mb-3 text-text-tertiary opacity-40"
                   />
                   <p className="text-text-secondary text-sm font-medium mb-1">
-                    &lsquo;{query}&rsquo;에 대한 결과가 없습니다
+                    {t("noResultsFor", { query: query ?? "" })}
                   </p>
                   <p className="text-text-tertiary text-xs mb-4">
-                    다른 검색어를 시도해 보세요
+                    {t("tryAnotherQuery")}
                   </p>
                   <button
                     onClick={clearSearch}
                     className="text-xs text-accent hover:underline"
                   >
-                    전체 글 보기
+                    {t("viewAllPosts")}
                   </button>
                 </>
               ) : (

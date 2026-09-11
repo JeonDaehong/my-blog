@@ -58,10 +58,15 @@ export default async function StudyPostPage({ params }: Props) {
       post={{
         slug: post.slug,
         title: post.title,
+        titleEn: post.titleEn,
         coverImage: post.coverImage,
         createdAt: post.createdAt.toISOString(),
         category: post.category
-          ? { name: post.category.name, slug: post.category.slug }
+          ? {
+              name: post.category.name,
+              nameEn: post.category.nameEn,
+              slug: post.category.slug,
+            }
           : null,
       }}
       html={rendered.html}

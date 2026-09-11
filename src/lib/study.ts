@@ -14,12 +14,12 @@ export const STUDY = "study";
 export type StudySubCategory = {
   id: string;
   name: string;
+  nameEn: string | null;
   slug: string;
   count: number;
 };
 
 export type StudyCategory = StudySubCategory & {
-  nameEn: string | null;
   children: StudySubCategory[];
 };
 
@@ -56,7 +56,7 @@ export async function loadStudyCategories(): Promise<StudyCategory[]> {
         _count: publishedCount,
         children: {
           orderBy: { order: "asc" },
-          select: { id: true, name: true, slug: true, _count: publishedCount },
+          select: { id: true, name: true, nameEn: true, slug: true, _count: publishedCount },
         },
       },
     });
@@ -80,8 +80,9 @@ export async function loadStudyCategories(): Promise<StudyCategory[]> {
 
 export type StudyCategoryDetail = {
   name: string;
+  nameEn: string | null;
   slug: string;
-  parent: { name: string; slug: string } | null;
+  parent: { name: string; nameEn: string | null; slug: string } | null;
   children: StudySubCategory[];
 };
 
@@ -92,11 +93,12 @@ export async function loadStudyCategory(slug: string): Promise<StudyCategoryDeta
       where: { slug, blog: STUDY },
       select: {
         name: true,
+        nameEn: true,
         slug: true,
-        parent: { select: { name: true, slug: true } },
+        parent: { select: { name: true, nameEn: true, slug: true } },
         children: {
           orderBy: { order: "asc" },
-          select: { id: true, name: true, slug: true, _count: publishedCount },
+          select: { id: true, name: true, nameEn: true, slug: true, _count: publishedCount },
         },
       },
     });

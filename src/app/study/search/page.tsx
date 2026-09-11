@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { postSummarySelect } from "@/lib/queries";
 import StudyList from "@/components/StudyList";
+import StudySearchHeading from "@/components/StudySearchHeading";
 import { STUDY } from "@/lib/study";
 import type { PostSummary } from "@/lib/types";
 
@@ -31,7 +32,9 @@ export default async function StudySearchPage({ searchParams }: Props) {
           blog: STUDY,
           OR: [
             { title: { contains: q, mode: "insensitive" } },
+            { titleEn: { contains: q, mode: "insensitive" } },
             { excerpt: { contains: q, mode: "insensitive" } },
+            { excerptEn: { contains: q, mode: "insensitive" } },
             { content: { contains: q, mode: "insensitive" } },
           ],
         },
@@ -56,18 +59,7 @@ export default async function StudySearchPage({ searchParams }: Props) {
 
   return (
     <>
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-[22px] sm:text-[28px] font-bold tracking-tight text-text-primary truncate">
-          {q ? `‘${q}’` : "검색"}
-        </h1>
-        <p className="mt-1 text-text-tertiary text-xs sm:text-sm">
-          {q
-            ? posts.length === 0
-              ? "검색 결과가 없습니다"
-              : `검색 결과 ${posts.length}개`
-            : "검색어를 입력해 주세요"}
-        </p>
-      </div>
+      <StudySearchHeading query={q} count={posts.length} />
       <StudyList posts={posts} />
     </>
   );
