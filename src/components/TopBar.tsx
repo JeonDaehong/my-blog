@@ -107,7 +107,6 @@ function PostRow({
 type Scope = {
   /** 글이 사는 블로그. 검색과 최신 글을 이 블로그로 좁힌다. */
   blog: "tech" | "study";
-  brand: string;
   listHref: string;
   postPrefix: string;
   categoryPrefix: string;
@@ -116,7 +115,6 @@ type Scope = {
 
 const TECH: Scope = {
   blog: "tech",
-  brand: "Daehong Blog",
   listHref: "/posts",
   postPrefix: "/posts",
   categoryPrefix: "/category",
@@ -125,7 +123,6 @@ const TECH: Scope = {
 
 export const STUDY_SCOPE: Scope = {
   blog: "study",
-  brand: "공부 블로그",
   listHref: "/study",
   postPrefix: "/study",
   categoryPrefix: "/study/category",
@@ -341,7 +338,7 @@ export default function TopBar({
                 className="w-7 h-7 rounded-md object-cover"
               />
               <span className="hidden sm:inline font-semibold text-[15px] text-text-primary tracking-tight">
-                {scope.brand}
+                Daehong Blog
               </span>
             </Link>
 
@@ -477,7 +474,7 @@ export default function TopBar({
                   className="w-[30px] h-[30px] rounded-md object-cover"
                 />
                 <span className="font-semibold text-[16px] text-text-primary tracking-tight">
-                  {scope.brand}
+                  Daehong Blog
                 </span>
               </Link>
               <button
