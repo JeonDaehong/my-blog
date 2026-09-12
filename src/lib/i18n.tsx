@@ -22,7 +22,7 @@ const translations = {
     latestPosts: "최신 글",
     studyBlog: "공부 블로그",
     studyBlogDesc: "개인 공부, 사이드 프로젝트, 그 밖의 기록",
-    noStudyPosts: "아직 올린 글이 없다",
+    noStudyPosts: "아직 올린 글이 없습니다",
     searchTitle: "검색",
     searchPrompt: "검색어를 입력해 주세요",
     noSearchResults: "검색 결과가 없습니다",
