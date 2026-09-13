@@ -229,25 +229,24 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                   </div>
 
                   {/*
-                    좁은 화면에서는 고정 폭이 너무 작아 보여서 화면 비율로 잡는다.
-                    예전에는 self-stretch로 행 높이를 채웠는데, 그러면 썸네일 비율이
-                    글 제목·요약 길이에 따라 달라져서 같은 글도 한국어와 영어에서
-                    잘리는 정도가 달랐다. 커버 이미지 비율(1.91:1)로 고정해 언어와
-                    무관하게 같은 그림이 나오게 한다.
+                    폭은 화면 비율(38%)이 아니라 고정값으로 둔다. 비율로 두면 기기 폭에
+                    따라 썸네일이 조금씩 달라져 목록이 들쭉날쭉해 보인다.
 
-                    대신 글 칸 높이는 제목 줄 수에 따라 변한다. 영어 제목은 두 줄이
-                    되는 일이 많아 위쪽만 맞추면 아래 여백만 커져 보이므로, 행을
-                    가운데 정렬(items-center)해 남는 높이를 위아래로 나눈다.
+                    좁은 화면에서는 1.91:1 이 너무 납작해서(폭 128px 기준 67px) 16:10 으로
+                    키우고, 공간이 있는 sm 이상에서는 커버 원본 비율 그대로 둬 잘리지 않게 한다.
+
+                    행은 가운데 정렬(items-center)이다. 글 칸 높이는 제목 줄 수에 따라
+                    변하는데, 위쪽만 맞추면 아래 여백만 커져 보이기 때문이다.
                   */}
-                  <div className="shrink-0 w-[38%] max-w-[150px] sm:w-[220px] sm:max-w-none">
+                  <div className="shrink-0 w-[128px] sm:w-[220px]">
                     <div
-                      className="relative w-full aspect-[1.91] rounded-xl overflow-hidden bg-bg-tertiary"
+                      className="relative w-full aspect-[16/10] sm:aspect-[1.91] rounded-xl overflow-hidden bg-bg-tertiary"
                     >
                       <Image
                         src={post.coverImage || "/images/default-thumbnail.png"}
                         alt=""
                         fill
-                        sizes="(max-width: 640px) 40vw, 220px"
+                        sizes="(max-width: 640px) 128px, 220px"
                         className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
                       />
                     </div>
