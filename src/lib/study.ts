@@ -11,7 +11,7 @@ import type { PaginationMeta, PostSummary } from "@/lib/types";
  */
 export const STUDY = "study";
 
-/** 기술 블로그와 같은 기준으로 한 페이지에 10개씩 */
+/** 기술 블로그와 같은 기준으로 한 페이지에 5개씩 */
 export const STUDY_PER_PAGE = 5;
 
 export type StudySubCategory = {
@@ -120,6 +120,48 @@ export async function loadStudyCategory(slug: string): Promise<StudyCategoryDeta
  * 공부 블로그 글 목록. categorySlug 를 주면 그 카테고리와 하위 카테고리의 글을 함께
  * 보여준다 — 상위를 눌렀을 때 하위 글이 사라지면 목록이 비어 보이기 때문이다.
  */
+/** 상위 카테고리를 열면 그 아래 하위 카테고리의 글까지 함께 잡는다. */
+function categoryWhere(categorySlug: string) {
+  return {
+    OR: [
+      { category: { slug: categorySlug } },
+      { category: { parent: { slug: categorySlug } } },
+    ],
+  };
+}
+
+/** 카테고리 목록의 한 페이지. 전체 목록과 같은 5개 단위다. */
+export async function loadStudyCategoryPage(
+  categorySlug: string,
+  page: number
+): Promise<{ posts: PostSummary[]; pagination: PaginationMeta }> {
+  const where = { published: true, blog: STUDY, ...categoryWhere(categorySlug) };
+  try {
+    const [rows, total] = await Promise.all([
+      prisma.post.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        select: postSummarySelect,
+        skip: (page - 1) * STUDY_PER_PAGE,
+        take: STUDY_PER_PAGE,
+      }),
+      prisma.post.count({ where }),
+    ]);
+    return {
+      posts: rows.map(serialize),
+      pagination: {
+        page,
+        limit: STUDY_PER_PAGE,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / STUDY_PER_PAGE)),
+      },
+    };
+  } catch (err) {
+    console.error("[study] 카테고리 목록을 불러오지 못했습니다:", err);
+    return { posts: [], pagination: { page, limit: STUDY_PER_PAGE, total: 0, totalPages: 1 } };
+  }
+}
+
 export async function loadStudyPosts(categorySlug?: string): Promise<PostSummary[]> {
   try {
     const posts = await prisma.post.findMany({

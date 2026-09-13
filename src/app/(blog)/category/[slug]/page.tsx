@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import CategoryClient from "./CategoryClient";
-import { postCardSelect } from "@/lib/queries";
+import { loadCategoryPage } from "@/lib/posts-page";
 
 export const revalidate = 60;
 
@@ -27,18 +27,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CategoryPage({ params }: Props) {
   const slug = decodeURIComponent(params.slug);
-  const category = await prisma.category.findFirst({
-    where: { slug, blog: "tech" },
-    include: {
-      posts: {
-        where: { published: true },
-        orderBy: { createdAt: "desc" },
-        select: postCardSelect,
-      },
-    },
-  });
+  const data = await loadCategoryPage(slug, 1);
+  if (!data) notFound();
 
-  if (!category) notFound();
-
-  return <CategoryClient category={JSON.parse(JSON.stringify(category))} />;
+  return (
+    <CategoryClient
+      category={JSON.parse(JSON.stringify(data.category))}
+      pagination={data.pagination}
+    />
+  );
 }

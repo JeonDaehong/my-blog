@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { postSummarySelect } from "@/lib/queries";
+import { postCardSelect, postSummarySelect } from "@/lib/queries";
 import { fetchRecentComments, type RawComment } from "@/lib/giscus";
 import type {
   PostSummary,
@@ -180,3 +180,34 @@ export async function loadPosts(page: number, q?: string | null): Promise<PostsP
   }
 }
 
+
+/**
+ * 카테고리 목록의 한 페이지. 전체 목록과 같은 5개 단위로 끊는다.
+ * 카테고리가 없으면 null 을 돌려주고, 404 판단은 호출한 쪽에 맡긴다.
+ */
+export async function loadCategoryPage(slug: string, page: number) {
+  const category = await prisma.category.findFirst({ where: { slug, blog: "tech" } });
+  if (!category) return null;
+
+  const where = { published: true, categoryId: category.id };
+  const [posts, total] = await Promise.all([
+    prisma.post.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      select: postCardSelect,
+      skip: (page - 1) * POSTS_PER_PAGE,
+      take: POSTS_PER_PAGE,
+    }),
+    prisma.post.count({ where }),
+  ]);
+
+  return {
+    category: { ...category, posts },
+    pagination: {
+      page,
+      limit: POSTS_PER_PAGE,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / POSTS_PER_PAGE)),
+    } satisfies PaginationMeta,
+  };
+}

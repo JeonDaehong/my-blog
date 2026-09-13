@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import StudyList from "@/components/StudyList";
 import StudyHeading from "@/components/StudyHeading";
 import StudySubCategories from "@/components/StudySubCategories";
-import { STUDY, loadStudyCategory, loadStudyPosts } from "@/lib/study";
+import StudyPagination from "@/components/StudyPagination";
+import { STUDY, loadStudyCategory, loadStudyCategoryPage } from "@/lib/study";
 
 export const revalidate = 60;
 
@@ -35,7 +36,7 @@ export default async function StudyCategoryPage({ params }: Props) {
   const category = await loadStudyCategory(slug);
   if (!category) notFound();
 
-  const posts = await loadStudyPosts(slug);
+  const { posts, pagination } = await loadStudyCategoryPage(slug, 1);
 
   return (
     <>
@@ -43,11 +44,12 @@ export default async function StudyCategoryPage({ params }: Props) {
         title={category.name}
         titleEn={category.nameEn}
         parent={category.parent}
-        count={posts.length}
+        count={pagination.total}
       />
       {/* 하위 카테고리 — 상위를 열었을 때만 나온다 */}
       <StudySubCategories items={category.children} />
       <StudyList posts={posts} />
+      <StudyPagination pagination={pagination} categorySlug={slug} />
     </>
   );
 }

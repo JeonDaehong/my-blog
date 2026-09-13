@@ -6,8 +6,17 @@ import { ko, enUS } from "date-fns/locale";
 import { HiOutlineArrowLeft, HiOutlineEye } from "react-icons/hi2";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
+import Pagination from "@/components/Pagination";
+import { categoryPageHref } from "@/lib/posts-nav";
+import type { PaginationMeta } from "@/lib/types";
 
-export default function CategoryClient({ category }: { category: any }) {
+export default function CategoryClient({
+  category,
+  pagination,
+}: {
+  category: any;
+  pagination: PaginationMeta;
+}) {
   const { locale, t } = useI18n();
   const dateLocale = locale === "ko" ? ko : enUS;
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
@@ -41,7 +50,7 @@ export default function CategoryClient({ category }: { category: any }) {
         </p>
       )}
       <p className="text-text-tertiary text-[12px] mb-8">
-        {t("postsInCategory", { count: category.posts.length })}
+        {t("postsInCategory", { count: pagination.total })}
       </p>
 
       {category.posts.length === 0 ? (
@@ -91,6 +100,11 @@ export default function CategoryClient({ category }: { category: any }) {
           ))}
         </div>
       )}
+
+      <Pagination
+        pagination={pagination}
+        hrefFor={(p) => categoryPageHref(category.slug, p)}
+      />
     </div>
   );
 }

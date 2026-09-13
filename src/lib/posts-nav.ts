@@ -18,3 +18,15 @@ export function postsPageHref(page: number, q?: string | null): string {
 export function studyPageHref(page: number): string {
   return page > 1 ? `/study/page/${page}` : "/study";
 }
+
+/** 카테고리 목록도 같은 규칙을 따른다. 1페이지는 /category/<slug>, 그다음은 그 아래 /page/N */
+export function categoryPageHref(slug: string, page: number): string {
+  const base = `/category/${encodeURIComponent(slug)}`;
+  return page > 1 ? `${base}/page/${page}` : base;
+}
+
+/** 공부 블로그 카테고리. 상위 카테고리를 열면 하위 글까지 함께 센다. */
+export function studyCategoryPageHref(slug: string, page: number): string {
+  const base = `/study/category/${encodeURIComponent(slug)}`;
+  return page > 1 ? `${base}/page/${page}` : base;
+}
