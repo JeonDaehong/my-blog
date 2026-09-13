@@ -114,10 +114,11 @@ export default function LandingPage() {
             </button>
             <button
               onClick={() => setLang(lang === "ko" ? "en" : "ko")}
+              aria-label={lang === "ko" ? "Switch to English" : "한국어로 전환"}
               className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors"
             >
               <HiOutlineGlobeAlt size={16} />
-              {lang === "ko" ? "EN" : "KR"}
+              {lang === "ko" ? "KR" : "EN"}
             </button>
           </div>
         </div>

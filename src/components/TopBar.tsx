@@ -435,13 +435,14 @@ export default function TopBar({
             {theme === "dark" ? <HiOutlineSun size={16} /> : <HiOutlineMoon size={16} />}
           </button>
 
-          {/* Language toggle */}
+          {/* 언어 전환. 글자는 바뀔 언어가 아니라 '지금 보고 있는 언어'다. */}
           <button
             onClick={() => setLocale(locale === "ko" ? "en" : "ko")}
+            aria-label={locale === "ko" ? "Switch to English" : "한국어로 전환"}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[12px] text-text-tertiary hover:text-text-primary hover:bg-bg-hover transition-colors"
           >
             <HiOutlineGlobeAlt size={14} />
-            {locale === "ko" ? "EN" : "KO"}
+            {locale === "ko" ? "KR" : "EN"}
           </button>
 
           {/* Search button */}

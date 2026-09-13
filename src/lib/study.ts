@@ -12,7 +12,7 @@ import type { PaginationMeta, PostSummary } from "@/lib/types";
 export const STUDY = "study";
 
 /** 기술 블로그와 같은 기준으로 한 페이지에 10개씩 */
-export const STUDY_PER_PAGE = 10;
+export const STUDY_PER_PAGE = 5;
 
 export type StudySubCategory = {
   id: string;

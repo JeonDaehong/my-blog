@@ -8,7 +8,7 @@ import type {
   CommentPreview,
 } from "@/lib/types";
 
-export const POSTS_PER_PAGE = 10;
+export const POSTS_PER_PAGE = 5;
 
 export const EMPTY_EXTRAS: PostsExtras = {
   featured: [],

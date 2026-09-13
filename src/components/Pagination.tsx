@@ -17,7 +17,9 @@ export default function Pagination({
 }) {
   const router = useRouter();
   const { page, totalPages } = pagination;
-  if (totalPages <= 1) return null;
+
+  // 한 쪽밖에 없어도 숨기지 않는다. 지금 몇 번째 쪽을 보고 있는지는
+  // 넘길 곳이 없을 때도 알려 줘야 목록이 끝났다는 게 드러난다.
 
   const go = (p: number) => router.push(hrefFor(p));
 

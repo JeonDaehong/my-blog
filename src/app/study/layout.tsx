@@ -1,4 +1,3 @@
-import { I18nProvider } from "@/lib/i18n";
 import TopBar, { STUDY_SCOPE } from "@/components/TopBar";
 import SiteFooter from "@/components/SiteFooter";
 import { loadStudyCategories } from "@/lib/study";
@@ -13,7 +12,7 @@ export default async function StudyLayout({
   const categories = await loadStudyCategories();
 
   return (
-    <I18nProvider>
+    <>
       <a href="#main-content" className="skip-to-content">
         Skip to content
       </a>
@@ -38,6 +37,6 @@ export default async function StudyLayout({
         </main>
         <SiteFooter />
       </div>
-    </I18nProvider>
+    </>
   );
 }
