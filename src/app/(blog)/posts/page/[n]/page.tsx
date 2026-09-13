@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import PostsClient from "../../PostsClient";
-import { EMPTY_EXTRAS, POSTS_PER_PAGE, loadPosts } from "@/lib/posts-page";
+import { POSTS_PER_PAGE, loadExtras, loadPosts } from "@/lib/posts-page";
 
 /** 2페이지부터. 1페이지는 /posts가 맡는다. */
 export const revalidate = 60;
@@ -40,10 +40,13 @@ export default async function PostsPaginatedPage({ params }: Props) {
   // /posts/page/1은 /posts와 같은 내용이라 한쪽으로 모은다.
   if (page === 1) redirect("/posts");
 
-  const { posts, pagination } = await loadPosts(page);
+  // 사이드바는 1페이지에만 있는 것이 아니다. 페이지를 넘겨도 목록만 바뀌어야
+  // 하므로 인기 글·최신 글·댓글도 같이 실어 보낸다.
+  const [{ posts, pagination }, extras] = await Promise.all([
+    loadPosts(page),
+    loadExtras(),
+  ]);
   if (posts.length === 0) notFound();
 
-  return (
-    <PostsClient posts={posts} pagination={pagination} extras={EMPTY_EXTRAS} />
-  );
+  return <PostsClient posts={posts} pagination={pagination} extras={extras} />;
 }
