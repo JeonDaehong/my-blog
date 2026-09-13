@@ -71,7 +71,7 @@ export default async function StudyPostPage({ params }: Props) {
             }
           : null,
       }}
-      html={rendered.html}
+      rendered={rendered}
     />
   );
 }

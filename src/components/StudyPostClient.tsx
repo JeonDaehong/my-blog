@@ -8,7 +8,9 @@ import { ko, enUS } from "date-fns/locale";
 import { useI18n } from "@/lib/i18n";
 import { HiOutlineArrowLeft, HiOutlineEye } from "react-icons/hi2";
 import PostBody from "@/components/PostBody";
+import TableOfContents from "@/components/TableOfContents";
 import Giscus from "@/components/Giscus";
+import type { RenderedMarkdown } from "@/lib/types";
 
 type StudyPost = {
   id: string;
@@ -23,15 +25,15 @@ type StudyPost = {
 
 export default function StudyPostClient({
   post,
-  html,
+  rendered,
 }: {
   post: StudyPost;
-  html: string;
+  rendered: RenderedMarkdown;
 }) {
   const { locale, t } = useI18n();
   const pick = (koText: string, en?: string | null) => (locale === "en" && en ? en : koText);
   const [viewCount, setViewCount] = useState<number | null>(null);
-  const [englishHtml, setEnglishHtml] = useState<string | null>(null);
+  const [englishBody, setEnglishBody] = useState<RenderedMarkdown | null>(null);
 
   useEffect(() => {
     const path = `/study/${post.slug}`;
@@ -48,18 +50,21 @@ export default function StudyPostClient({
 
   /* 영어 본문은 실제로 전환했을 때만 받아온다. 기본 화면에서는 한국어만 내려간다. */
   useEffect(() => {
-    if (locale !== "en" || !post.hasContentEn || englishHtml) return;
+    if (locale !== "en" || !post.hasContentEn || englishBody) return;
     let cancelled = false;
     fetch(`/api/posts/${post.id}/content?locale=en`)
       .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!cancelled && data?.html) setEnglishHtml(data.html);
+      .then((data: RenderedMarkdown | null) => {
+        if (!cancelled && data) setEnglishBody(data);
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
-  }, [locale, post.id, post.hasContentEn, englishHtml]);
+  }, [locale, post.id, post.hasContentEn, englishBody]);
+
+  // 아직 못 받았거나 영어 본문이 없으면 한국어를 그대로 보여준다. 목차도 본문을 따라간다.
+  const body = locale === "en" && englishBody ? englishBody : rendered;
 
   return (
     <article>
@@ -113,9 +118,14 @@ export default function StudyPostClient({
         </div>
       )}
 
-      <PostBody html={locale === "en" && englishHtml ? englishHtml : html} />
+      <div className="flex gap-6 lg:gap-10">
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <PostBody html={body.html} />
 
-      <Giscus />
+          <Giscus />
+        </div>
+        <TableOfContents toc={body.toc} />
+      </div>
     </article>
   );
 }
