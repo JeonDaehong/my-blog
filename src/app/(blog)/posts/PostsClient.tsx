@@ -83,11 +83,8 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
 
   return (
     <div>
-      {/* 대문은 첫 화면의 인사말이라 1페이지에만 둔다. 2페이지부터도 띄우면
-          정작 넘겨서 보러 온 목록이 배너에 밀려 한참 아래로 내려간다. */}
-      {!isSearching && pagination.page === 1 && (
-        <FeaturedHero posts={extras.featured} />
-      )}
+      {/* 페이지를 넘겨도 화면은 그대로고 목록만 바뀐다. 대문도 페이지마다 둔다. */}
+      {!isSearching && <FeaturedHero posts={extras.featured} />}
 
       <div
         className={
