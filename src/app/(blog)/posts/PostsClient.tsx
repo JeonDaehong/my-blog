@@ -7,8 +7,6 @@ import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
 import {
   HiOutlineEye,
-  HiChevronLeft,
-  HiChevronRight,
   HiOutlineMagnifyingGlass,
   HiOutlineXMark,
 } from "react-icons/hi2";
@@ -17,6 +15,7 @@ import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import type { PostSummary, PaginationMeta, PostsExtras } from "@/lib/types";
 import { postsPageHref } from "@/lib/posts-nav";
+import Pagination from "@/components/Pagination";
 import {
   FeaturedHero,
   PopularCard,
@@ -71,10 +70,6 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
     locale === "en" && post.excerptEn ? post.excerptEn : post.excerpt;
   const getCatName = (cat: NonNullable<PostSummary["category"]>) =>
     locale === "en" && cat.nameEn ? cat.nameEn : cat.name;
-
-  function goToPage(p: number) {
-    router.push(postsPageHref(p, query));
-  }
 
   function clearSearch() {
     router.push("/posts");
@@ -315,37 +310,10 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
           )}
 
           {/* ── Pagination ── */}
-          {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-8">
-              <button
-                onClick={() => goToPage(pagination.page - 1)}
-                disabled={pagination.page <= 1}
-                className="p-2 rounded-md border border-border-color text-text-tertiary hover:bg-bg-hover disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <HiChevronLeft size={16} />
-              </button>
-              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => goToPage(p)}
-                  className={`w-8 h-8 rounded-md text-[13px] font-medium transition-colors ${
-                    p === pagination.page
-                      ? "bg-accent text-white"
-                      : "border border-border-color text-text-tertiary hover:bg-bg-hover"
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-              <button
-                onClick={() => goToPage(pagination.page + 1)}
-                disabled={pagination.page >= pagination.totalPages}
-                className="p-2 rounded-md border border-border-color text-text-tertiary hover:bg-bg-hover disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <HiChevronRight size={16} />
-              </button>
-            </div>
-          )}
+          <Pagination
+            pagination={pagination}
+            hrefFor={(p) => postsPageHref(p, query)}
+          />
         </div>
 
         {hasAside && (

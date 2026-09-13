@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { postSummarySelect } from "@/lib/queries";
-import type { PostSummary } from "@/lib/types";
+import type { PaginationMeta, PostSummary } from "@/lib/types";
 
 /**
  * 공부 블로그(/study) 쪽 조회. 기술 블로그와 글도 카테고리도 완전히 갈라져 있고,
@@ -10,6 +10,9 @@ import type { PostSummary } from "@/lib/types";
  * 하위 카테고리가 붙고(예: 개인 공부 > Spark), 상위 목록은 하위 글까지 함께 보여준다.
  */
 export const STUDY = "study";
+
+/** 기술 블로그와 같은 기준으로 한 페이지에 10개씩 */
+export const STUDY_PER_PAGE = 10;
 
 export type StudySubCategory = {
   id: string;
@@ -141,3 +144,36 @@ export async function loadStudyPosts(categorySlug?: string): Promise<PostSummary
     return [];
   }
 }
+
+
+/** 공부 블로그 목록 한 페이지. 카테고리 화면은 기술 블로그와 같이 나누지 않는다. */
+export async function loadStudyPage(
+  page: number
+): Promise<{ posts: PostSummary[]; pagination: PaginationMeta }> {
+  try {
+    const where = { published: true, blog: STUDY };
+    const [rows, total] = await Promise.all([
+      prisma.post.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        select: postSummarySelect,
+        skip: (page - 1) * STUDY_PER_PAGE,
+        take: STUDY_PER_PAGE,
+      }),
+      prisma.post.count({ where }),
+    ]);
+    return {
+      posts: rows.map(serialize),
+      pagination: {
+        page,
+        limit: STUDY_PER_PAGE,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / STUDY_PER_PAGE)),
+      },
+    };
+  } catch (err) {
+    console.error("[study] 목록을 불러오지 못했습니다:", err);
+    return { posts: [], pagination: { page, limit: STUDY_PER_PAGE, total: 0, totalPages: 1 } };
+  }
+}
+

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import StudyList from "@/components/StudyList";
 import StudyHeading from "@/components/StudyHeading";
-import { loadStudyPosts } from "@/lib/study";
+import StudyPagination from "@/components/StudyPagination";
+import { loadStudyPage } from "@/lib/study";
 
 export const revalidate = 60;
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function StudyPage() {
-  const posts = await loadStudyPosts();
+  const { posts, pagination } = await loadStudyPage(1);
 
   return (
     <>
@@ -22,6 +23,7 @@ export default async function StudyPage() {
         subtitleEn="Personal study, side projects, and everything else"
       />
       <StudyList posts={posts} />
+      <StudyPagination pagination={pagination} />
     </>
   );
 }

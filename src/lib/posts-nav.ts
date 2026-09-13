@@ -13,3 +13,8 @@ export function postsPageHref(page: number, q?: string | null): string {
   }
   return page > 1 ? `/posts/page/${page}` : "/posts";
 }
+
+/** 공부 블로그도 같은 규칙. 1페이지는 /study, 그다음은 /study/page/N */
+export function studyPageHref(page: number): string {
+  return page > 1 ? `/study/page/${page}` : "/study";
+}

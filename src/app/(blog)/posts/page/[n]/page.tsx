@@ -17,7 +17,7 @@ function parsePage(raw: string): number | null {
 
 export async function generateStaticParams() {
   try {
-    const total = await prisma.post.count({ where: { published: true } });
+    const total = await prisma.post.count({ where: { published: true, blog: "tech" } });
     const totalPages = Math.ceil(total / POSTS_PER_PAGE);
     // 2페이지부터 미리 만들어 둔다. 없는 페이지는 요청이 올 때 처리한다.
     return Array.from({ length: Math.max(0, totalPages - 1) }, (_, i) => ({
