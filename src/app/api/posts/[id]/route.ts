@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePost } from "@/lib/revalidate";
 import { prisma } from "@/lib/prisma";
 import { isAuthenticated } from "@/lib/auth";
 import { translateToEnglish } from "@/lib/translate";
@@ -60,10 +60,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
     include: { category: true },
   });
 
-  revalidatePath("/");
-  revalidatePath("/posts");
-  revalidatePath(`/posts/${post.slug}`);
-  if (post.category) revalidatePath(`/category/${post.category.slug}`);
+  revalidatePost({ blog: post.blog, slug: post.slug, categorySlug: post.category?.slug });
 
   return NextResponse.json(post);
 }
@@ -84,10 +81,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
 
   await prisma.post.delete({ where: { id: params.id } });
 
-  revalidatePath("/");
-  revalidatePath("/posts");
-  if (post?.slug) revalidatePath(`/posts/${post.slug}`);
-  if (post?.category) revalidatePath(`/category/${post.category.slug}`);
+  revalidatePost({ blog: post?.blog ?? "tech", slug: post?.slug, categorySlug: post?.category?.slug });
 
   return NextResponse.json({ success: true });
 }

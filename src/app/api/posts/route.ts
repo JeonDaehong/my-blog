@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePost } from "@/lib/revalidate";
 import { prisma } from "@/lib/prisma";
 import { isAuthenticated } from "@/lib/auth";
 import { translateToEnglish } from "@/lib/translate";
@@ -105,16 +105,7 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  revalidatePath("/");
-  if (post.blog === "study") {
-    revalidatePath("/study");
-    revalidatePath(`/study/${slug}`);
-    revalidatePath("/study/category", "page");
-  } else {
-    revalidatePath("/posts");
-    revalidatePath(`/posts/${slug}`);
-    revalidatePath("/category", "page");
-  }
+  revalidatePost({ blog: post.blog, slug });
 
   return NextResponse.json(post, { status: 201 });
 }
