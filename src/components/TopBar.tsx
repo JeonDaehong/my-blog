@@ -96,8 +96,8 @@ function PostRow({
               src={post.coverImage}
               alt=""
               fill
-              sizes="150px"
-              className="object-cover"
+              sizes="(max-width: 640px) 92px, 150px"
+              className="object-contain"
             />
           </div>
         </div>

@@ -93,14 +93,14 @@ export function FeaturedHero({ posts }: { posts: PostSummary[] }) {
                   href={`/posts/${post.slug}`}
                   className="group order-1 lg:order-2 block rounded-2xl overflow-hidden bg-bg-tertiary"
                 >
-                  <div className="relative w-full" style={{ aspectRatio: "16 / 10" }}>
+                  <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
                     <Image
                       src={post.coverImage || "/images/default-thumbnail.png"}
                       alt=""
                       fill
                       sizes="(max-width: 1024px) 100vw, 520px"
                       priority={i === 0}
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+                      className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.06]"
                     />
                   </div>
                 </Link>

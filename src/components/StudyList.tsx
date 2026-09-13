@@ -77,13 +77,13 @@ export default function StudyList({ posts }: { posts: PostSummary[] }) {
 
             {post.coverImage && (
               <div className="shrink-0 self-start w-[88px] sm:w-[120px]">
-                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-bg-tertiary">
+                <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden bg-bg-tertiary">
                   <Image
                     src={post.coverImage}
                     alt=""
                     fill
-                    sizes="120px"
-                    className="object-cover"
+                    sizes="(max-width: 640px) 88px, 120px"
+                    className="object-contain"
                   />
                 </div>
               </div>

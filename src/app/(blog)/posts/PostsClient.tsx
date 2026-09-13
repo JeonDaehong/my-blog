@@ -227,22 +227,22 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                     폭은 화면 비율(38%)이 아니라 고정값으로 둔다. 비율로 두면 기기 폭에
                     따라 썸네일이 조금씩 달라져 목록이 들쭉날쭉해 보인다.
 
-                    좁은 화면에서는 1.91:1 이 너무 납작해서(폭 128px 기준 67px) 16:10 으로
-                    키우고, 공간이 있는 sm 이상에서는 커버 원본 비율 그대로 둬 잘리지 않게 한다.
+                    비율은 화면 크기와 무관하게 16:9 로 고정한다. 커버가 대부분 16:9 라
+                    상자를 여기에 맞추고 contain 으로 담아야 좌우가 잘리지 않는다.
 
                     행은 가운데 정렬(items-center)이다. 글 칸 높이는 제목 줄 수에 따라
                     변하는데, 위쪽만 맞추면 아래 여백만 커져 보이기 때문이다.
                   */}
                   <div className="shrink-0 w-[128px] sm:w-[220px]">
                     <div
-                      className="relative w-full aspect-[16/10] sm:aspect-[1.91] rounded-xl overflow-hidden bg-bg-tertiary"
+                      className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-bg-tertiary"
                     >
                       <Image
                         src={post.coverImage || "/images/default-thumbnail.png"}
                         alt=""
                         fill
                         sizes="(max-width: 640px) 128px, 220px"
-                        className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                        className="object-contain group-hover:scale-[1.03] transition-transform duration-300"
                       />
                     </div>
                   </div>
