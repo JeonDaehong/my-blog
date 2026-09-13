@@ -43,11 +43,14 @@ export default async function StudyPaginatedPage({ params }: Props) {
 
   return (
     <>
+      {/* 머리말은 1페이지와 같아야 한다. 몇 페이지인지는 아래 페이지 버튼이
+          이미 알려주므로, 여기서 블로그 설명을 페이지 번호로 갈아치우면
+          페이지를 넘길 때 화면 윗부분이 바뀌어 딴 곳에 온 것처럼 보인다. */}
       <StudyHeading
         title="공부 블로그"
         titleEn="Study Blog"
-        subtitle={`${page}페이지`}
-        subtitleEn={`Page ${page}`}
+        subtitle="개인 공부, 사이드 프로젝트, 그 밖의 기록"
+        subtitleEn="Personal study, side projects, and everything else"
       />
       <StudyList posts={posts} />
       <StudyPagination pagination={pagination} />
