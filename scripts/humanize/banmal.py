@@ -113,6 +113,20 @@ def first_person(t):
     t = re.sub(r'(?<![가-힣])여러분(?:께서는|께서|에게|은|이|의)?\s*', '', t)
     return t
 
+RE_DASH = re.compile(r'[—–]')
+
+
+def normalize_dashes(t):
+    """대시는 영어·AI 글의 습관이라 쓰지 않는다.
+
+    숫자 범위는 물결로, 라벨과 설명을 가르던 자리는 콜론으로 바꾼다.
+    두 문장을 잇던 대시는 마침표로 끊는 편이 자연스러운데 그건 기계가 정할 수 없으므로,
+    대시가 있던 줄을 전부 보고해서 사람이 확인하게 한다.
+    """
+    t = re.sub(r'(\d)\s*[—–]\s*(\d)', r'\1~\2', t)
+    return t.replace(' — ', ' : ').replace(' – ', ' : ')
+
+
 RE_COLON = re.compile(r'(?<=[^\s:\x00])(:)(?=\s|\*\*|$)')
 
 def space_colon(line):
@@ -125,10 +139,17 @@ def convert(text):
     body, store = protect(text)
     body = convert_endings(body)
     body = first_person(body)
+    body = normalize_dashes(body)
     body = '\n'.join(space_colon(l) for l in body.split('\n'))
     body = re.sub(r'[ \t]+\n', '\n', body)
     body = re.sub(r'(?<=\S)  +', ' ', body)
     return restore(body, store)
+
+def dash_lines(text):
+    """대시가 있던 줄(변환 전 기준). 문장을 잇던 자리면 마침표로 끊는 게 낫다."""
+    body = RE_CODEBLOCK.sub('', text)
+    return [l.strip() for l in body.splitlines() if RE_DASH.search(l)]
+
 
 def leftovers(text):
     stripped = RE_CODEBLOCK.sub('', text)
@@ -149,10 +170,13 @@ def main():
         out = convert(text)
         io.open(dst, 'w', encoding='utf-8', newline='\n').write(out)
         left = leftovers(out)
+        dashes = dash_lines(text)
         total += len(left)
-        print(f'{slug}: {len(text)} → {len(out)}자, 잔여 {len(left)}건')
+        print(f'{slug}: {len(text)} → {len(out)}자, 잔여 {len(left)}건, 대시 {len(dashes)}줄')
         for l in left[:15]:
             print('   ?', l.strip())
+        for l in dashes[:10]:
+            print('   -', l[:110])
     print('잔여 합계', total)
 
 if __name__ == '__main__':
