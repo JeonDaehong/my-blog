@@ -43,3 +43,6 @@ next-env.d.ts
 /src/generated/prisma
 
 .vercel
+
+# humanize 작업 폴더 (글 원본·윤문본·백업)
+/_workspace
