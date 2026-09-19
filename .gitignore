@@ -46,3 +46,7 @@ next-env.d.ts
 
 # humanize 작업 폴더 (글 원본·윤문본·백업)
 /_workspace
+
+# python
+__pycache__/
+*.pyc
