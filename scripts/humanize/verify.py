@@ -1,9 +1,10 @@
 """final.md 를 원문과 대조해 구조·숫자·존댓말 잔여를 검사한다. DB 에 넣기 전 확인용.
 
-사용: python scripts/humanize/verify.py <slug> [<slug> ...]   (exit 0 = 전부 통과)
+사용: python scripts/humanize/verify.py [--rebuild] <slug> [<slug> ...]   (exit 0 = 전부 통과)
 
-chunks/*.out.md 가 있으면 그것을 이어붙여 final.md 를 먼저 만든다(스킬로 조각 윤문한 경우).
-없으면 이미 있는 final.md 를 그대로 검사한다(banmal.py 로 변환한 경우).
+기본은 이미 있는 final.md 를 그대로 검사한다.
+--rebuild 를 주면 chunks/*.out.md 를 이어붙여 final.md 를 새로 쓴 뒤 검사한다
+(스킬로 조각 윤문한 직후에만 쓴다 — final.md 를 손으로 고친 뒤에 주면 그 수정이 날아간다).
 """
 import glob, io, json, os, re, sys
 
@@ -15,12 +16,12 @@ RE_SUMMARY = re.compile(r'\n*<!--\s*HUMANIZE-SUMMARY[\s\S]*?-->\s*$')
 POLITE = re.compile(r'(?!아니다)[가-힣]니다|[가-힣]세요|[가-힣]십시오')
 
 
-def build(base):
-    """조각 출력이 있으면 합쳐서 final.md 를 새로 쓰고, 없으면 기존 final.md 를 읽는다."""
+def build(base, rebuild=False):
+    """--rebuild 일 때만 조각을 합쳐 final.md 를 새로 쓴다. 기본은 기존 final.md 를 읽는다."""
     mpath = os.path.join(base, 'manifest.json')
     outs = glob.glob(os.path.join(base, 'chunks', '*.out.md'))
     fpath = os.path.join(base, 'final.md')
-    if os.path.exists(mpath) and outs:
+    if rebuild and os.path.exists(mpath) and outs:
         parts = []
         for m in json.load(io.open(mpath, encoding='utf-8')):
             p = os.path.join(base, 'chunks', m['output'])
@@ -33,7 +34,7 @@ def build(base):
         io.open(fpath, 'w', encoding='utf-8', newline='\n').write(final)
         return final
     if not os.path.exists(fpath):
-        print('FAIL final.md 없음 — banmal.py 를 먼저 돌릴 것')
+        print('FAIL final.md 없음 — banmal.py 를 돌리거나 --rebuild 를 줄 것')
         return None
     return io.open(fpath, encoding='utf-8').read().replace('\r\n', '\n')
 
@@ -57,10 +58,10 @@ def struct(s):
     }
 
 
-def check(slug):
+def check(slug, rebuild=False):
     base = os.path.join('_workspace', 'posts', slug)
     orig = io.open(os.path.join(base, 'original.md'), encoding='utf-8').read().replace('\r\n', '\n')
-    final = build(base)
+    final = build(base, rebuild)
     if final is None:
         return False
 
@@ -100,5 +101,7 @@ def check(slug):
 
 
 if __name__ == '__main__':
-    results = [check(s) for s in sys.argv[1:]]
+    args = sys.argv[1:]
+    rebuild = '--rebuild' in args
+    results = [check(s, rebuild) for s in args if s != '--rebuild']
     sys.exit(0 if all(results) else 1)
