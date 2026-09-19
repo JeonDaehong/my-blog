@@ -109,7 +109,8 @@ def lint(path):
             seen[key] = i
 
     for i, sent in prose:
-        if len(sent) > 180:
+        # 링크 주소가 길어서 길어진 줄은 긴 문장이 아니다
+        if len(sent) > 180 and len(re.sub(r'링크|코드', '', sent)) > 180:
             hits['너무 긴 문장'].append((slug, i, sent[:110], f'{len(sent)}자'))
 
     run, prev = [], None
