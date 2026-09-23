@@ -42,6 +42,8 @@ model Post {
   published   Boolean   @default(false)
   /// 카테고리가 없는 글도 갈라져야 하므로 글 자체에 둔다
   blog        String    @default("tech")
+  /// 기술 블로그 글에 붙는 주제 태그. 최대 3개까지만 쓴다.
+  tags        String[]  @default([])
   categoryId  String?
   category    Category? @relation(fields: [categoryId], references: [id])
   createdAt   DateTime  @default(now())

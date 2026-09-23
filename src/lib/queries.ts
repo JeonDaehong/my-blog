@@ -26,6 +26,7 @@ export const postCardSelect = {
   coverImage: true,
   published: true,
   createdAt: true,
+  tags: true,
 } satisfies Prisma.PostSelect;
 
 export const postSummarySelect = {

@@ -12,6 +12,7 @@ import {
 } from "react-icons/hi2";
 import { HiOutlineViewGrid, HiOutlineViewList } from "react-icons/hi";
 import { useI18n } from "@/lib/i18n";
+import PostTags from "@/components/PostTags";
 import { useEffect, useState } from "react";
 import type { PostSummary, PaginationMeta, PostsExtras } from "@/lib/types";
 import { postsPageHref } from "@/lib/posts-nav";
@@ -215,6 +216,8 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                         {getExcerpt(post)}
                       </p>
                     )}
+
+                    <PostTags tags={post.tags} size="sm" className="mt-2.5" />
 
                     {viewCounts[post.slug] !== undefined && (
                       <span className="mt-2.5 inline-flex items-center gap-1 text-[12px] text-text-tertiary">

@@ -22,6 +22,8 @@ export type PostWithCategory = {
   excerptEn: string | null;
   coverImage: string | null;
   published: boolean;
+  /** 기술 블로그 전용 주제 태그. 최대 3개. */
+  tags: string[];
   categoryId: string | null;
   createdAt: string;
   updatedAt: string;
@@ -39,6 +41,7 @@ export type PostSummary = Pick<
   | "coverImage"
   | "published"
   | "createdAt"
+  | "tags"
   | "category"
 >;
 
@@ -76,6 +79,7 @@ export type PostDetail = {
   excerptEn: string | null;
   coverImage: string | null;
   createdAt: string;
+  tags: string[];
   category: CategoryBasic | null;
   hasContentEn: boolean;
 };

@@ -22,6 +22,8 @@ export default function WriteContent() {
   const [coverImage, setCoverImage] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [blog, setBlog] = useState<"tech" | "study">("tech");
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagDraft, setTagDraft] = useState("");
   const [published, setPublished] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [saving, setSaving] = useState(false);
@@ -41,6 +43,7 @@ export default function WriteContent() {
           setCoverImage(post.coverImage || "");
           setCategoryId(post.categoryId || "");
           setBlog(post.blog === "study" ? "study" : "tech");
+          setTags(Array.isArray(post.tags) ? post.tags : []);
           setPublished(post.published);
         }
       });
@@ -79,6 +82,15 @@ export default function WriteContent() {
     }
   }
 
+  function addTag() {
+    const tag = tagDraft.trim();
+    if (!tag || tags.length >= 3) return;
+    // 대소문자만 다른 중복은 같은 태그로 본다. 서버도 같은 기준으로 한 번 더 거른다.
+    if (tags.some((t) => t.toLowerCase() === tag.toLowerCase())) { setTagDraft(""); return; }
+    setTags([...tags, tag]);
+    setTagDraft("");
+  }
+
   async function save(asDraft = false) {
     if (!title.trim()) return alert("제목을 입력하세요");
     if (!content.trim()) return alert("내용을 입력하세요");
@@ -90,6 +102,7 @@ export default function WriteContent() {
       coverImage: coverImage || null,
       categoryId: categoryId || null,
       blog,
+      tags: blog === "tech" ? tags : [],
       published: asDraft ? false : published,
     };
     try {
@@ -182,6 +195,30 @@ export default function WriteContent() {
               value={currentExcerpt} onChange={(e) => setCurrentExcerpt(e.target.value)}
               className="px-3 py-2 rounded-md border border-border-color bg-bg-secondary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-text-tertiary" />
           </div>
+
+          {/* 태그 : 기술 블로그만. 최대 3개 */}
+          {blog === "tech" && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[13px] text-text-tertiary shrink-0">태그</span>
+              {tags.map((tag) => (
+                <span key={tag} className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-full border border-border-color bg-bg-tertiary text-text-secondary text-[12px]">
+                  {tag}
+                  <button type="button" onClick={() => setTags(tags.filter((t) => t !== tag))}
+                    aria-label={`${tag} 태그 제거`}
+                    className="text-text-tertiary hover:text-red-400 transition-colors leading-none">&times;</button>
+                </span>
+              ))}
+              {tags.length < 3 && (
+                <input type="text" value={tagDraft}
+                  onChange={(e) => setTagDraft(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); } }}
+                  onBlur={addTag}
+                  placeholder="입력 후 Enter"
+                  className="w-[140px] px-2.5 py-1 rounded-full border border-dashed border-border-light bg-transparent text-text-primary text-[12px] focus:outline-none focus:border-accent placeholder:text-text-tertiary" />
+              )}
+              <span className="text-[12px] text-text-tertiary">{tags.length}/3</span>
+            </div>
+          )}
 
           {/* Cover image */}
           <div className="flex items-center gap-3">

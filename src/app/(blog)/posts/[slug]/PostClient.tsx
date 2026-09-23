@@ -9,6 +9,7 @@ import { HiOutlineArrowLeft, HiOutlineArrowRight, HiOutlineCalendar, HiOutlineFo
 import { useI18n } from "@/lib/i18n";
 import PostBody from "@/components/PostBody";
 import TableOfContents from "@/components/TableOfContents";
+import PostTags from "@/components/PostTags";
 import Giscus from "@/components/Giscus";
 import type { PostDetail, RenderedMarkdown } from "@/lib/types";
 
@@ -106,6 +107,8 @@ export default function PostClient({
             </span>
           )}
         </div>
+        {/* 메타 줄에 같이 넣으면 좁은 화면에서 날짜·조회수와 뒤엉킨다. 한 줄 내려 둔다. */}
+        <PostTags tags={post.tags} className="mt-3 sm:mt-4" />
       </header>
 
       <div className="flex gap-6 lg:gap-10">

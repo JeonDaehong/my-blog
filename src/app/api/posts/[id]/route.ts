@@ -3,6 +3,7 @@ import { revalidatePost } from "@/lib/revalidate";
 import { prisma } from "@/lib/prisma";
 import { isAuthenticated } from "@/lib/auth";
 import { translateToEnglish } from "@/lib/translate";
+import { normalizeTags } from "@/lib/tags";
 
 type Context = { params: { id: string } };
 
@@ -56,6 +57,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
       coverImage: body.coverImage || null,
       published: body.published,
       categoryId: body.categoryId || null,
+      tags: normalizeTags(body.tags),
     },
     include: { category: true },
   });

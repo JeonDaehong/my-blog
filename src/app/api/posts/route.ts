@@ -5,6 +5,7 @@ import { isAuthenticated } from "@/lib/auth";
 import { translateToEnglish } from "@/lib/translate";
 import { generateSlug } from "@/lib/slug";
 import { postSummarySelect } from "@/lib/queries";
+import { normalizeTags } from "@/lib/tags";
 
 const DEFAULT_LIMIT = 10;
 
@@ -101,6 +102,7 @@ export async function POST(req: NextRequest) {
       coverImage: body.coverImage || null,
       published: body.published ?? false,
       blog: body.blog === "study" ? "study" : "tech",
+      tags: normalizeTags(body.tags),
       categoryId: body.categoryId || null,
     },
   });

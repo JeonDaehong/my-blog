@@ -85,6 +85,7 @@ function toPostDetail(post: PostRecord): PostDetail {
     excerptEn: post.excerptEn,
     coverImage: post.coverImage,
     createdAt: post.createdAt.toISOString(),
+    tags: post.tags,
     hasContentEn: Boolean(post.contentEn),
     category: post.category
       ? {
