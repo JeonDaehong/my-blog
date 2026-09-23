@@ -6,9 +6,12 @@
 import { PrismaClient } from '@prisma/client'
 import translate from 'google-translate-api-x'
 
-const slugs = process.argv.slice(2)
+const argv = process.argv.slice(2)
+const forceMeta = argv.includes('--meta')      // 제목·요약 번역을 다시 만든다
+const slugs = argv.filter(a => !a.startsWith('--'))
 if (!slugs.length) {
-  console.error('사용법: node scripts/humanize/translate-post.mjs <slug> [<slug> ...]')
+  console.error('사용법: node scripts/humanize/translate-post.mjs [--meta] <slug> [<slug> ...]')
+  console.error('  --meta : 제목과 요약의 영문본도 다시 만든다 (기본은 본문만)')
   process.exit(1)
 }
 
@@ -38,6 +41,34 @@ function restore(text, store) {
   return text.replace(/@\s*@\s*(\d+)\s*@\s*@/g, (_, i) => store[Number(i)] ?? '')
 }
 
+// 번역기가 흔들어놓은 마크다운을 되돌린다. 자리표시자를 끼웠다 빼면서 생기는 흔적들이다.
+function tidy(text) {
+  return text
+    // "#2. Upstream" 처럼 # 뒤 공백이 먹히면 제목이 아니게 된다
+    .replace(/^(#{1,6})([^#\s])/gm, '$1 $2')
+    // 보호 구간 양옆에서 강조 표시가 쪼개지는 경우 : "**foo** ** `bar` ** **baz"
+    .replace(/\*\* +\*\*/g, ' ')
+    .replace(/\*{4,}/g, '**')
+    // 줄 끝에 남는 공백
+    .replace(/[ 	]+$/gm, '')
+}
+
+// 링크 표시 문구는 보호 구간 안에 있어서 번역되지 않는다. 주소는 그대로 두고 문구만 옮긴다.
+async function translateLinkText(text) {
+  const seen = new Map()
+  const links = [...text.matchAll(/\[([^\]]*[가-힣][^\]]*)\]\((?!http)([^)]*)\)/g)]
+  for (const [, label] of links) {
+    if (seen.has(label)) continue
+    try {
+      const r = await translate(label, { from: 'ko', to: 'en', forceBatch: false })
+      seen.set(label, r.text.trim())
+    } catch { /* 실패하면 원문 그대로 둔다 */ }
+  }
+  let out = text
+  for (const [ko, en] of seen) out = out.split(`[${ko}](`).join(`[${en}](`)
+  return { out, n: seen.size }
+}
+
 async function translateChunks(text) {
   const SEP = '\n\n'
   const chunks = []
@@ -60,7 +91,7 @@ async function translateChunks(text) {
 const prisma = new PrismaClient()
 
 for (const slug of slugs) {
-  const post = await prisma.post.findUnique({ where: { slug }, select: { id: true, content: true } })
+  const post = await prisma.post.findUnique({ where: { slug }, select: { id: true, content: true, title: true, titleEn: true, excerpt: true, excerptEn: true } })
   if (!post) { console.error(`글을 찾을 수 없음: ${slug}`); continue }
 
   const { out, store } = protect(post.content.replace(/\r\n/g, '\n'))
@@ -68,7 +99,10 @@ for (const slug of slugs) {
 
   let en
   try {
-    en = restore(await translateChunks(out), store)
+    en = tidy(restore(await translateChunks(out), store))
+    const { out: linked, n } = await translateLinkText(en)
+    en = linked
+    if (n) console.log(`  링크 문구 ${n}개 번역`)
   } catch (e) {
     console.error(`  번역 실패: ${e?.message ?? e}`)
     continue
@@ -83,8 +117,22 @@ for (const slug of slugs) {
     continue
   }
 
-  await prisma.post.update({ where: { id: post.id }, data: { contentEn: en } })
-  console.log(`  저장 완료 ${en.length}자 (코드블록 ${fence}개 유지)`)
+  const data = { contentEn: en }
+
+  // 제목·요약은 손으로 다듬는 경우가 많아 기본적으로 건드리지 않는다.
+  // 비어 있거나 --meta 를 준 경우에만 다시 만든다.
+  if (forceMeta || !post.titleEn) {
+    try { data.titleEn = (await translate(post.title, { from: 'ko', to: 'en' })).text.trim() } catch {}
+  }
+  if (post.excerpt && (forceMeta || !post.excerptEn)) {
+    try { data.excerptEn = (await translate(post.excerpt, { from: 'ko', to: 'en' })).text.trim() } catch {}
+  }
+
+  await prisma.post.update({ where: { id: post.id }, data })
+  console.log(`  저장 완료 ${en.length}자 (코드블록 ${fence}개 유지)${data.titleEn ? ' + 제목' : ''}${data.excerptEn ? ' + 요약' : ''}`)
+
+  // 제목을 고쳤는데 영문 제목을 안 고치면 조용히 어긋난다. 눈에 보이게 알린다.
+  if (!data.titleEn) console.log(`  제목 영문본은 그대로다 : "${post.titleEn}"  (--meta 로 다시 만든다)`)
 }
 
 await prisma.$disconnect()
