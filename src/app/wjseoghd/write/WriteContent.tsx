@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useDeferredValue } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { HiOutlineArrowLeft, HiOutlinePhoto, HiOutlineEye, HiOutlineGlobeAlt } from "react-icons/hi2";
+import { HiOutlineArrowLeft, HiOutlinePhoto, HiOutlineGlobeAlt } from "react-icons/hi2";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 type Category = { id: string; name: string; parent?: { name: string } | null };
@@ -27,10 +27,11 @@ export default function WriteContent() {
   const [published, setPublished] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [saving, setSaving] = useState(false);
-  const [preview, setPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [lang, setLang] = useState<"ko" | "en">("ko");
   const fileRef = useRef<HTMLInputElement>(null);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch(`/api/categories?blog=${blog}`).then((r) => r.json()).then(setCategories);
@@ -120,8 +121,21 @@ export default function WriteContent() {
   const setCurrentContent = lang === "ko" ? setContent : setContentEn;
   const setCurrentExcerpt = lang === "ko" ? setExcerpt : setExcerptEn;
 
+  // 긴 글에서 타이핑이 밀리지 않도록 미리보기는 한 박자 늦게 그린다.
+  const previewTitle = useDeferredValue(currentTitle || title);
+  const previewContent = useDeferredValue(currentContent || content);
+
+  // 편집창을 스크롤하면 미리보기도 같은 비율 위치로 따라간다.
+  function syncScroll() {
+    const ed = editorRef.current, pv = previewRef.current;
+    if (!ed || !pv) return;
+    const max = ed.scrollHeight - ed.clientHeight;
+    const ratio = max > 0 ? ed.scrollTop / max : 0;
+    pv.scrollTop = ratio * (pv.scrollHeight - pv.clientHeight);
+  }
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-3">
@@ -142,10 +156,6 @@ export default function WriteContent() {
               EN
             </button>
           </div>
-          <button onClick={() => setPreview(!preview)}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md border border-border-color text-[12px] sm:text-[13px] hover:bg-bg-hover transition-colors">
-            <HiOutlineEye size={14} /> {preview ? "편집" : "미리보기"}
-          </button>
           <button onClick={() => save(true)} disabled={saving}
             className="px-2.5 sm:px-3 py-1.5 rounded-md border border-border-color text-[12px] sm:text-[13px] hover:bg-bg-hover transition-colors disabled:opacity-50">
             임시저장
@@ -164,97 +174,101 @@ export default function WriteContent() {
         {lang === "en" && !contentEn && <span className="text-yellow-500">(영어 버전이 비어있으면 한글이 표시됩니다)</span>}
       </div>
 
-      {preview ? (
-        <div className="border border-border-color rounded-lg p-6">
-          <h1 className="text-2xl font-bold mb-4 text-text-primary">{currentTitle || "제목 없음"}</h1>
-          {coverImage && <img src={coverImage} alt="cover" className="w-full h-56 object-cover rounded-lg mb-6 border border-border-color" />}
-          <MarkdownRenderer content={currentContent || content} />
+      <div className="space-y-4">
+        <input type="text" placeholder={lang === "ko" ? "제목을 입력하세요" : "Enter title (English)"}
+          value={currentTitle} onChange={(e) => setCurrentTitle(e.target.value)}
+          className="w-full text-xl sm:text-2xl font-bold px-0 py-2 border-0 border-b border-border-color bg-transparent text-text-primary focus:outline-none focus:border-accent placeholder:text-text-tertiary" />
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <select value={blog} onChange={(e) => { setBlog(e.target.value as "tech" | "study"); setCategoryId(""); }}
+            className="px-3 py-2 rounded-md border border-border-color bg-bg-secondary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent">
+            <option value="tech">기술 블로그</option>
+            <option value="study">공부 블로그</option>
+          </select>
+          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
+            className="px-3 py-2 rounded-md border border-border-color bg-bg-secondary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent">
+            <option value="">카테고리 선택</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.parent ? `${cat.parent.name} › ${cat.name}` : cat.name}
+              </option>
+            ))}
+          </select>
+          <input type="text" placeholder={lang === "ko" ? "요약 (목록에 표시)" : "Excerpt (English)"}
+            value={currentExcerpt} onChange={(e) => setCurrentExcerpt(e.target.value)}
+            className="px-3 py-2 rounded-md border border-border-color bg-bg-secondary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-text-tertiary" />
         </div>
-      ) : (
-        <div className="space-y-4">
-          <input type="text" placeholder={lang === "ko" ? "제목을 입력하세요" : "Enter title (English)"}
-            value={currentTitle} onChange={(e) => setCurrentTitle(e.target.value)}
-            className="w-full text-xl sm:text-2xl font-bold px-0 py-2 border-0 border-b border-border-color bg-transparent text-text-primary focus:outline-none focus:border-accent placeholder:text-text-tertiary" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <select value={blog} onChange={(e) => { setBlog(e.target.value as "tech" | "study"); setCategoryId(""); }}
-              className="px-3 py-2 rounded-md border border-border-color bg-bg-secondary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent">
-              <option value="tech">기술 블로그</option>
-              <option value="study">공부 블로그</option>
-            </select>
-            <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-              className="px-3 py-2 rounded-md border border-border-color bg-bg-secondary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent">
-              <option value="">카테고리 선택</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.parent ? `${cat.parent.name} › ${cat.name}` : cat.name}
-                </option>
-              ))}
-            </select>
-            <input type="text" placeholder={lang === "ko" ? "요약 (목록에 표시)" : "Excerpt (English)"}
-              value={currentExcerpt} onChange={(e) => setCurrentExcerpt(e.target.value)}
-              className="px-3 py-2 rounded-md border border-border-color bg-bg-secondary text-text-primary text-[13px] focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-text-tertiary" />
+        {/* 태그 : 기술 블로그만. 최대 3개 */}
+        {blog === "tech" && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[13px] text-text-tertiary shrink-0">태그</span>
+            {tags.map((tag) => (
+              <span key={tag} className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-full border border-border-color bg-bg-tertiary text-text-secondary text-[12px]">
+                {tag}
+                <button type="button" onClick={() => setTags(tags.filter((t) => t !== tag))}
+                  aria-label={`${tag} 태그 제거`}
+                  className="text-text-tertiary hover:text-red-400 transition-colors leading-none">&times;</button>
+              </span>
+            ))}
+            {tags.length < 3 && (
+              <input type="text" value={tagDraft}
+                onChange={(e) => setTagDraft(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); } }}
+                onBlur={addTag}
+                placeholder="입력 후 Enter"
+                className="w-[140px] px-2.5 py-1 rounded-full border border-dashed border-border-light bg-transparent text-text-primary text-[12px] focus:outline-none focus:border-accent placeholder:text-text-tertiary" />
+            )}
+            <span className="text-[12px] text-text-tertiary">{tags.length}/3</span>
           </div>
+        )}
 
-          {/* 태그 : 기술 블로그만. 최대 3개 */}
-          {blog === "tech" && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[13px] text-text-tertiary shrink-0">태그</span>
-              {tags.map((tag) => (
-                <span key={tag} className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-full border border-border-color bg-bg-tertiary text-text-secondary text-[12px]">
-                  {tag}
-                  <button type="button" onClick={() => setTags(tags.filter((t) => t !== tag))}
-                    aria-label={`${tag} 태그 제거`}
-                    className="text-text-tertiary hover:text-red-400 transition-colors leading-none">&times;</button>
-                </span>
-              ))}
-              {tags.length < 3 && (
-                <input type="text" value={tagDraft}
-                  onChange={(e) => setTagDraft(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); } }}
-                  onBlur={addTag}
-                  placeholder="입력 후 Enter"
-                  className="w-[140px] px-2.5 py-1 rounded-full border border-dashed border-border-light bg-transparent text-text-primary text-[12px] focus:outline-none focus:border-accent placeholder:text-text-tertiary" />
-              )}
-              <span className="text-[12px] text-text-tertiary">{tags.length}/3</span>
+        {/* Cover image */}
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-color text-[13px] cursor-pointer hover:bg-bg-hover transition-colors text-text-secondary">
+            <HiOutlinePhoto size={14} /> 커버 이미지
+            <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
+          </label>
+          {coverImage && (
+            <div className="flex items-center gap-2">
+              <img src={coverImage} alt="cover" className="w-8 h-8 rounded object-cover border border-border-color" />
+              <button onClick={() => setCoverImage("")} className="text-[12px] text-red-400 hover:underline">제거</button>
             </div>
           )}
+          {uploading && <span className="text-[12px] text-text-tertiary">업로드 중...</span>}
+        </div>
 
-          {/* Cover image */}
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-color text-[13px] cursor-pointer hover:bg-bg-hover transition-colors text-text-secondary">
-              <HiOutlinePhoto size={14} /> 커버 이미지
-              <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
-            </label>
-            {coverImage && (
-              <div className="flex items-center gap-2">
-                <img src={coverImage} alt="cover" className="w-8 h-8 rounded object-cover border border-border-color" />
-                <button onClick={() => setCoverImage("")} className="text-[12px] text-red-400 hover:underline">제거</button>
-              </div>
-            )}
-            {uploading && <span className="text-[12px] text-text-tertiary">업로드 중...</span>}
+        {/* Editor */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <button onClick={() => fileRef.current?.click()}
+              className="flex items-center gap-1 px-2 py-1 rounded border border-border-color text-[12px] hover:bg-bg-hover transition-colors text-text-secondary">
+              <HiOutlinePhoto size={12} /> 이미지 삽입
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" onChange={handleInsertImage} className="hidden" />
+            <span className="text-[12px] text-text-tertiary">Markdown 문법을 사용할 수 있습니다</span>
           </div>
-
-          {/* Editor */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <button onClick={() => fileRef.current?.click()}
-                className="flex items-center gap-1 px-2 py-1 rounded border border-border-color text-[12px] hover:bg-bg-hover transition-colors text-text-secondary">
-                <HiOutlinePhoto size={12} /> 이미지 삽입
-              </button>
-              <input ref={fileRef} type="file" accept="image/*" onChange={handleInsertImage} className="hidden" />
-              <span className="text-[12px] text-text-tertiary">Markdown 문법을 사용할 수 있습니다</span>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <textarea
+              ref={editorRef}
+              onScroll={syncScroll}
               placeholder={lang === "ko" ? "내용을 작성하세요... (Markdown 지원)" : "Write content in English... (Markdown supported)"}
               value={currentContent}
               onChange={(e) => setCurrentContent(e.target.value)}
               rows={14}
-              className="w-full px-3 sm:px-4 py-3 rounded-lg border border-border-color bg-bg-secondary text-text-primary focus:outline-none focus:ring-2 focus:ring-accent text-[13px] font-mono resize-y placeholder:text-text-tertiary min-h-[200px] sm:min-h-[400px]"
+              className="w-full px-3 sm:px-4 py-3 rounded-lg border border-border-color bg-bg-secondary text-text-primary focus:outline-none focus:ring-2 focus:ring-accent text-[13px] font-mono resize-y lg:resize-none placeholder:text-text-tertiary min-h-[200px] sm:min-h-[400px] lg:h-[75vh]"
             />
+            <div ref={previewRef}
+              className="rounded-lg border border-border-color p-4 sm:p-6 overflow-y-auto max-h-[60vh] lg:max-h-none lg:h-[75vh]">
+              <h1 className="text-2xl font-bold mb-4 text-text-primary">{previewTitle || "제목 없음"}</h1>
+              {coverImage && <img src={coverImage} alt="cover" className="w-full h-56 object-cover rounded-lg mb-6 border border-border-color" />}
+              {previewContent
+                ? <MarkdownRenderer content={previewContent} />
+                : <p className="text-[13px] text-text-tertiary">왼쪽에 쓰는 내용이 여기에 바로 보인다.</p>}
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
