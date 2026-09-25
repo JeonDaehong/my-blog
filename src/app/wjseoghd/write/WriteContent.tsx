@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { HiOutlineArrowLeft, HiOutlinePhoto, HiOutlineGlobeAlt } from "react-icons/hi2";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { buildAnchors, syncPreviewScroll } from "./scrollSync";
 
 type Category = { id: string; name: string; parent?: { name: string } | null };
 
@@ -32,6 +33,8 @@ export default function WriteContent() {
   const fileRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<HTMLTextAreaElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+  const previewBodyRef = useRef<HTMLDivElement>(null);
+  const anchorsRef = useRef<ReturnType<typeof buildAnchors> | null>(null);
 
   useEffect(() => {
     fetch(`/api/categories?blog=${blog}`).then((r) => r.json()).then(setCategories);
@@ -125,14 +128,23 @@ export default function WriteContent() {
   const previewTitle = useDeferredValue(currentTitle || title);
   const previewContent = useDeferredValue(currentContent || content);
 
-  // 편집창을 스크롤하면 미리보기도 같은 비율 위치로 따라간다.
+  // 편집창을 스크롤하면 미리보기도 같은 블록 위치로 따라간다. 앵커는 재는 값이 비싸서 캐시해 둔다.
   function syncScroll() {
     const ed = editorRef.current, pv = previewRef.current;
     if (!ed || !pv) return;
-    const max = ed.scrollHeight - ed.clientHeight;
-    const ratio = max > 0 ? ed.scrollTop / max : 0;
-    pv.scrollTop = ratio * (pv.scrollHeight - pv.clientHeight);
+    anchorsRef.current ??= buildAnchors(ed, pv);
+    syncPreviewScroll(ed, pv, anchorsRef.current);
   }
+
+  // 내용이 바뀌거나, 창 크기·이미지 로딩으로 높이가 달라지면 앵커를 다시 잰다.
+  useEffect(() => {
+    const resync = () => { anchorsRef.current = null; syncScroll(); };
+    resync();
+    const observer = new ResizeObserver(resync);
+    if (editorRef.current) observer.observe(editorRef.current);
+    if (previewBodyRef.current) observer.observe(previewBodyRef.current);
+    return () => observer.disconnect();
+  }, [previewContent, previewTitle, coverImage]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -260,11 +272,13 @@ export default function WriteContent() {
             />
             <div ref={previewRef}
               className="rounded-lg border border-border-color p-4 sm:p-6 overflow-y-auto max-h-[60vh] lg:max-h-none lg:h-[75vh]">
-              <h1 className="text-2xl font-bold mb-4 text-text-primary">{previewTitle || "제목 없음"}</h1>
-              {coverImage && <img src={coverImage} alt="cover" className="w-full h-56 object-cover rounded-lg mb-6 border border-border-color" />}
-              {previewContent
-                ? <MarkdownRenderer content={previewContent} />
-                : <p className="text-[13px] text-text-tertiary">왼쪽에 쓰는 내용이 여기에 바로 보인다.</p>}
+              <div ref={previewBodyRef}>
+                <h1 className="text-2xl font-bold mb-4 text-text-primary">{previewTitle || "제목 없음"}</h1>
+                {coverImage && <img src={coverImage} alt="cover" className="w-full h-56 object-cover rounded-lg mb-6 border border-border-color" />}
+                {previewContent
+                  ? <MarkdownRenderer content={previewContent} lineMarkers />
+                  : <p className="text-[13px] text-text-tertiary">왼쪽에 쓰는 내용이 여기에 바로 보인다.</p>}
+              </div>
             </div>
           </div>
         </div>

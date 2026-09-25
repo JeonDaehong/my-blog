@@ -15,6 +15,17 @@ function headingId(text: string): string {
     .replace(/\s+/g, "-");
 }
 
+// 편집기 미리보기용 : 최상위 블록마다 원문 줄 번호를 단 높이 0짜리 표식을 앞에 끼운다.
+// 편집창 스크롤을 블록 단위로 맞출 때 이 표식을 기준점으로 쓴다.
+function rehypeLineMarkers() {
+  return (tree: any) => {
+    tree.children = tree.children.flatMap((node: any) =>
+      node.type === "element" && node.position
+        ? [{ type: "element", tagName: "div", properties: { className: ["md-line-marker"], dataLine: node.position.start.line }, children: [] }, node]
+        : [node]);
+  };
+}
+
 function CopyButton({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -46,7 +57,7 @@ function extractText(node: React.ReactNode): string {
   return "";
 }
 
-export default function MarkdownRenderer({ content }: { content: string }) {
+export default function MarkdownRenderer({ content, lineMarkers = false }: { content: string; lineMarkers?: boolean }) {
   const [lightbox, setLightbox] = useState<string | null>(null);
 
   const closeLightbox = useCallback(() => setLightbox(null), []);
@@ -125,7 +136,7 @@ export default function MarkdownRenderer({ content }: { content: string }) {
       <div className="prose max-w-none">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeHighlight]}
+          rehypePlugins={lineMarkers ? [rehypeHighlight, rehypeLineMarkers] : [rehypeHighlight]}
           components={components}
         >
           {content}
