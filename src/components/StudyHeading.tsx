@@ -40,7 +40,7 @@ export default function StudyHeading({
         {pick(title, titleEn)}
       </h1>
       {subtitle ? (
-        <p className="mt-1 text-text-tertiary text-xs sm:text-sm">
+        <p className="mt-1 text-text-tertiary text-xs sm:text-sm whitespace-pre-line">
           {pick(subtitle, subtitleEn)}
         </p>
       ) : count !== undefined ? (
