@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkCjkFriendly from "remark-cjk-friendly";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark-dimmed.css";
 import { Components } from "react-markdown";
@@ -135,7 +136,7 @@ export default function MarkdownRenderer({ content, lineMarkers = false }: { con
     <>
       <div className="prose max-w-none">
         <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
+          remarkPlugins={[remarkGfm, remarkCjkFriendly]}
           rehypePlugins={lineMarkers ? [rehypeHighlight, rehypeLineMarkers] : [rehypeHighlight]}
           components={components}
         >
