@@ -151,8 +151,10 @@ async function countsFromGraphQL(token: string): Promise<Map<string, number>> {
       next: { revalidate: 300 },
     });
     if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+    const json = (await res.json()) as CountResponse & { errors?: Array<{ message: string }> };
+    if (json.errors?.length) throw new Error(`GraphQL ${json.errors[0].message}`);
     const discussions: NonNullable<NonNullable<CountResponse["data"]>["repository"]>["discussions"] =
-      ((await res.json()) as CountResponse).data?.repository?.discussions;
+      json.data?.repository?.discussions;
     for (const d of discussions?.nodes ?? []) {
       const replies = d.comments.nodes.reduce((sum, c) => sum + c.replies.totalCount, 0);
       counts.set(d.title.replace(/^\/+/, ""), d.comments.totalCount + replies);
@@ -179,16 +181,20 @@ async function countFromGiscus(term: string): Promise<number> {
  * 글 목록에 보여줄 댓글 수(댓글 + 답글). 키는 페이지 경로("/posts/slug").
  * 알아내지 못한 경로는 결과에서 빠지고, 화면에서는 그 글의 댓글 수만 표시되지 않는다.
  */
-export async function fetchCommentCounts(paths: string[]): Promise<Record<string, number>> {
+export async function fetchCommentCounts(
+  paths: string[]
+): Promise<{ counts: Record<string, number>; source: "graphql" | "giscus"; reason?: string }> {
   const result: Record<string, number> = {};
   const token = process.env.GITHUB_TOKEN;
+  let reason = token ? undefined : "no-token";
   try {
     if (token) {
       const counts = await countsFromGraphQL(token);
       for (const path of paths) result[path] = counts.get(path.replace(/^\/+/, "")) ?? 0;
-      return result;
+      return { counts: result, source: "graphql" };
     }
   } catch (err) {
+    reason = err instanceof Error ? err.message : "graphql-error";
     console.error("[giscus] 댓글 수를 GraphQL 로 읽지 못해 공개 API 로 넘어갑니다:", err);
   }
   await Promise.all(
@@ -200,5 +206,5 @@ export async function fetchCommentCounts(paths: string[]): Promise<Record<string
       }
     })
   );
-  return result;
+  return { counts: result, source: "giscus", reason };
 }

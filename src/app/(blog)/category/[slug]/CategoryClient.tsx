@@ -27,16 +27,21 @@ export default function CategoryClient({
   const getTitle = (post: any) => locale === "en" && post.titleEn ? post.titleEn : post.title;
   const getExcerpt = (post: any) => locale === "en" && post.excerptEn ? post.excerptEn : post.excerpt;
 
+  // 글마다 따로 묻지 않고 목록 전체를 한 번에 묻는다 (엣지 캐시도 이 묶음 조회에만 걸린다).
   useEffect(() => {
-    category.posts.forEach((post: any) => {
-      const path = `/posts/${post.slug}`;
-      fetch(`/api/views?path=${encodeURIComponent(path)}`)
-        .then((r) => r.json())
-        .then((d) => {
-          setViewCounts((prev) => ({ ...prev, [post.slug]: d.total }));
-        })
-        .catch(() => {});
-    });
+    if (category.posts.length === 0) return;
+    const paths = category.posts.map((post: any) => `/posts/${post.slug}`).join(",");
+    fetch(`/api/views?paths=${encodeURIComponent(paths)}`)
+      .then((r) => r.json())
+      .then((countMap: Record<string, number>) => {
+        const result: Record<string, number> = {};
+        for (const post of category.posts as any[]) {
+          const count = countMap[`/posts/${post.slug}`];
+          result[post.slug] = count ?? 0;
+        }
+        setViewCounts(result);
+      })
+      .catch(() => {});
   }, [category.posts]);
 
   return (

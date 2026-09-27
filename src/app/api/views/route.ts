@@ -26,7 +26,11 @@ export async function GET(req: NextRequest) {
     for (const c of counts) {
       countMap[c.path] = c._count.path;
     }
-    return NextResponse.json(countMap);
+    // 목록용 묶음 조회는 엣지에 30초 캐시한다. 만료 뒤에도 옛 값을 바로 주고 뒤에서 새로 받아 오므로
+    // 목록의 조회수가 DB(Neon) 가 깨어나는 동안 늦게 뜨지 않는다. 숫자는 최대 30초쯤 늦을 수 있다.
+    return NextResponse.json(countMap, {
+      headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=600" },
+    });
   }
 
   if (path) {
