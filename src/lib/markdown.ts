@@ -2,6 +2,7 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkCjkFriendly from "remark-cjk-friendly";
+import remarkSlides from "@/lib/remark-slides";
 import remarkRehype from "remark-rehype";
 import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
@@ -101,6 +102,7 @@ export async function renderMarkdown(content: string): Promise<RenderedMarkdown>
     .use(remarkGfm)
     // "**하둡(Hadoop)**입니다" 처럼 문장부호 뒤에 조사가 바로 붙어도 굵게 인식한다 (CommonMark 는 못 한다)
     .use(remarkCjkFriendly)
+    .use(remarkSlides)
     .use(remarkRehype)
     .use(rehypeHighlight, { detect: false, ignoreMissing: true })
     .use(() => enhance(toc))

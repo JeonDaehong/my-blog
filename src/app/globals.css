@@ -119,6 +119,20 @@ body {
     .prose hr { margin: 2rem 0; }
     .prose th, .prose td { padding: 0.5rem 0.75rem; font-size: 0.875rem; }
   }
+
+  /* ```slides 블록 : 한 장씩 넘겨 보는 발표 자료 (src/lib/remark-slides.ts, slide-deck.ts) */
+  .prose .slide-deck { margin: 2rem 0; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background: var(--bg-secondary); outline: none; }
+  .prose .slide-deck:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
+  .prose .slide-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+  .prose .slide-track::-webkit-scrollbar { display: none; }
+  .prose .slide-deck .slide { flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 16 / 9; background: var(--bg-primary); }
+  .prose .slide-deck img { display: block; width: 100%; height: 100%; object-fit: contain; margin: 0; border: 0; border-radius: 0; }
+  .prose .slide-controls { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-top: 1px solid var(--border-color); font-size: 0.8125rem; color: var(--text-secondary); }
+  .prose .slide-nav { width: 2rem; height: 2rem; border-radius: 9999px; font-size: 1.25rem; line-height: 1; color: var(--text-primary); background: var(--bg-tertiary); transition: background 0.15s; }
+  .prose .slide-nav:hover:not(:disabled) { background: var(--bg-active); }
+  .prose .slide-nav:disabled { opacity: 0.35; cursor: default; }
+  .prose .slide-counter { min-width: 3.5rem; text-align: center; font-variant-numeric: tabular-nums; }
+  .prose .slide-title { margin-left: auto; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 
 /* 카테고리 탭처럼 가로 스크롤은 되되 스크롤바는 숨겨야 하는 영역 */

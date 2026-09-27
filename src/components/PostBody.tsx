@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { wireSlideDecks } from "@/lib/slide-deck";
 
 const ICON_ATTRS =
   'xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="14" height="14"';
@@ -56,6 +57,12 @@ export default function PostBody({ html }: { html: string }) {
     });
 
     return () => cleanups.forEach((cleanup) => cleanup());
+  }, [html]);
+
+  // ```slides 블록의 넘기기 버튼·키보드·쪽수 표시
+  useEffect(() => {
+    const root = containerRef.current;
+    return root ? wireSlideDecks(root) : undefined;
   }, [html]);
 
   // 이미지 클릭 → 라이트박스 (이벤트 위임)

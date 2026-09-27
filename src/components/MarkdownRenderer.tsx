@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkCjkFriendly from "remark-cjk-friendly";
+import remarkSlides from "@/lib/remark-slides";
+import { wireSlideDecks } from "@/lib/slide-deck";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark-dimmed.css";
 import { Components } from "react-markdown";
@@ -62,6 +64,13 @@ export default function MarkdownRenderer({ content, lineMarkers = false }: { con
   const [lightbox, setLightbox] = useState<string | null>(null);
 
   const closeLightbox = useCallback(() => setLightbox(null), []);
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  // ```slides 블록의 넘기기 동작 (본문 PostBody 와 같은 함수)
+  useEffect(() => {
+    const root = bodyRef.current;
+    return root ? wireSlideDecks(root) : undefined;
+  }, [content]);
 
   const components: Components = {
     h1: ({ children }) => {
@@ -134,9 +143,9 @@ export default function MarkdownRenderer({ content, lineMarkers = false }: { con
 
   return (
     <>
-      <div className="prose max-w-none">
+      <div ref={bodyRef} className="prose max-w-none">
         <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkCjkFriendly]}
+          remarkPlugins={[remarkGfm, remarkCjkFriendly, remarkSlides]}
           rehypePlugins={lineMarkers ? [rehypeHighlight, rehypeLineMarkers] : [rehypeHighlight]}
           components={components}
         >
