@@ -69,8 +69,9 @@ function buildDeck(config: Record<string, string>): Element | null {
     ])
   );
 
-  const button = (className: string, label: string, symbol: string) =>
-    el("button", { type: "button", className: ["slide-nav", className], ariaLabel: label }, [{ type: "text", value: symbol }]);
+  // 첫 화면 상태(1쪽 : 이전 버튼 꺼짐)는 HTML 에 미리 적어 둔다. 이후는 스크롤할 때 클라이언트가 고친다.
+  const button = (className: string, label: string, symbol: string, disabled: boolean) =>
+    el("button", { type: "button", className: ["slide-nav", className], ariaLabel: label, disabled }, [{ type: "text", value: symbol }]);
 
   return el(
     "figure",
@@ -78,9 +79,9 @@ function buildDeck(config: Record<string, string>): Element | null {
     [
       el("div", { className: ["slide-track"] }, slides),
       el("figcaption", { className: ["slide-controls"] }, [
-        button("slide-prev", "이전 슬라이드", "‹"),
+        button("slide-prev", "이전 슬라이드", "‹", true),
         el("span", { className: ["slide-counter"], ariaLive: "polite" }, [{ type: "text", value: `1 / ${shown.length}` }]),
-        button("slide-next", "다음 슬라이드", "›"),
+        button("slide-next", "다음 슬라이드", "›", shown.length <= 1),
         ...(title ? [el("span", { className: ["slide-title"] }, [{ type: "text", value: title }])] : []),
       ]),
     ]

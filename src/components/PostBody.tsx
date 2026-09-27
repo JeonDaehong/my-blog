@@ -21,42 +21,52 @@ export default function PostBody({ html }: { html: string }) {
   const [lightbox, setLightbox] = useState<string | null>(null);
 
   // 코드 블록마다 복사 버튼을 붙인다.
+  // 본문 HTML 은 첫 렌더 뒤에 통째로 다시 들어가는 일이 있어, 붙인 버튼이 함께 사라진다.
+  // 그래서 본문 루트의 자식이 바뀔 때마다 빠진 버튼을 다시 붙이고, 클릭은 루트에서 위임받는다.
   useEffect(() => {
     const root = containerRef.current;
     if (!root) return;
 
-    const cleanups: Array<() => void> = [];
-
-    root.querySelectorAll<HTMLElement>(".code-block-wrapper").forEach((wrapper) => {
-      const button = document.createElement("button");
-      button.className = COPY_BUTTON_CLASS;
-      button.type = "button";
-      button.setAttribute("aria-label", "Copy code");
-      button.innerHTML = COPY_ICON;
-
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      const onClick = () => {
-        const code = wrapper.querySelector("pre code")?.textContent ?? "";
-        navigator.clipboard.writeText(code).then(() => {
-          button.innerHTML = CHECK_ICON;
-          clearTimeout(timer);
-          timer = setTimeout(() => {
-            button.innerHTML = COPY_ICON;
-          }, 2000);
-        });
-      };
-
-      button.addEventListener("click", onClick);
-      wrapper.insertBefore(button, wrapper.firstChild);
-
-      cleanups.push(() => {
-        clearTimeout(timer);
-        button.removeEventListener("click", onClick);
-        button.remove();
+    const decorate = () => {
+      root.querySelectorAll<HTMLElement>(".code-block-wrapper").forEach((wrapper) => {
+        if (wrapper.querySelector(":scope > .code-copy-button")) return;
+        const button = document.createElement("button");
+        button.className = COPY_BUTTON_CLASS;
+        button.type = "button";
+        button.setAttribute("aria-label", "Copy code");
+        button.innerHTML = COPY_ICON;
+        wrapper.insertBefore(button, wrapper.firstChild);
       });
-    });
+    };
 
-    return () => cleanups.forEach((cleanup) => cleanup());
+    const timers = new Set<ReturnType<typeof setTimeout>>();
+    const onClick = (event: MouseEvent) => {
+      const button = (event.target as Element).closest?.<HTMLButtonElement>(".code-copy-button");
+      const wrapper = button?.closest(".code-block-wrapper");
+      if (!button || !wrapper) return;
+      const code = wrapper.querySelector("pre code")?.textContent ?? "";
+      navigator.clipboard.writeText(code).then(() => {
+        button.innerHTML = CHECK_ICON;
+        const timer = setTimeout(() => {
+          button.innerHTML = COPY_ICON;
+          timers.delete(timer);
+        }, 2000);
+        timers.add(timer);
+      });
+    };
+
+    decorate();
+    // 루트의 직계 자식만 본다. 버튼을 붙이는 건 그 아래 변화라 다시 불리지 않는다.
+    const observer = new MutationObserver(decorate);
+    observer.observe(root, { childList: true });
+    root.addEventListener("click", onClick);
+
+    return () => {
+      observer.disconnect();
+      root.removeEventListener("click", onClick);
+      timers.forEach(clearTimeout);
+      root.querySelectorAll(".code-copy-button").forEach((button) => button.remove());
+    };
   }, [html]);
 
   // ```slides 블록의 넘기기 버튼·키보드·쪽수 표시
