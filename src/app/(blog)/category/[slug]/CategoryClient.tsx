@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
-import { HiOutlineArrowLeft, HiOutlineEye } from "react-icons/hi2";
+import { HiOutlineArrowLeft, HiOutlineChatBubbleOvalLeft, HiOutlineEye } from "react-icons/hi2";
+import { useCommentCounts } from "@/lib/use-comment-counts";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import Pagination from "@/components/Pagination";
@@ -20,6 +21,7 @@ export default function CategoryClient({
   const { locale, t } = useI18n();
   const dateLocale = locale === "ko" ? ko : enUS;
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
+  const commentCounts = useCommentCounts(category.posts.map((post: any) => post.slug), "/posts");
 
   const catName = locale === "en" && category.nameEn ? category.nameEn : category.name;
   const getTitle = (post: any) => locale === "en" && post.titleEn ? post.titleEn : post.title;
@@ -88,12 +90,20 @@ export default function CategoryClient({
                   <span>
                     {format(new Date(post.createdAt), "yyyy.MM.dd", { locale: dateLocale })}
                   </span>
-                  {viewCounts[post.slug] !== undefined && (
-                    <span className="inline-flex items-center gap-1 text-accent/80">
-                      <HiOutlineEye size={13} />
-                      {viewCounts[post.slug].toLocaleString()}
-                    </span>
-                  )}
+                  <span className="inline-flex items-center gap-3 tabular-nums">
+                    {viewCounts[post.slug] !== undefined && (
+                      <span className="inline-flex items-center gap-1 text-accent/80">
+                        <HiOutlineEye size={13} />
+                        {viewCounts[post.slug].toLocaleString()}
+                      </span>
+                    )}
+                    {commentCounts[post.slug] !== undefined && (
+                      <span className="inline-flex items-center gap-1 text-accent/80" title="댓글">
+                        <HiOutlineChatBubbleOvalLeft size={13} />
+                        {commentCounts[post.slug].toLocaleString()}
+                      </span>
+                    )}
+                  </span>
                 </div>
               </div>
             </Link>

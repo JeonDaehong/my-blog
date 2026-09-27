@@ -4,7 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
-import { HiOutlineEye } from "react-icons/hi2";
+import { HiOutlineChatBubbleOvalLeft, HiOutlineEye } from "react-icons/hi2";
+import { useCommentCounts } from "@/lib/use-comment-counts";
 import { useI18n } from "@/lib/i18n";
 import type { PostSummary } from "@/lib/types";
 
@@ -16,6 +17,7 @@ export default function StudyList({ posts }: { posts: PostSummary[] }) {
   const { locale, t } = useI18n();
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
   const pick = (ko: string, en?: string | null) => (locale === "en" && en ? en : ko);
+  const commentCounts = useCommentCounts(posts.map((post) => post.slug), "/study");
 
   useEffect(() => {
     if (posts.length === 0) return;
@@ -60,6 +62,12 @@ export default function StudyList({ posts }: { posts: PostSummary[] }) {
                   <span className="inline-flex items-center gap-1 text-text-tertiary tabular-nums">
                     <HiOutlineEye size={12} />
                     {viewCounts[post.slug].toLocaleString()}
+                  </span>
+                )}
+                {commentCounts[post.slug] !== undefined && (
+                  <span className="inline-flex items-center gap-1 text-text-tertiary tabular-nums" title="댓글">
+                    <HiOutlineChatBubbleOvalLeft size={12} />
+                    {commentCounts[post.slug].toLocaleString()}
                   </span>
                 )}
               </div>

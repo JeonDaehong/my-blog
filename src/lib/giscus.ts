@@ -111,3 +111,94 @@ export async function fetchRecentComments(limit = 3): Promise<RawComment[]> {
     return [];
   }
 }
+
+const CATEGORY = "General";
+
+const COUNT_QUERY = `
+  query CommentCounts($owner: String!, $name: String!, $after: String) {
+    repository(owner: $owner, name: $name) {
+      discussions(first: 100, after: $after) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          title
+          comments(first: 100) { totalCount nodes { replies { totalCount } } }
+        }
+      }
+    }
+  }
+`;
+
+type CountResponse = {
+  data?: {
+    repository?: {
+      discussions?: {
+        pageInfo: { hasNextPage: boolean; endCursor: string | null };
+        nodes: Array<{ title: string; comments: { totalCount: number; nodes: Array<{ replies: { totalCount: number } }> } }>;
+      };
+    };
+  };
+};
+
+/** 토큰이 있으면 GraphQL 로 토론 전체를 한 번에 훑어 "경로 → 댓글+답글 수" 를 만든다. */
+async function countsFromGraphQL(token: string): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  let after: string | null = null;
+  for (let page = 0; page < 5; page++) {
+    const res: Response = await fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ query: COUNT_QUERY, variables: { owner: REPO_OWNER, name: REPO_NAME, after } }),
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+    const discussions: NonNullable<NonNullable<CountResponse["data"]>["repository"]>["discussions"] =
+      ((await res.json()) as CountResponse).data?.repository?.discussions;
+    for (const d of discussions?.nodes ?? []) {
+      const replies = d.comments.nodes.reduce((sum, c) => sum + c.replies.totalCount, 0);
+      counts.set(d.title.replace(/^\/+/, ""), d.comments.totalCount + replies);
+    }
+    if (!discussions?.pageInfo.hasNextPage) break;
+    after = discussions.pageInfo.endCursor;
+  }
+  return counts;
+}
+
+/** 토큰이 없으면 giscus 위젯이 쓰는 공개 API 로 경로마다 묻는다. 토론이 없으면 404 = 댓글 0. */
+async function countFromGiscus(term: string): Promise<number> {
+  const url =
+    `https://giscus.app/api/discussions?repo=${REPO_OWNER}/${REPO_NAME}` +
+    `&term=${encodeURIComponent(term)}&category=${CATEGORY}&number=0&strict=false&last=1`;
+  const res = await fetch(url, { next: { revalidate: 300 } });
+  if (res.status === 404) return 0;
+  if (!res.ok) throw new Error(`giscus ${res.status}`);
+  const json = (await res.json()) as { discussion?: { totalCommentCount?: number; totalReplyCount?: number } };
+  return (json.discussion?.totalCommentCount ?? 0) + (json.discussion?.totalReplyCount ?? 0);
+}
+
+/**
+ * 글 목록에 보여줄 댓글 수(댓글 + 답글). 키는 페이지 경로("/posts/slug").
+ * 알아내지 못한 경로는 결과에서 빠지고, 화면에서는 그 글의 댓글 수만 표시되지 않는다.
+ */
+export async function fetchCommentCounts(paths: string[]): Promise<Record<string, number>> {
+  const result: Record<string, number> = {};
+  const token = process.env.GITHUB_TOKEN;
+  try {
+    if (token) {
+      const counts = await countsFromGraphQL(token);
+      for (const path of paths) result[path] = counts.get(path.replace(/^\/+/, "")) ?? 0;
+      return result;
+    }
+  } catch (err) {
+    console.error("[giscus] 댓글 수를 GraphQL 로 읽지 못해 공개 API 로 넘어갑니다:", err);
+  }
+  await Promise.all(
+    paths.map(async (path) => {
+      try {
+        result[path] = await countFromGiscus(path.replace(/^\/+/, ""));
+      } catch {
+        /* 이 글만 건너뛴다 */
+      }
+    })
+  );
+  return result;
+}

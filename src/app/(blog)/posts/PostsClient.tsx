@@ -7,10 +7,12 @@ import { format } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
 import {
   HiOutlineEye,
+  HiOutlineChatBubbleOvalLeft,
   HiOutlineMagnifyingGlass,
   HiOutlineXMark,
 } from "react-icons/hi2";
 import { HiOutlineViewGrid, HiOutlineViewList } from "react-icons/hi";
+import { useCommentCounts } from "@/lib/use-comment-counts";
 import { useI18n } from "@/lib/i18n";
 import PostTags from "@/components/PostTags";
 import { useEffect, useState } from "react";
@@ -38,6 +40,7 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
   const { locale, t } = useI18n();
   const dateLocale = locale === "ko" ? ko : enUS;
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
+  const commentCounts = useCommentCounts(posts.map((post) => post.slug), "/posts");
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== "undefined") {
       return (localStorage.getItem("postViewMode") as ViewMode) || "card";
@@ -219,10 +222,20 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
 
                     <PostTags tags={post.tags} size="sm" className="mt-2.5" />
 
-                    {viewCounts[post.slug] !== undefined && (
-                      <span className="mt-2.5 inline-flex items-center gap-1 text-[12px] text-text-tertiary">
-                        <HiOutlineEye size={13} />
-                        {viewCounts[post.slug].toLocaleString()}
+                    {(viewCounts[post.slug] !== undefined || commentCounts[post.slug] !== undefined) && (
+                      <span className="mt-2.5 inline-flex items-center gap-3 text-[12px] text-text-tertiary tabular-nums">
+                        {viewCounts[post.slug] !== undefined && (
+                          <span className="inline-flex items-center gap-1">
+                            <HiOutlineEye size={13} />
+                            {viewCounts[post.slug].toLocaleString()}
+                          </span>
+                        )}
+                        {commentCounts[post.slug] !== undefined && (
+                          <span className="inline-flex items-center gap-1" title="댓글">
+                            <HiOutlineChatBubbleOvalLeft size={13} />
+                            {commentCounts[post.slug].toLocaleString()}
+                          </span>
+                        )}
                       </span>
                     )}
                   </div>
@@ -299,6 +312,12 @@ export default function PostsClient({ posts, pagination, query, extras }: Props)
                         <>
                           <HiOutlineEye size={12} className="shrink-0" />
                           {viewCounts[post.slug].toLocaleString()}
+                        </>
+                      )}
+                      {commentCounts[post.slug] !== undefined && (
+                        <>
+                          <HiOutlineChatBubbleOvalLeft size={12} className="shrink-0 ml-1.5" />
+                          {commentCounts[post.slug].toLocaleString()}
                         </>
                       )}
                     </span>
