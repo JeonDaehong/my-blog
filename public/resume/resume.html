@@ -56,7 +56,7 @@
   .meta .pos2 { font-size: 9pt; }
   .meta .date { color: var(--sub); font-size: 8.8pt; margin-top: 0.3mm; }
   .group + .group { margin-top: 2mm; }
-  .group .label { font-weight: 700; margin-bottom: 0.6mm; }
+  .group .label { font-weight: 700; color: var(--accent); margin-bottom: 0.6mm; }
 
   ul { margin: 0; padding-left: 4mm; }
   li { margin: 0 0 0.8mm; padding-left: 0.5mm; }
@@ -72,7 +72,7 @@
   .toolbar a:hover { color: var(--ink); border-color: #c7cbd1; }
   .toolbar a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .toolbar .home { margin-right: auto; border: none; padding-left: 0; }
-  @media print { .toolbar { display: none; } }
+  @media print { .toolbar { display: none; } section { padding-top: 4mm; margin-top: 5mm; } .company + .company { margin-top: 4.5mm; } .group + .group { margin-top: 1.4mm; } body { line-height: 1.5; } li { margin-bottom: 0.5mm; } }
   @media screen and (min-width: 641px) {
     body { font-size: 15px; }
     .sheet { max-width: 1000px; padding: 48px 48px 80px; }
@@ -141,7 +141,6 @@
   <div class="company">
     <h3>PFCT</h3>
     <div class="desc">AI 기반 대출 리스크 관리 핀테크 기업, 크플 앱 운영</div>
-    <div class="stack">Databricks, Delta Lake, Spark, AWS DMS, Airflow, EKS, Terraform</div>
     <div class="row">
       <div class="meta">
         <div class="pos">데이터플랫폼팀</div><div class="pos2">매니저</div>
@@ -177,7 +176,6 @@
   <div class="company">
     <h3>디딤365</h3>
     <div class="desc">금융기관 대상 빅데이터 플랫폼 구축 기업</div>
-    <div class="stack">Spark, Iceberg, Hadoop, Hive, Impala, Java, Scala, Spring Boot</div>
     <div class="row">
       <div class="meta">
         <div class="pos">데이터솔루션팀</div><div class="pos2">선임(대리)</div>
@@ -207,20 +205,31 @@
   <div class="company">
     <h3>디세이코리아</h3>
     <div class="desc">AI 솔루션 전문기업, 이커머스 플랫폼 구축 사업</div>
-    <div class="stack">Java, Spring, MyBatis, MySQL</div>
     <div class="row">
       <div class="meta">
         <div class="pos">개발팀</div><div class="pos2">사원(연구원)</div>
         <div class="date">2022.04 - 2023.08</div>
       </div>
-      <div class="body">
-        <ul>
-          <li>국내 · 베트남 이커머스 물류 플랫폼의 상품 · 물류 API 개발 및 양국 서버 동시 운영</li>
-          <li>ngram Full Text Index · 쿼리 튜닝으로 상품 조회 <b>300ms → 90ms 미만</b> 단축</li>
-          <li>DB Lock · 트랜잭션 재설계로 동시 발급 시 쿠폰 중복 · 초과 발급 방지</li>
-        </ul>
-      </div>
-    </div>
+            <div class="body">
+        <div class="group">
+          <div class="label">상품 조회 성능 개선</div>
+          <ul>
+            <li>ngram Full Text Index · 쿼리 튜닝으로 상품 조회 <b>300ms → 90ms 미만</b> 단축</li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="label">쿠폰 발급 동시성 제어</div>
+          <ul>
+            <li>DB Lock · 트랜잭션 재설계로 동시 발급 시 <b>쿠폰 중복 · 초과 발급 방지</b></li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="label">데이터 처리 성능 최적화</div>
+          <ul>
+            <li>C# 기반으로 기존 단일 파일 처리 방식의 한계를 개선해 <b>수십 GB 규모 대용량 파일을 Chunk 단위로 분할 · 병렬 처리</b>하고, Wafer LOT ID 기반 데이터 분류 로직 구현</li>
+          </ul>
+        </div>
+      </div></div>
   </div>
 </section>
 
