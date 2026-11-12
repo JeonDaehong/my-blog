@@ -58,6 +58,7 @@
   .group + .group { margin-top: 2mm; }
   .group .label { font-weight: 700; color: var(--accent); margin-bottom: 0.6mm; }
 
+  a.pr { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
   ul { margin: 0; padding-left: 4mm; }
   li { margin: 0 0 0.8mm; padding-left: 0.5mm; }
   li::marker { color: var(--accent); }
@@ -246,18 +247,18 @@
     </ul>
   </div>
   <div class="item">
-    <div class="title"><div>Apache Iceberg <span>/ Contributor</span></div></div>
+    <div class="title"><div>Apache Iceberg <span>/ Contributor (Java · Rust)</span></div></div>
     <ul>
-      <li>Spark 벡터화 읽기에서 행마다 하던 Position Delete Index 조회를 범위 단위 순회로 바꿔 검사 CPU 사용량 최대 <b>9.3배 감소</b> (#18027)</li>
-      <li>Position Delete 로딩 실패 시 Loading 상태가 풀리지 않던 무한 대기 문제 수정, 실패 감지 · 재시도 로직 구현 (#3435)</li>
-      <li>Delete Vector의 연속 삭제 구간으로 Row Selection을 만들고 불필요한 Row Group 탐색을 생략해 읽기 시간 최대 <b>48% 단축</b> (#3454)</li>
+      <li>Spark 벡터화 읽기에서 행마다 하던 Position Delete Index 조회를 범위 단위 순회로 바꿔 검사 CPU 사용량 최대 <b>9.3배 감소</b> (<a class="pr" href="https://github.com/apache/iceberg/pull/18027">#18027</a>)</li>
+      <li>Position Delete 로딩 실패 시 Loading 상태가 풀리지 않던 무한 대기 문제 수정, 실패 감지 · 재시도 로직 구현 (<a class="pr" href="https://github.com/apache/iceberg-rust/pull/3435">#3435</a>)</li>
+      <li>Delete Vector의 연속 삭제 구간으로 Row Selection을 만들고 불필요한 Row Group 탐색을 생략해 읽기 시간 최대 <b>48% 단축</b> (<a class="pr" href="https://github.com/apache/iceberg-rust/pull/3454">#3454</a>)</li>
     </ul>
   </div>
   <div class="item">
-    <div class="title"><div>Apache Paimon <span>/ Contributor</span></div></div>
+    <div class="title"><div>Apache Paimon <span>/ Contributor (Rust)</span></div></div>
     <ul>
-      <li>정렬 구간이 하나뿐일 때 불필요한 Sort Merge를 생략하고 중복 키 검증 경로를 추가해 읽기 시간 <b>102ms → 18ms</b> 단축 (#1164)</li>
-      <li>집계 과정에서 승자 레코드를 복사하지 않고 참조로 처리해 메모리 할당 <b>19.6%</b> · 읽기 시간 <b>13% 감소</b> (#1338)</li>
+      <li>정렬 구간이 하나뿐일 때 불필요한 Sort Merge를 생략하고 중복 키 검증 경로를 추가해 읽기 시간 <b>102ms → 18ms</b> 단축 (<a class="pr" href="https://github.com/apache/paimon-rust/pull/1164">#1164</a>)</li>
+      <li>집계 과정에서 승자 레코드를 복사하지 않고 참조로 처리해 메모리 할당 <b>19.6%</b> · 읽기 시간 <b>13% 감소</b> (<a class="pr" href="https://github.com/apache/paimon-rust/pull/1338">#1338</a>)</li>
     </ul>
   </div></section>
 
