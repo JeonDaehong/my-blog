@@ -55,7 +55,12 @@
   .toolbar a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .toolbar .home { margin-right: auto; border: none; padding-left: 0; }
   @media print { .toolbar { display: none; } }
-  @media (max-width: 640px) {
+  @media screen and (min-width: 641px) {
+    body { font-size: 15px; }
+    .sheet { max-width: 1000px; padding: 48px 48px 80px; }
+    .row { grid-template-columns: 170px 1fr; column-gap: 28px; }
+    .skills { grid-template-columns: 150px 1fr; }
+  }  @media (max-width: 640px) {
     body { font-size: 14px; }
     .sheet { padding: 20px 16px; }
     .row { grid-template-columns: 1fr; row-gap: 4px; }
