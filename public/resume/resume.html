@@ -210,18 +210,12 @@
       </div>
             <div class="body">
         <div class="group">
-          <div class="label">상품 조회 성능 개선</div>
+          <div class="label">E-commerce B2C 플랫폼 설계 · 개발</div>
           <ul>
             <li>ngram Full Text Index · 쿼리 튜닝으로 상품 조회 <b>300ms → 90ms 미만</b> 단축</li>
-          </ul>
-        </div>
-        <div class="group">
-          <div class="label">쿠폰 발급 동시성 제어</div>
-          <ul>
             <li>DB Lock · 트랜잭션 재설계로 동시 발급 시 <b>쿠폰 중복 · 초과 발급 방지</b></li>
           </ul>
-        </div>
-        <div class="group">
+        </div><div class="group">
           <div class="label">데이터 처리 성능 최적화</div>
           <ul>
             <li>C# 기반으로 기존 단일 파일 처리 방식의 한계를 개선해 <b>수십 GB 규모 대용량 파일을 Chunk 단위로 분할 · 병렬 처리</b>하고, Wafer LOT ID 기반 데이터 분류 로직 구현</li>
@@ -244,7 +238,7 @@
     <div class="title"><div>Apache Iceberg <span>/ Contributor</span></div></div>
     <ul>
       <li>Spark 벡터화 읽기에서 행마다 하던 Position Delete Index 조회를 범위 단위 순회로 바꿔 검사 CPU 사용량 최대 <b>9.3배 감소</b> (#18027)</li>
-      <li>Position Delete 파일 로딩이 실패하면 Loading 상태가 풀리지 않아 읽기가 무한 대기하던 문제를 수정하고, 실패 감지 · 대기 작업 재시도 로직 구현 (#3435)</li>
+      <li>Position Delete 로딩 실패 시 Loading 상태가 풀리지 않던 무한 대기 문제 수정, 실패 감지 · 재시도 로직 구현 (#3435)</li>
       <li>Delete Vector의 연속 삭제 구간으로 Row Selection을 만들고 불필요한 Row Group 탐색을 생략해 읽기 시간 최대 <b>48% 단축</b> (#3454)</li>
     </ul>
   </div>
