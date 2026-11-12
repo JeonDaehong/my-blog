@@ -63,9 +63,9 @@
   li::marker { color: var(--accent); }
 
   .item + .item { margin-top: 3.5mm; }
-  .item .title { font-weight: 700; }
+  .item .title { font-weight: 700; display: flex; justify-content: space-between; gap: 4mm; align-items: baseline; margin-bottom: 0.6mm; }
   .item .title span { font-weight: 400; }
-  .item .date { color: var(--sub); font-size: 8.8pt; margin: 0.2mm 0 1mm; }
+  .item .date { color: var(--sub); font-size: 8.8pt; font-weight: 400; white-space: nowrap; }
 
   .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8mm; font-size: 13px; }
   .toolbar a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--sub); text-decoration: none; font-style: normal; }
@@ -234,39 +234,35 @@
 <section>
   <h2>Open Source</h2>
   <div class="item">
-    <div class="title">오픈소스 한국 커뮤니티 <span>/ 멘토(운영진)</span></div>
-    <div class="date">2025.05 - 현재</div>
+    <div class="title"><div>오픈소스 한국 커뮤니티 <span>/ 멘토(운영진)</span></div><div class="date">2025.05 - 현재</div></div>
     <ul>
       <li>멘티 <b>500명 이상</b> 대상 오픈소스 기여 멘토링 진행</li>
       <li>Apache Iceberg, Paimon, Gravitino 등 <b>5개 프로젝트에 PR 20건 이상 merge</b></li>
     </ul>
   </div>
   <div class="item">
-    <div class="title">Apache Iceberg <span>/ Contributor</span></div>
+    <div class="title"><div>Apache Iceberg <span>/ Contributor</span></div></div>
     <ul>
-      <li>Delete 검사를 구간 단위 순회로 바꿔 검사 CPU 최대 <b>9배 감소</b> (#18027)</li>
-      <li>Delete 파일 로드 실패 시 읽기 작업이 멈추던 장애 수정 (#3435)</li>
-      <li>Delete 행 선택 방식 개선으로 읽기 성능 최대 <b>48% 향상</b> (#3454)</li>
+      <li>Spark 벡터화 읽기에서 행마다 하던 Position Delete Index 조회를 범위 단위 순회로 바꿔 검사 CPU 사용량 최대 <b>9.3배 감소</b> (#18027)</li>
+      <li>Position Delete 파일 로딩이 실패하면 Loading 상태가 풀리지 않아 읽기가 무한 대기하던 문제를 수정하고, 실패 감지 · 대기 작업 재시도 로직 구현 (#3435)</li>
+      <li>Delete Vector의 연속 삭제 구간으로 Row Selection을 만들고 불필요한 Row Group 탐색을 생략해 읽기 시간 최대 <b>48% 단축</b> (#3454)</li>
     </ul>
   </div>
   <div class="item">
-    <div class="title">Apache Paimon <span>/ Contributor</span></div>
+    <div class="title"><div>Apache Paimon <span>/ Contributor</span></div></div>
     <ul>
-      <li>불필요한 Sort Merge를 생략해 읽기 시간 약 <b>62% 단축</b> (#1164)</li>
-      <li>Merge 중 값 복사를 없애 메모리 할당 <b>19.6%</b> · 읽기 시간 <b>13% 감소</b> (#1338)</li>
+      <li>정렬 구간이 하나뿐일 때 불필요한 Sort Merge를 생략하고 중복 키 검증 경로를 추가해 읽기 시간 <b>102ms → 18ms</b> 단축 (#1164)</li>
+      <li>집계 과정에서 승자 레코드를 복사하지 않고 참조로 처리해 메모리 할당 <b>19.6%</b> · 읽기 시간 <b>13% 감소</b> (#1338)</li>
     </ul>
-  </div>
-</section>
+  </div></section>
 
 <section>
   <h2>Education</h2>
   <div class="item">
-    <div class="title">한국방송통신대학교 <span>/ 컴퓨터과학과</span></div>
-    <div class="date">2024.03 - 2026.08</div>
+    <div class="title"><div>한국방송통신대학교 <span>/ 컴퓨터과학과</span></div><div class="date">2024.03 - 2026.08</div></div>
   </div>
   <div class="item">
-    <div class="title">강남대학교 <span>/ 국어국문학과</span></div>
-    <div class="date">2015.03 - 2019.02</div>
+    <div class="title"><div>강남대학교 <span>/ 국어국문학과</span></div><div class="date">2015.03 - 2019.02</div></div>
   </div>
 </section>
 
