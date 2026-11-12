@@ -21,6 +21,7 @@ import { useI18n } from "@/lib/i18n";
 const LINKS = {
   blog: "/posts",
   study: "/study",
+  resume: "/resume",
   github: "https://github.com/JeonDaehong",
   linkedin: "https://linkedin.com/in/daehong-jeon",
 };
@@ -33,6 +34,7 @@ const TEXT = {
     study: "공부 블로그 읽기",
     navBlog: "기술 블로그",
     navStudy: "공부 블로그",
+    navResume: "이력서",
   },
   en: {
     title: "Daehong's Data Log",
@@ -41,6 +43,7 @@ const TEXT = {
     study: "Read Study Blog",
     navBlog: "Tech Blog",
     navStudy: "Study Blog",
+    navResume: "Resume",
   },
 };
 
@@ -97,6 +100,8 @@ export default function LandingPage() {
           <div className="flex items-center gap-0.5 sm:gap-2">
             <Link href={LINKS.blog} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navBlog}</Link>
             <Link href={LINKS.study} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navStudy}</Link>
+            {/* 이력서는 블로그 밖의 정적 HTML 이라 Link 대신 a 로 연다 */}
+            <a href={LINKS.resume} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navResume}</a>
             <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors hidden sm:block">GitHub</a>
             <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors hidden sm:block">LinkedIn</a>
             {/* 좁은 화면에서는 글자 대신 아이콘만 */}

@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>전대홍 경력기술서</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --ink: #1f2328;
+    --sub: #6b7280;
+    --line: #e5e7eb;
+    --accent: #2f7a5b;
+  }
+  @page { size: A4; margin: 14mm 16mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body {
+    font-family: "Pretendard", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    color: var(--ink);
+    font-size: 9.8pt;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .sheet { max-width: 178mm; margin: 0 auto; padding: 10mm 0; }
+  @media print { .sheet { padding: 0; max-width: none; } }
+
+  .doc-head { margin-bottom: 6mm; }
+  .doc-head .kind { color: var(--accent); font-weight: 700; font-size: 12pt; }
+  .doc-head h1 { font-size: 22pt; margin: 0.5mm 0 0; letter-spacing: -0.5px; }
+
+  article { border-top: 2px solid var(--ink); padding-top: 4mm; }
+  article + article { break-before: page; margin-top: 10mm; }
+  @media print { article + article { margin-top: 0; } }
+
+  article h2 { font-size: 15pt; color: var(--accent); margin: 0; letter-spacing: -0.3px; }
+  .sub { margin-top: 1mm; font-weight: 600; font-size: 10.6pt; }
+  .sub .meta { color: var(--sub); font-weight: 500; font-size: 9pt; margin-left: 2mm; }
+
+  h3 { font-size: 10.6pt; margin: 4.5mm 0 1.5mm; }
+  h3 .n { color: var(--accent); margin-right: 1.5mm; }
+
+  ul { margin: 0; padding-left: 5mm; }
+  li { margin: 0 0 1.1mm; padding-left: 0.5mm; }
+  li::marker { color: var(--accent); }
+  b { font-weight: 700; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8mm; font-size: 13px; }
+  .toolbar a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--sub); text-decoration: none; }
+  .toolbar a:hover { color: var(--ink); border-color: #c7cbd1; }
+  .toolbar a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .toolbar .home { margin-right: auto; border: none; padding-left: 0; }
+  @media print { .toolbar { display: none; } }
+  @media (max-width: 640px) {
+    body { font-size: 14px; }
+    .sheet { padding: 20px 16px; }
+    .row { grid-template-columns: 1fr; row-gap: 4px; }
+    .skills { grid-template-columns: 1fr; }
+    .skills dd { margin-bottom: 6px; }
+    header h1, .doc-head h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+<nav class="toolbar">
+  <a class="home" href="/">← Daehong's Blog</a>
+  <a href="/resume">이력서</a>
+  <a class="on" href="/resume/career">경력기술서</a>
+  <a href="/resume/career.pdf" download>PDF 다운로드</a>
+</nav>
+
+<div class="doc-head">
+  <div class="kind">경력기술서</div>
+  <h1>전대홍</h1>
+</div>
+
+<!-- 1 -->
+<article>
+  <h2>Redshift → Databricks 메달리온 레이크하우스 전환</h2>
+  <div class="sub">CDC 기반 준실시간 레이크하우스 구축 · 운영 <span class="meta">PFCT · 2026.02 - 현재</span></div>
+
+  <h3><span class="n">1.</span>배경 및 목표</h3>
+  <ul>
+    <li>운영 DB를 DMS로 Redshift에 직접 복제하는 구조로, 적재 작업이 Redshift 실행 시간의 58% ~ 최대 99.8%를 차지해 조회 성능 저하. 적재 · 조회 컴퓨트 분리 필요</li>
+    <li>데이터를 다시 만들려면 운영 DB를 재조회해야 하고, 변경 이력 · 삭제 기록 · 64KB 초과 값 보존 불가</li>
+    <li>약 1,600개 테이블을 준실시간으로 적재하되, 일 DBU 비용 상한 안에서 운영</li>
+  </ul>
+
+  <h3><span class="n">2.</span>기술 스택 및 환경</h3>
+  <ul>
+    <li>Python, Spark, Databricks, Delta Lake, AWS DMS, S3, Aurora MySQL, Redshift, Airflow</li>
+    <li>DMS CDC 태스크 30개 이상의 AWS 클라우드 환경</li>
+    <li>약 1,600개 테이블, 20TB 이상 규모 데이터</li>
+  </ul>
+
+  <h3><span class="n">3.</span>주요 업무 및 상세 역할</h3>
+  <ul>
+    <li>Tech Proposal 작성 → PoC → 설계 및 구축까지 주도</li>
+    <li>메달리온 계층별 S3 버킷 · Unity Catalog 구조와 권한 · 라이프사이클 정책 설계</li>
+    <li>Aurora 스냅샷 S3 Export 기반 초기 풀로드 설계 · 수행</li>
+    <li>DMS CDC → S3 Landing → Delta Lake Bronze 준실시간 적재 아키텍처 설계 · 개발</li>
+    <li>Fan-out 스트리밍 Job 설계 및 MERGE 성능 최적화</li>
+    <li>Landing ↔ Bronze 전수 정합성 검증(DQ) 체계 구현</li>
+  </ul>
+
+  <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
+  <ul>
+    <li>메달리온 계층별 S3 버킷 · Unity Catalog 구조를 설계하고 계층별 권한 · 라이프사이클 정책을 적용하여, 데이터 접근 통제와 스토리지 관리 기준 확립</li>
+    <li>Read Replica에서 풀로드 시 조회 성능 저하와 장시간 적재가 발생해, Aurora 스냅샷을 S3로 Export(Parquet)하는 방식으로 전환하여 운영 DB · 복제본 부하 없이 <b>약 20TB 초기 적재</b></li>
+    <li>DMS CDC → S3 Landing → Delta Lake Bronze 준실시간 적재를 구축하여, <b>약 1,600개 테이블</b>을 <b>End-to-End Latency p99 30초</b>로 적재</li>
+    <li>테이블별 스트림 구조(DLT)를 스키마당 스트림 하나가 테이블별로 분배 · MERGE하는 Fan-out Job으로 재설계하여, <b>CPU 75% · 메모리 66% · 인프라 비용 39% 절감</b></li>
+    <li>Execution Plan 분석으로 NULL 허용 머지 키(&lt;=&gt;)가 Data Skipping을 막아 전체 스캔하는 원인을 찾고, 키 범위 조건 추가와 &lt;=&gt; 제한 적용으로 <b>Merge 시간 73% 단축</b></li>
+    <li>약 1,600개 테이블 전수 정합성 검증(DQ)을 자동화하여 <b>적재 누락 31만 행 · CDC 순서 오류 15만 행</b>을 탐지하고, 멱등한 조건부 MERGE로 복구하여 <b>최종 누락 0건</b> 달성</li>
+    <li>Redshift 감사 로그와 Airflow DAG 분석으로 테이블을 실시간 · 6시간 · 일 배치로 등급화하고, 등급별 Job 클러스터와 인스턴스 타입을 최적화하여 <b>일 운영 비용 DBU $100 이내</b> 달성</li>
+  </ul>
+</article>
+
+<!-- 2 -->
+<article>
+  <h2>데이터 분석 전용 온톨로지 · 시맨틱 레이어 구축</h2>
+  <div class="sub">분석용 Gold 테이블 및 지표 표준화 질의 엔진 개발 <span class="meta">PFCT · 2026.03 - 2026.11</span></div>
+
+  <h3><span class="n">1.</span>배경 및 목표</h3>
+  <ul>
+    <li>데이터 분석가들이 의미가 겹치는 테이블과 중복 컬럼 때문에 어떤 테이블을 써야 할지 판단하기 어려워, 분석용 데이터 정리와 질의 체계 개선을 요청</li>
+    <li>사내 공용 에이전트의 분석용 온톨로지가 원천 테이블을 그대로 매핑해, 같은 질문에도 다른 답 발생(정답률 17%, 일관성 30%)</li>
+    <li>금융 데이터 특성상 정확성 · 일관성이 필수이며, 흩어진 지표 정의를 한 곳으로 모을 필요</li>
+  </ul>
+
+  <h3><span class="n">2.</span>기술 스택 및 환경</h3>
+  <ul>
+    <li>Python, SQL, OWL/RDF(Turtle), Redshift, LLM(Claude), AWS EKS, ECR, S3</li>
+    <li>사내 DW의 대출 · 투자 · 신용 도메인 테이블 환경</li>
+  </ul>
+
+  <h3><span class="n">3.</span>주요 업무 및 상세 역할</h3>
+  <ul>
+    <li>원천 테이블 · 중복 컬럼 전수 분석 및 분석용 Gold 테이블 설계 · 구축</li>
+    <li>OWL 기반 데이터 · 지표 정의 계층 설계</li>
+    <li>LLM 질의 의도 추출 · 실행 전 검증 · SQL 컴파일러 구조의 질의 엔진 설계 · 개발</li>
+    <li>정답지 기반 정확도 · 일관성 측정 하네스 및 테스트 체계 개발</li>
+  </ul>
+
+  <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
+  <ul>
+    <li>의미가 겹치는 원천 테이블과 중복 컬럼을 전수 분석하여, 컬럼마다 기준 테이블을 하나로 정한 분석용 Gold 테이블 설계 · 구축</li>
+    <li>단계별 출력을 비교하는 측정 하네스로 불일치 원인을 분리하고, LLM은 질의 의도만 구조화해 추출하고 코드가 SQL을 생성하는 구조로 재설계</li>
+    <li>현업 질문 61문항 × 20회 반복 테스트에서 기존 대비 <b>정답률 17% → 98%</b>, 동일 질문 응답 <b>일관성 30% → 98%</b> 개선</li>
+    <li>동일 테스트 기준 <b>응답 시간 91% 단축</b>(416분 → 38분), <b>LLM 토큰 사용량 87% 절감</b>(134.8M → 17.2M)</li>
+  </ul>
+</article>
+
+<!-- 3 -->
+<article>
+  <h2>Hadoop Ecosystem 기반 플랫폼 성능 최적화 및 고도화</h2>
+  <div class="sub">NH 금융 빅데이터 개인신용정보 파기 프로세스 성능 개선 <span class="meta">(주)디딤365 · 2025.04 - 2025.08</span></div>
+
+  <h3><span class="n">1.</span>배경 및 목표</h3>
+  <ul>
+    <li>매년 데이터가 꾸준히 늘면서 기존 Hive 기반 데이터 처리 애플리케이션의 성능 저하. 개선 필요</li>
+    <li>금융감독원 제출을 위한 데이터 처리 결과 자동화 필요</li>
+    <li>운영 중 발생하는 플랫폼(애플리케이션)의 주요 이슈 해결</li>
+  </ul>
+
+  <h3><span class="n">2.</span>기술 스택 및 환경</h3>
+  <ul>
+    <li>Java, Scala, Spring Boot, Spark, Hadoop, YARN, Hive, Zookeeper, Oozie, MySQL, Impala, Hue</li>
+    <li>30대 이상 규모의 Hadoop 클러스터 환경</li>
+    <li>테이블당 수십TB ~ 수백TB 이상의 데이터 환경</li>
+  </ul>
+
+  <h3><span class="n">3.</span>주요 업무 및 상세 역할</h3>
+  <ul>
+    <li>성능 향상을 위한 프로세스 재설계, Spark · Hive 데이터 처리 애플리케이션 개발</li>
+    <li>데이터 처리 프로세스 리팩토링을 통해 집계 로직을 자동화하여 운영 효율성 향상</li>
+    <li>수백TB의 데이터를 활용하여 성능 및 안정성 검증</li>
+    <li>TCP Leak, Memory OOM 등 운영 환경에서 발생하는 플랫폼(애플리케이션)의 주요 이슈 해결</li>
+  </ul>
+
+  <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
+  <ul>
+    <li>하나의 Spark 애플리케이션 안에서 파티션 단위 Job을 멀티 스레드로 동시 제출해 유휴 Executor 슬롯을 채우고, Spark UI로 Task 분포 · GC를 검증하여 약 1,100개 파기 작업의 <b>CPU 코어 사용률 20~30% → 80%, 처리 시간 70% 단축</b></li>
+    <li>한 번에 돌던 백업 · 파기 작업을 단계별로 나누고, 실패하면 <b>실패한 파티션부터 재실행</b>하도록 개선. 같은 파티션을 다시 돌려도 결과가 같도록 덮어쓰기(INSERT OVERWRITE) 방식으로 설계</li>
+    <li>파기 건수를 집계하려고 매번 4억 행 백업 테이블을 Join하고 사람이 다시 집계하던 과정을, 백업 시점에 파기 대상을 미리 표시하는 방식으로 바꿔 <b>전체 워크플로우 시간 80% 단축</b> 및 금융감독원 제출 집계 자동화</li>
+    <li>Hive 통계가 없어 작은 기준 테이블도 큰 테이블로 판단되어 Sort-Merge Join으로 처리되던 것을 Broadcast Join으로 바로잡아, 같은 자원에서 <b>처리량 20% 향상</b></li>
+    <li>JVM Heap Dump 분석으로 Bean Lifecycle · Task 객체(Map)의 메모리 누수를, 예외 처리의 finally 누락으로 생긴 TCP Connection 누수를 찾아 제거하여 <b>월 장애 시간 90% 이상 감소, 가용성 99.9%</b> SLA 충족</li>
+    <li>프로젝트 성과로 고객사에 기술 역량을 인정받아 <b>후속 프로젝트 계약 유치</b>, 수억 원 규모 매출에 기여</li>
+  </ul>
+</article>
+
+<!-- 4 -->
+<article>
+  <h2>Spark · Iceberg 기반 대규모 데이터 파이프라인 플랫폼 설계 · 개발</h2>
+  <div class="sub">Didim-DP Batch Cloud Solution 개발 <span class="meta">(주)디딤365 · 2024.07 - 2025.03</span></div>
+
+  <h3><span class="n">1.</span>배경 및 목표</h3>
+  <ul>
+    <li>기존 Hadoop 에코시스템에 종속된 아키텍처에서 벗어나, 유연하게 동작하는 데이터 처리 플랫폼 필요</li>
+    <li>DB, Cloud Storage, NAS, Hive 등 다양한 엔드포인트에서 데이터를 효율적으로 추출 · 적재하는 구조 설계 및 구현</li>
+    <li>고정된 수집-변환-적재(ETL) 구조에서 벗어나, DAG 기반 파이프라인으로 분기 · 이벤트 · 병렬 · 조건별 처리 등 다양한 데이터 흐름 지원</li>
+  </ul>
+
+  <h3><span class="n">2.</span>기술 스택 및 환경</h3>
+  <ul>
+    <li>Java, Scala, Spring Boot, Spark, Iceberg, DuckDB, Zookeeper, MinIO, AWS S3, AWS Aurora, Hive, MySQL, Oracle, GitLab Runner</li>
+    <li>온프레미스 서버 7대 환경</li>
+    <li>일 평균 25억 건 데이터 처리 환경</li>
+  </ul>
+
+  <h3><span class="n">3.</span>주요 업무 및 상세 역할</h3>
+  <ul>
+    <li>Spark · Iceberg 기반 분산 데이터 처리 체계 및 플랫폼 아키텍처 설계 · 개발</li>
+    <li>Module H/A 구성 및 Failover 체계 설계 · 구현</li>
+    <li>Iceberg Expired Snapshot · Orphan File 관리 체계 구현</li>
+    <li>DB Lock 기반 Resource 제어 Module 개발</li>
+  </ul>
+
+  <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
+  <ul>
+    <li>Spark · Iceberg 기반 데이터 처리 체계를 신규 아키텍처로 설계 · 구현하여, 기존 Hadoop 기반 ETL 대비 <b>처리 시간 40% 단축</b> 및 HDFS 종속성 제거로 S3 · Glue 등 클라우드 확장성 확보</li>
+    <li>Module H/A 구성 및 Failover 체계 구현으로 장애 시 대기 노드로 자동 전환되도록 하여 <b>장애 자동 복구율 95% 이상</b> 달성</li>
+    <li>Iceberg Expired Snapshot 및 Orphan File 관리를 자동화하여 <b>스토리지 사용량 30% 이상 절감</b>, 장기 운영 시 메타데이터 누적으로 인한 성능 저하 예방</li>
+    <li>DB Lock 기반 Resource 제어 모듈로 병렬 작업 간 자원 경합 없이 <b>일 평균 800건 이상의 배치 작업</b> 안정 처리</li>
+    <li><b>일 평균 25억 건</b> 이상의 대용량 데이터 처리 환경에서 성능 · 안정성을 검증하고, 삼성 Monimo 프로젝트에 납품 · 운영</li>
+  </ul>
+</article>
+
+<!-- 5 -->
+<article>
+  <h2>E-commerce B2C 플랫폼 백엔드 서비스 API 설계 · 개발</h2>
+  <div class="sub">글로벌 이커머스 물류 통합 플랫폼 서비스 개발 <span class="meta">(주)디세이코리아 · 2022.06 - 2023.07</span></div>
+
+  <h3><span class="n">1.</span>배경 및 목표</h3>
+  <ul>
+    <li>국내 브랜드 상품을 베트남 매장에서 판매하기 위한 이커머스 물류 연동 통합 플랫폼 개발</li>
+    <li>상품 등록부터 선적, 현지 매장 판매까지 QR 기반 물류 추적 및 통합관리 기능 구현</li>
+    <li>사내 AI 솔루션 연계를 위한 플랫폼 기반 협력형 SI 사업 수행</li>
+  </ul>
+
+  <h3><span class="n">2.</span>기술 스택 및 환경</h3>
+  <ul>
+    <li>Java, Spring, MyBatis, MySQL</li>
+    <li>온프레미스 기반의 국내 서버, 베트남 서버 동시 운영</li>
+  </ul>
+
+  <h3><span class="n">3.</span>주요 업무 및 상세 역할</h3>
+  <ul>
+    <li>개발 및 운영 환경 구축(3-tier 구조)</li>
+    <li>상품 조회 · 검색 API 개발 및 성능 최적화</li>
+    <li>DB Lock 기반 쿠폰 발급 기능 설계 · 구현</li>
+    <li>Code Convention 수립을 통한 사내 개발 표준화</li>
+  </ul>
+
+  <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
+  <ul>
+    <li>ngram 기반 Full Text Index, 인덱스 최적화 및 쿼리 튜닝을 통해 상품 조회 속도를 <b>300ms → 90ms 미만으로 단축(70%)</b></li>
+    <li>DB Lock 기반 쿠폰 발급 기능 설계 · 구현으로 <b>동시 발급 시 쿠폰 중복 · 초과 발급 방지</b></li>
+    <li>같은 클래스 내부 호출로 @Transactional이 적용되지 않던 Self-Invocation 문제를 트랜잭션 메서드를 별도 Bean으로 분리해 해결</li>
+    <li>한국 · 베트남 서버 동시 운영 환경에서 서비스 오픈 및 운영</li>
+  </ul>
+</article>
+
+</div>
+</body>
+</html>
