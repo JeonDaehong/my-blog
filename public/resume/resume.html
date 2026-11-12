@@ -18,51 +18,57 @@
   body {
     font-family: "Pretendard", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
     color: var(--ink);
-    font-size: 9.6pt;
+    font-size: 9.5pt;
     line-height: 1.55;
     word-break: keep-all;
     overflow-wrap: break-word;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
   .sheet { max-width: 180mm; margin: 0 auto; padding: 10mm 0; }
   @media print { .sheet { padding: 0; max-width: none; } }
 
-  header { margin-bottom: 5mm; }
   header h1 { font-size: 24pt; margin: 0; letter-spacing: -0.5px; }
   header .role { font-size: 12pt; color: var(--accent); font-weight: 700; margin-top: 1mm; }
   header .contact { margin-top: 2.5mm; color: var(--sub); font-size: 9pt; }
   header .contact a { color: var(--sub); text-decoration: underline; text-underline-offset: 2px; }
   header .contact span + span::before { content: "|"; margin: 0 2.2mm; color: #c7cbd1; }
 
-  section { border-top: 1px solid var(--line); padding-top: 3.2mm; margin-top: 3.8mm; }
-  h2 {
-    font-size: 14pt; color: var(--accent); margin: 0 0 2.4mm;
-    letter-spacing: -0.3px;
-  }
+  section { border-top: 1px solid var(--line); padding-top: 5mm; margin-top: 6mm; }
+  h2 { font-size: 14pt; color: var(--accent); margin: 0 0 3.5mm; letter-spacing: -0.3px; }
   p { margin: 0 0 1.6mm; }
-  b, strong { font-weight: 700; }
+  b { font-weight: 700; }
 
-  .skills { display: grid; grid-template-columns: 26mm 1fr; row-gap: 0.8mm; }
+  .skills { display: grid; grid-template-columns: 27mm 1fr; row-gap: 0.8mm; margin: 0; }
   .skills dt { color: var(--sub); font-weight: 600; }
   .skills dd { margin: 0; }
 
-  .row { display: grid; grid-template-columns: 34mm 1fr; column-gap: 4mm; break-inside: avoid; }
-  .row + .row { margin-top: 3mm; }
-  .meta .name { font-weight: 700; font-size: 10.4pt; }
-  .meta .pos { font-size: 8.8pt; margin-top: 0.4mm; }
-  .meta .date { color: var(--sub); font-size: 8.6pt; margin-top: 0.4mm; }
-  .body .desc { color: var(--sub); font-size: 8.8pt; margin-bottom: 0.8mm; }
-  .body .title { font-weight: 700; font-size: 10.4pt; margin-bottom: 0.8mm; }
+  .company { break-inside: avoid-page; }
+  .company + .company { margin-top: 6mm; }
+  .company h3 { font-size: 12pt; margin: 0; letter-spacing: -0.2px; }
+  .company .desc { color: var(--sub); font-size: 9pt; margin-top: 0.4mm; }
+  .company .stack { color: var(--sub); font-size: 8.8pt; font-style: italic; margin-top: 0.2mm; }
+
+  .row { display: grid; grid-template-columns: 34mm 1fr; column-gap: 5mm; margin-top: 2.6mm; }
+  .meta .pos { font-weight: 700; font-size: 9.2pt; }
+  .meta .pos2 { font-size: 9pt; }
+  .meta .date { color: var(--sub); font-size: 8.8pt; margin-top: 0.3mm; }
+  .group + .group { margin-top: 2mm; }
+  .group .label { font-weight: 700; margin-bottom: 0.6mm; }
 
   ul { margin: 0; padding-left: 4mm; }
-  li { margin: 0 0 0.9mm; padding-left: 0.5mm; }
+  li { margin: 0 0 0.8mm; padding-left: 0.5mm; }
   li::marker { color: var(--accent); }
 
-  .oss .repo { font-weight: 700; margin-top: 1.2mm; }
-  .oss .repo:first-child { margin-top: 0; }
+  .item + .item { margin-top: 3.5mm; }
+  .item .title { font-weight: 700; }
+  .item .title span { font-weight: 400; }
+  .item .date { color: var(--sub); font-size: 8.8pt; margin: 0.2mm 0 1mm; }
+
   .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8mm; font-size: 13px; }
-  .toolbar a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--sub); text-decoration: none; }
+  .toolbar a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--sub); text-decoration: none; font-style: normal; }
   .toolbar a:hover { color: var(--ink); border-color: #c7cbd1; }
   .toolbar a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .toolbar .home { margin-right: auto; border: none; padding-left: 0; }
@@ -70,15 +76,22 @@
   @media screen and (min-width: 641px) {
     body { font-size: 15px; }
     .sheet { max-width: 1000px; padding: 48px 48px 80px; }
-    .row { grid-template-columns: 170px 1fr; column-gap: 28px; }
+    .row { grid-template-columns: 170px 1fr; column-gap: 28px; margin-top: 14px; }
     .skills { grid-template-columns: 150px 1fr; }
-  }  @media (max-width: 640px) {
+    section { padding-top: 36px; margin-top: 44px; }
+    h2 { margin-bottom: 20px; font-size: 24px; }
+    .company + .company { margin-top: 36px; }
+    .company h3 { font-size: 19px; }
+    .group + .group { margin-top: 12px; }
+    .item + .item { margin-top: 18px; }
+  }
+  @media (max-width: 640px) {
     body { font-size: 14px; }
     .sheet { padding: 20px 16px; }
-    .row { grid-template-columns: 1fr; row-gap: 4px; }
+    .row { grid-template-columns: 1fr; row-gap: 6px; }
     .skills { grid-template-columns: 1fr; }
     .skills dd { margin-bottom: 6px; }
-    header h1, .doc-head h1 { font-size: 28px; }
+    header h1 { font-size: 28px; }
   }
 </style>
 </head>
@@ -93,7 +106,7 @@
 
 <header>
   <h1>전대홍</h1>
-  <div class="role">Data Engineer</div>
+  <div class="role">Data Engineer · Open Source Contributor</div>
   <div class="contact">
     <span>daehong770@gmail.com</span>
     <span><a href="https://github.com/JeonDaehong">GitHub</a></span>
@@ -106,7 +119,9 @@
   <h2>Introduce</h2>
   <p>백엔드 개발로 시작해 지금은 데이터 플랫폼을 만들고 있는 데이터 엔지니어 전대홍입니다.</p>
   <p>금융권에서 Hadoop · Spark · Iceberg 기반 배치 플랫폼을 설계하고 성능을 최적화하며 <b>일 평균 25억 건, 수백TB 규모</b>의 데이터를 다뤘습니다. 지금은 핀테크에서 Redshift DW를 Databricks 레이크하우스로 전환해 <b>약 1,600개 테이블 · 20TB 이상</b>의 데이터를 <b>적재 누락 0건</b>으로 옮기고 있습니다.</p>
-  <p>문제가 생기면 먼저 측정해서 원인을 찾고, 기술 제안과 PoC로 검증한 뒤 구조를 바꾸는 방식으로 일합니다.</p></section>
+  <p>Apache Iceberg · Paimon 등 데이터 레이크 오픈소스에 <b>Contributor</b>로 기여하며, 테이블 포맷의 내부 동작을 코드 수준에서 다뤄 왔습니다.</p>
+  <p>문제가 생기면 먼저 측정해서 원인을 찾고, 기술 제안과 PoC로 검증한 뒤 구조를 바꾸는 방식으로 일합니다.</p>
+</section>
 
 <section>
   <h2>Skills</h2>
@@ -123,166 +138,128 @@
 <section>
   <h2>Work Experience</h2>
 
-  <div class="row">
-    <div class="meta">
-      <div class="name">PFCT</div>
-      <div class="pos">데이터플랫폼팀 · 매니저</div>
-      <div class="date">2026.01 - 현재</div>
-    </div>
-    <div class="body">
-      <div class="desc">AI 기반 대출 리스크 관리 핀테크 기업, 크플 앱 운영</div>
-      <ul>
-        <li>Redshift → Databricks 메달리온 레이크하우스 전환 및 준실시간 CDC 파이프라인 구축 · 운영</li>
-        <li>데이터 분석 전용 시맨틱 레이어 구축, EKS 기반 Airflow 운영, AWS 인프라 Terraform 전환</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="meta">
-      <div class="name">디딤365</div>
-      <div class="pos">데이터솔루션팀 · 선임(대리)</div>
-      <div class="date">2024.03 - 2025.12</div>
-    </div>
-    <div class="body">
-      <div class="desc">금융기관 대상 빅데이터 플랫폼 구축 기업</div>
-      <ul>
-        <li>Spark · Iceberg 기반 금융권 대용량 배치 데이터 플랫폼 설계 · 개발, Hadoop 플랫폼 성능 최적화</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="meta">
-      <div class="name">디세이코리아</div>
-      <div class="pos">개발팀 · 사원(연구원)</div>
-      <div class="date">2022.04 - 2023.08</div>
-    </div>
-    <div class="body">
-      <div class="desc">AI 솔루션 전문기업, 이커머스 플랫폼 구축 사업</div>
-      <ul>
-        <li>국내 · 베트남 이커머스 물류 플랫폼 API 개발, 상품 조회 <b>300ms → 90ms 미만</b> 단축, 쿠폰 동시 발급 제어</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<section>
-  <h2>Key Projects</h2>
-
-  <div class="row">
-    <div class="meta">
-      <div class="name">PFCT</div>
-      <div class="date">2026.02 - 현재</div>
-    </div>
-    <div class="body">
-      <div class="title">Redshift → Databricks 메달리온 레이크하우스 전환</div>
-      <ul>
-        <li>Redshift 기반 <b>약 20TB · 1,600개 테이블</b>을 Delta Lake 레이크하우스로 이관</li>
-        <li>DMS CDC 기반 Bronze 준실시간 적재 구축, End-to-End Latency <b>p99 30초 이내</b> 달성</li>
-        <li>DLT를 단일 Fan-out Job으로 재설계하고 Merge 병목 제거, <b>비용 39% 절감 · Merge 시간 73% 단축</b></li>
-        <li>DQ 검증 자동화로 누락 31만 행 · 순서 오류 15만 행 탐지 · 복구, <b>최종 누락 0건</b></li>
-        <li>메달리온 계층별 S3 버킷 · Unity Catalog 구조와 권한 · 라이프사이클 정책 설계</li>
-      </ul>
+  <div class="company">
+    <h3>PFCT</h3>
+    <div class="desc">AI 기반 대출 리스크 관리 핀테크 기업, 크플 앱 운영</div>
+    <div class="stack">Databricks, Delta Lake, Spark, AWS DMS, Airflow, EKS, Terraform</div>
+    <div class="row">
+      <div class="meta">
+        <div class="pos">데이터플랫폼팀</div><div class="pos2">매니저</div>
+        <div class="date">2026.01 - 현재</div>
+      </div>
+      <div class="body">
+        <div class="group">
+          <div class="label">Redshift → Databricks 메달리온 레이크하우스 전환</div>
+          <ul>
+            <li><b>약 20TB · 1,600개 테이블</b> 이관, DMS CDC 기반 Bronze 준실시간 적재 구축, End-to-End Latency <b>p99 30초 이내</b></li>
+            <li>DLT를 단일 Fan-out Job으로 재설계하고 Merge 병목 제거, <b>비용 39% 절감 · Merge 시간 73% 단축</b></li>
+            <li>DQ 검증 자동화로 누락 31만 행 · 순서 오류 15만 행 탐지 · 복구, <b>최종 누락 0건</b></li>
+            <li>메달리온 계층별 S3 버킷 · Unity Catalog 구조와 권한 · 라이프사이클 정책 설계</li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="label">데이터 분석 전용 시맨틱 레이어 구축</div>
+          <ul>
+            <li>의미가 겹치는 테이블과 중복 컬럼을 정리해 기준 테이블이 하나인 분석용 Gold 테이블 설계 · 구축</li>
+            <li>기존 사내 온톨로지 대비 질의 <b>정답률 17% → 98%</b>, <b>일관성 30% → 98%</b>, <b>응답 시간 91% · LLM 토큰 87% 절감</b></li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="label">플랫폼 운영</div>
+          <ul>
+            <li>EKS 기반 Airflow · 데이터 플랫폼 운영, AWS 인프라 Terraform 전환, Grafana · Prometheus 모니터링</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="row">
-    <div class="meta">
-      <div class="name">PFCT</div>
-      <div class="date">2026.03 - 2026.11</div>
-    </div>
-    <div class="body">
-      <div class="title">데이터 분석 전용 온톨로지 · 시맨틱 레이어 구축</div>
-      <ul>
-        <li>의미가 겹치는 원천 테이블과 중복 컬럼을 전수 분석해, 기준 테이블을 하나로 정한 분석용 Gold 테이블 설계 · 구축</li>
-        <li>흩어진 데이터 정의를 시맨틱 레이어(OWL)로 표준화하고, 항상 같은 SQL로 실행되는 단일 지표 정의 체계 구축</li>
-        <li>기존 사내 온톨로지 대비 정답지 기준 <b>정답률 17% → 98%</b>, 동일 질문 응답 <b>일관성 30% → 98%</b> 달성</li>
-        <li>LLM은 질의 의도만 추출하고 코드가 SQL을 생성하는 구조로 바꿔, <b>응답 시간 91% · LLM 토큰 사용량 87% 절감</b></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="meta">
-      <div class="name">디딤365</div>
-      <div class="date">2025.04 - 2025.08</div>
-    </div>
-    <div class="body">
-      <div class="title">Hadoop Ecosystem 기반 플랫폼 성능 최적화 및 고도화</div>
-      <ul>
-        <li>Java · HiveQL 기반 파기 시스템을 Scala · Spark 기반으로 전환, 데이터 범위 · 파티션 단위로 실행 구조 세분화</li>
-        <li>약 1,100개 파기 작업을 병렬 제출해 <b>CPU 코어 사용률 20~30% → 80%</b>, <b>처리 시간 70% 이상 단축</b></li>
-        <li>반복되던 4억 행 백업 테이블 Join과 수작업 2차 집계를 선집계로 대체해, 전체 워크플로우 시간 <b>80% 단축</b></li>
-        <li>Hive 통계 누락으로 Sort-Merge Join되던 기준 테이블을 Broadcast로 바로잡아 같은 자원에서 처리량 <b>20% 향상</b></li>
-        <li>배치 스케줄러의 힙 · TCP Connection 누수를 Heap Dump · 소켓 분석으로 제거해 월 장애 시간 <b>90% 이상 감소</b>, 가용성 <b>99.9%</b> 충족</li>
-      </ul>
+  <div class="company">
+    <h3>디딤365</h3>
+    <div class="desc">금융기관 대상 빅데이터 플랫폼 구축 기업</div>
+    <div class="stack">Spark, Iceberg, Hadoop, Hive, Impala, Java, Scala, Spring Boot</div>
+    <div class="row">
+      <div class="meta">
+        <div class="pos">데이터솔루션팀</div><div class="pos2">선임(대리)</div>
+        <div class="date">2024.03 - 2025.12</div>
+      </div>
+      <div class="body">
+        <div class="group">
+          <div class="label">Spark · Iceberg 기반 배치 데이터 플랫폼 설계 · 개발</div>
+          <ul>
+            <li>기존 Hadoop ETL 대비 <b>처리 시간 40% 단축</b>, S3 · Glue 등 HDFS에 종속되지 않는 구조 확보</li>
+            <li>모듈 H/A · Failover로 <b>장애 자동 복구율 95% 이상</b>, Snapshot · Orphan File 정리 자동화로 <b>스토리지 30% 이상 절감</b></li>
+            <li>DB Lock 기반 자원 제어로 <b>일 평균 800개 이상 배치 작업 · 25억 건</b> 데이터 안정 처리</li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="label">개인신용정보 파기 시스템 성능 최적화</div>
+          <ul>
+            <li>약 1,100개 파기 작업을 Spark 병렬 제출로 전환해 <b>CPU 코어 사용률 20~30% → 80%, 처리 시간 70% 이상 단축</b></li>
+            <li>반복되던 4억 행 백업 테이블 Join과 수작업 집계를 선집계로 대체해 <b>전체 워크플로우 시간 80% 단축</b></li>
+            <li>Hive 통계 누락으로 잘못 선택된 Join을 Broadcast로 교정해 <b>처리량 20% 향상</b>, 힙 · TCP 누수 제거로 <b>월 장애 시간 90% 감소</b></li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="row">
-    <div class="meta">
-      <div class="name">디딤365</div>
-      <div class="date">2024.07 - 2025.03</div>
-    </div>
-    <div class="body">
-      <div class="title">Spark · Iceberg 기반 대규모 데이터 파이프라인 플랫폼 설계 · 개발</div>
-      <ul>
-        <li>Spark · Iceberg 기반 플랫폼 아키텍처 설계 · 구현, 기존 Hadoop ETL 대비 <b>처리 시간 40% 단축</b>, S3 · Glue 등 HDFS 비종속 구조 확보</li>
-        <li>모듈 H/A · Failover 구현으로 장애 자동 복구율 <b>95% 이상</b> 달성</li>
-        <li>Iceberg Snapshot 만료 · Orphan File 정리 자동화로 스토리지 사용량 <b>30% 이상 절감</b></li>
-        <li>DB Lock 기반 자원 제어 모듈로 일 평균 <b>800개 이상 배치 작업 · 25억 건</b> 데이터 안정 처리</li>
-      </ul>
+  <div class="company">
+    <h3>디세이코리아</h3>
+    <div class="desc">AI 솔루션 전문기업, 이커머스 플랫폼 구축 사업</div>
+    <div class="stack">Java, Spring, MyBatis, MySQL</div>
+    <div class="row">
+      <div class="meta">
+        <div class="pos">개발팀</div><div class="pos2">사원(연구원)</div>
+        <div class="date">2022.04 - 2023.08</div>
+      </div>
+      <div class="body">
+        <ul>
+          <li>국내 · 베트남 이커머스 물류 플랫폼의 상품 · 물류 API 개발 및 양국 서버 동시 운영</li>
+          <li>ngram Full Text Index · 쿼리 튜닝으로 상품 조회 <b>300ms → 90ms 미만</b> 단축</li>
+          <li>DB Lock · 트랜잭션 재설계로 동시 발급 시 쿠폰 중복 · 초과 발급 방지</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
 <section>
   <h2>Open Source</h2>
-
-  <div class="row">
-    <div class="meta">
-      <div class="name">오픈소스 한국 커뮤니티</div>
-      <div class="pos">멘토(운영진)</div>
-      <div class="date">2025.05 - 현재</div>
-    </div>
-    <div class="body">
-      <ul>
-        <li>멘티 <b>500명 이상</b> 대상 오픈소스 기여 멘토링 진행</li>
-        <li>Apache Iceberg, Paimon, Gravitino 등 <b>5개 프로젝트에 PR 20건 이상 merge</b></li>
-      </ul>
-    </div>
+  <div class="item">
+    <div class="title">오픈소스 한국 커뮤니티 <span>/ 멘토(운영진)</span></div>
+    <div class="date">2025.05 - 현재</div>
+    <ul>
+      <li>멘티 <b>500명 이상</b> 대상 오픈소스 기여 멘토링 진행</li>
+      <li>Apache Iceberg, Paimon, Gravitino 등 <b>5개 프로젝트에 PR 20건 이상 merge</b></li>
+    </ul>
   </div>
-
-  <div class="row oss">
-    <div class="meta">
-      <div class="name">Contributions</div>
-    </div>
-    <div class="body">
-      <div class="repo">Apache Iceberg</div>
-      <ul>
-        <li>Delete 검사를 구간 단위 순회로 바꿔 검사 CPU 최대 <b>9배 감소</b> (#18027)</li>
-        <li>Delete 파일 로드 실패 시 읽기 작업이 멈추던 장애 수정 (#3435)</li>
-        <li>Delete 행 선택 방식 개선으로 읽기 성능 최대 <b>48% 향상</b> (#3454)</li>
-      </ul>
-      <div class="repo">Apache Paimon</div>
-      <ul>
-        <li>불필요한 Sort Merge를 생략해 읽기 시간 약 <b>62% 단축</b> (#1164)</li>
-        <li>Merge 중 값 복사를 없애 메모리 할당 <b>19.6%</b> · 읽기 시간 <b>13% 감소</b> (#1338)</li>
-      </ul>
-    </div>
+  <div class="item">
+    <div class="title">Apache Iceberg <span>/ Contributor</span></div>
+    <ul>
+      <li>Delete 검사를 구간 단위 순회로 바꿔 검사 CPU 최대 <b>9배 감소</b> (#18027)</li>
+      <li>Delete 파일 로드 실패 시 읽기 작업이 멈추던 장애 수정 (#3435)</li>
+      <li>Delete 행 선택 방식 개선으로 읽기 성능 최대 <b>48% 향상</b> (#3454)</li>
+    </ul>
+  </div>
+  <div class="item">
+    <div class="title">Apache Paimon <span>/ Contributor</span></div>
+    <ul>
+      <li>불필요한 Sort Merge를 생략해 읽기 시간 약 <b>62% 단축</b> (#1164)</li>
+      <li>Merge 중 값 복사를 없애 메모리 할당 <b>19.6%</b> · 읽기 시간 <b>13% 감소</b> (#1338)</li>
+    </ul>
   </div>
 </section>
 
 <section>
   <h2>Education</h2>
-  <div class="row">
-    <div class="meta"><div class="date">2024.03 - 2026.08</div></div>
-    <div class="body"><b>한국방송통신대학교</b> · 컴퓨터과학과</div>
+  <div class="item">
+    <div class="title">한국방송통신대학교 <span>/ 컴퓨터과학과</span></div>
+    <div class="date">2024.03 - 2026.08</div>
   </div>
-  <div class="row" style="margin-top:1.2mm">
-    <div class="meta"><div class="date">2015.03 - 2019.02</div></div>
-    <div class="body"><b>강남대학교</b> · 국어국문학과</div>
+  <div class="item">
+    <div class="title">강남대학교 <span>/ 국어국문학과</span></div>
+    <div class="date">2015.03 - 2019.02</div>
   </div>
 </section>
 
