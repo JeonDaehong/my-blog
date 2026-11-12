@@ -162,12 +162,21 @@
           </ul>
         </div>
         <div class="group">
-          <div class="label">플랫폼 운영</div>
+          <div class="label">AI 기반 인프라 운영 체계 구축</div>
           <ul>
-            <li>EKS 기반 Airflow · 데이터 플랫폼 운영, AWS 인프라 Terraform 전환, Grafana · Prometheus 모니터링</li>
+            <li>AWS 리소스 약 1,200개를 LLM 기반으로 Terraform IaC 전환, <b>plan 변경 0건</b>으로 무중단 이관</li>
+            <li><b>팀 공용 AI Workspace</b> 기반 IaC로 누가 작업해도 같은 결과 · 변경 이력이 남는 운영 체계 구축</li>
+            <li>망분리 환경의 Databricks까지 Workspace로 제어, 장애 분석은 옵저버빌리티부터 보도록 표준화</li>
           </ul>
         </div>
-      </div>
+        <div class="group">
+          <div class="label">데이터 플랫폼 운영 · 업무 자동화</div>
+          <ul>
+            <li>EKS 기반 Airflow 운영, 신규 데이터 파이프라인 구축, DMS · Zero-ETL 태스크 관리</li>
+            <li>Grafana · Prometheus · Loki 기반 데이터 플랫폼 모니터링 · 알림 운영</li>
+            <li>신규 데이터 적재, 모기지론 데이터 싱크 등 사내 데이터 업무 자동화</li>
+          </ul>
+        </div></div>
     </div>
   </div>
 
@@ -194,6 +203,7 @@
             <li>약 1,100개 파기 작업을 Spark 병렬 제출로 전환해 <b>CPU 코어 사용률 20~30% → 80%, 처리 시간 70% 이상 단축</b></li>
             <li>반복되던 4억 행 백업 테이블 Join과 수작업 집계를 선집계로 대체해 <b>전체 워크플로우 시간 80% 단축</b></li>
             <li>Hive 통계 누락으로 잘못 선택된 Join을 Broadcast로 교정해 <b>처리량 20% 향상</b></li>
+            <li>셔플 파티션 수만큼 쌓이던 Small File을 coalesce로 병합해 NameNode · 조회 부하 감소</li>
             <li>배치 스케줄러의 힙 · TCP 누수를 Heap Dump로 찾아 제거해 <b>월 장애 시간 90% 감소</b></li>
           </ul>
         </div>
