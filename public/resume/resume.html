@@ -151,8 +151,8 @@
         <div class="group">
           <div class="label">Redshift → Databricks 메달리온 레이크하우스 전환</div>
           <ul>
-            <li><b>수십TB · 1,600개 테이블</b> 이관 및 DMS CDC 기반 Bronze 적재 구축, E2E Latency <b>p99 30초 이내</b></li>
-            <li>DLT를 단일 Fan-out Job으로 재설계하고 Merge 병목 제거, <b>비용 39% 절감 · Merge 시간 73% 단축</b></li>
+            <li><b>수십TB 데이터 · 1,600개 테이블</b> 이관 및 DMS CDC 기반 Bronze 적재 구축, E2E Latency <b>p99 30초 이내</b></li>
+            <li>DLT 파이프라인을 단일 Fan-out Job 구조로 재설계하고 Merge 병목을 개선하여 Compute 비용 39% 절감 · Merge 처리 시간 73% 단축</li>
             <li>DQ 검증 자동화 체계를 구축하여 데이터 적재 과정에서 발생한 누락 31만 건을 식별하여 복구. <b>최종 누락 0건 달성</b></li>
             <li>메달리온 계층별 S3 버킷 · Unity Catalog 구조와 권한 · 라이프사이클 정책 설계</li>
           </ul>
@@ -167,17 +167,18 @@
         <div class="group">
           <div class="label">AI 기반 인프라 운영 체계 구축</div>
           <ul>
-            <li>AWS 리소스 약 1,200개를 LLM 기반으로 Terraform IaC 전환, <b>plan 변경 0건</b>으로 무중단 이관</li>
-            <li><b>팀 공용 AI Workspace</b> 기반 IaC로 누가 작업해도 같은 결과 · 변경 이력이 남는 운영 체계 구축</li>
-            <li>망분리 환경의 Databricks까지 Workspace로 제어, 장애 분석은 옵저버빌리티부터 보도록 표준화</li>
+            <li>AWS 콘솔 기반으로 관리하던 약 1,200개 리소스를 Terraform IaC로 전환하고, 기존 인프라와의 상태 일치 검증을 통해 무중단 이관</li>
+            <li>LLM 기반 Terraform 생성 · 동기화 워크플로우를 표준화하고, 위험 변경을 사전 검증하는 실행 하네스를 구축하여 팀 공통의 AI 기반 IaC 운영 체계 확립</li>
+            <li>AWS NAT Gateway · CodeBuild 기반 제어 경로를 구성하여, 망분리된 폐쇄망 환경의 Databricks Workspace까지 IaC 기반 통합 관리 체계 확장</li>
           </ul>
         </div>
         <div class="group">
           <div class="label">데이터 플랫폼 운영 · 업무 자동화</div>
           <ul>
-            <li>EKS 기반 Airflow 운영, 신규 데이터 파이프라인 구축, DMS · Zero-ETL 태스크 관리</li>
-            <li>Grafana · Prometheus · Loki 기반 데이터 플랫폼 모니터링 · 알림 운영</li>
-            <li>신규 데이터 적재, 모기지론 데이터 싱크 등 사내 데이터 업무 자동화</li>
+            <li>EKS 기반 Airflow 운영 및 신규 데이터 파이프라인 구축, AWS DMS · Zero-ETL 기반 데이터 동기화 작업 관리</li>
+            <li>Grafana · Prometheus · Loki 기반 관측 체계를 활용한 데이터 플랫폼 모니터링, 이슈 분석 및 장애 대응</li>
+            <li>AMD(x86) · ARM 환경에 혼재된 AMI를 양쪽 아키텍처를 지원하는 이미지로 표준화하여 인프라 운영 일관성 확보</li>
+            <li>DQ 검증 파이프라인 및 LLM 기반 코드 리뷰 자동화 구축으로 데이터 품질 검증과 개발 반복 업무 효율화</li>
           </ul>
         </div></div>
     </div>
@@ -195,19 +196,19 @@
         <div class="group">
           <div class="label">Spark · Iceberg 기반 배치 데이터 플랫폼 설계 · 개발</div>
           <ul>
-            <li>기존 Hadoop ETL 대비 <b>처리 시간 40% 단축</b>, S3 · Glue 등 HDFS에 종속되지 않는 구조 확보</li>
-            <li>H/A · Failover로 <b>장애 자동 복구율 95%</b>, Snapshot · Orphan File 자동 정리로 <b>스토리지 30% 절감</b></li>
-            <li>DB Lock 기반 자원 제어로 <b>일 평균 800개 이상 배치 작업 · 25억 건</b> 데이터 안정 처리</li>
+            <li>Spark · Iceberg 기반 데이터 처리 아키텍처를 설계 · 구축하여 기존 Hadoop ETL 대비 데이터 처리 시간 40% 단축, S3 · Glue 기반으로 전환하며 HDFS 종속성 제거</li>
+            <li>고가용성(HA) 및 Failover 기반 장애 자동 복구 체계를 구축하고, Iceberg Snapshot · Orphan File 정리 자동화로 장애 자동 복구율 95% 및 스토리지 사용량 30% 절감</li>
+            <li>Spark Standalone 환경에 DB Lock 기반 자원 스케줄링 체계를 구축하여 Core · Memory 할당량 및 SLA Queue별 작업 제출을 제어하고, Driver 병목에 따른 데드락을 방지하여 일 평균 800개 이상의 배치 작업으로 25억 건 이상의 데이터 처리</li>
           </ul>
         </div>
         <div class="group">
           <div class="label">개인신용정보 파기 시스템 성능 최적화</div>
           <ul>
-            <li>약 1,100개 파기 작업을 Spark 병렬 제출로 전환해 <b>CPU 코어 사용률 20~30% → 80%, 처리 시간 70% 이상 단축</b></li>
-            <li>반복되던 4억 행 백업 테이블 Join과 수작업 집계를 선집계로 대체해 <b>전체 워크플로우 시간 80% 단축</b></li>
-            <li>Hive 통계 누락으로 잘못 선택된 Join을 Broadcast로 교정해 <b>처리량 20% 향상</b></li>
-            <li>셔플 파티션 수만큼 쌓이던 Small File을 coalesce로 병합해 NameNode · 조회 부하 감소</li>
-            <li>배치 스케줄러의 힙 · TCP 누수를 Heap Dump로 찾아 제거해 <b>월 장애 시간 90% 감소</b></li>
+            <li>약 1,100개 파기 작업의 Spark Job 제출을 병렬화하여 CPU 코어 사용률 20~30% → 80% 개선, 전체 처리 시간 70% 이상 단축</li>
+            <li>반복 수행되던 4억 행 규모의 백업 테이블 Join 및 수작업 집계를 선집계 방식으로 개선하여 전체 워크플로우 시간 80% 단축</li>
+            <li>Hive 통계 누락으로 비효율적인 Join 전략이 선택되는 문제를 분석하고 Broadcast Join을 적용하여 처리량 20% 향상</li>
+            <li>셔플 파티션별로 생성되던 Small File을 coalesce로 병합하여 HDFS NameNode 메타데이터 관리 및 파일 조회 부하 감소</li>
+            <li>Heap Dump 분석으로 배치 스케줄러의 JVM Heap 및 TCP 리소스 누수를 찾아 수정하여 월간 장애 시간 90% 감소</li>
           </ul>
         </div>
       </div>
@@ -227,12 +228,12 @@
           <div class="label">E-commerce B2C 플랫폼 설계 · 개발</div>
           <ul>
             <li>ngram Full Text Index · 쿼리 튜닝으로 상품 조회 <b>300ms → 90ms 미만</b> 단축</li>
-            <li>DB Lock · 트랜잭션 재설계로 동시 발급 시 <b>쿠폰 중복 · 초과 발급 방지</b></li>
+            <li>DB Lock · 트랜잭션 재설계로 동시 발급 시 <b>이벤트 쿠폰 중복 · 초과 발급 방지</b></li>
           </ul>
         </div><div class="group">
           <div class="label">데이터 처리 성능 최적화</div>
           <ul>
-            <li><b>수십 GB 규모 대용량 파일을 Chunk 단위로 분할 · 병렬 처리</b>하고, Wafer LOT ID 기반 데이터 분류 구현</li>
+            <li><b>대용량 데이터 처리 도구를 개발하여 파일당 수십 GB 규모의 CSV 데이터를 Chunk 단위로 분할·병렬 처리하고, Wafer LOT ID 기반 데이터 분류 기능 구현</li>
           </ul>
         </div>
       </div></div>
@@ -244,8 +245,8 @@
   <div class="item">
     <div class="title"><div>오픈소스 한국 커뮤니티 <span>/ 멘토(운영진)</span></div><div class="date">2025.05 - 현재</div></div>
     <ul>
-      <li>멘티 <b>500명 이상</b> 대상 오픈소스 기여 멘토링 진행</li>
-      <li>Apache Iceberg, Paimon, Gravitino 등 <b>5개 프로젝트에 PR 20건 이상 merge</b></li>
+      <li>기수별 오픈소스 기여 멘토링을 지속적으로 운영하며 <b>누적 500명 이상</b>의 멘티 지도</li>
+      <li>개인적으로도 Apache Iceberg, Paimon, Gravitino 등 <b>5개 프로젝트에 PR 20건 이상 merge</b></li>
     </ul>
   </div>
   <div class="item">
