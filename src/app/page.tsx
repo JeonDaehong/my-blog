@@ -78,6 +78,16 @@ export default function LandingPage() {
     return () => clearInterval(timer);
   }, [lang, mounted]);
 
+  // 블로그 · 공부 · 이력서 메뉴. 넓은 화면과 좁은 화면에서 같은 목록을 다른 자리에 그린다.
+  // 이력서는 블로그 밖의 정적 HTML 이라 Link 대신 a 로 연다.
+  const pageLinks = (size: string) => (
+    <>
+      <Link href={LINKS.blog} className={`${size} text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap`}>{t.navBlog}</Link>
+      <Link href={LINKS.study} className={`${size} text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap`}>{t.navStudy}</Link>
+      <a href={LINKS.resume} className={`${size} text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap`}>{t.navResume}</a>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary relative overflow-hidden">
       {/* Gradient blob */}
@@ -98,34 +108,39 @@ export default function LandingPage() {
             <span className="font-bold text-sm tracking-tight hidden sm:inline">{"Daehong's Blog"}</span>
           </Link>
           <div className="flex items-center gap-0.5 sm:gap-2">
-            <Link href={LINKS.blog} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navBlog}</Link>
-            <Link href={LINKS.study} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navStudy}</Link>
-            {/* 이력서는 블로그 밖의 정적 HTML 이라 Link 대신 a 로 연다 */}
-            <a href={LINKS.resume} className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">{t.navResume}</a>
-            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors hidden sm:block">GitHub</a>
-            <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors hidden sm:block">LinkedIn</a>
-            {/* 좁은 화면에서는 글자 대신 아이콘만 */}
+            {/* 넓은 화면: 글자 메뉴를 한 줄에 */}
+            <div className="hidden sm:flex items-center gap-2">
+              {pageLinks("px-3 py-1.5 text-sm")}
+              <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors">GitHub</a>
+              <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors">LinkedIn</a>
+            </div>
+            {/* 좁은 화면: 윗줄은 아이콘만 */}
             <a href={LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="p-2 text-text-secondary hover:text-text-primary transition-colors sm:hidden">
-              <FaGithub size={16} />
+              <FaGithub size={17} />
             </a>
             <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="p-2 text-text-secondary hover:text-text-primary transition-colors sm:hidden">
-              <FaLinkedin size={16} />
+              <FaLinkedin size={17} />
             </a>
             <button
               onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Light mode" : "Dark mode"}
               className="inline-flex items-center p-2 text-text-secondary hover:text-text-primary transition-colors"
             >
-              {theme === "dark" ? <HiOutlineSun size={16} /> : <HiOutlineMoon size={16} />}
+              {theme === "dark" ? <HiOutlineSun size={17} /> : <HiOutlineMoon size={17} />}
             </button>
             <button
               onClick={() => setLang(lang === "ko" ? "en" : "ko")}
               aria-label={lang === "ko" ? "Switch to English" : "한국어로 전환"}
               className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors"
             >
-              <HiOutlineGlobeAlt size={16} />
+              <HiOutlineGlobeAlt size={17} />
               {lang === "ko" ? "KR" : "EN"}
             </button>
           </div>
+        </div>
+        {/* 좁은 화면: 글자 메뉴는 아랫줄로 내려 잘리지 않게 */}
+        <div className="sm:hidden mt-3 flex items-center gap-1 border-t border-border-color pt-2">
+          {pageLinks("px-2.5 py-1.5 text-sm")}
         </div>
       </nav>
 
