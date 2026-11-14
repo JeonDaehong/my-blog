@@ -194,7 +194,7 @@
         <div class="group">
           <div class="label">데이터 플랫폼 운영 · 업무 자동화</div>
           <ul>
-            <li>EKS 기반 Airflow 운영 · 신규 파이프라인 구축, DMS · Zero-ETL 동기화 작업 관리</li>
+            <li>EKS 기반 Airflow 운영 · 신규 파이프라인 구축, DMS · Zero-ETL로 운영 DB → Redshift 복제 운영</li>
             <li>Grafana · Prometheus · Loki로 데이터 플랫폼 모니터링 · 이슈 분석 · 장애 대응</li>
             <li>인스턴스를 Graviton(ARM)으로 전환하며 컨테이너 이미지를 amd64 · arm64 멀티 아키텍처로 표준화</li>
             <li>DQ 검증 파이프라인과 LLM 기반 코드 리뷰 자동화로 데이터 품질 검증 · 반복 업무 효율화</li>
@@ -215,7 +215,7 @@
         <div class="group">
           <div class="label">Spark · Iceberg 기반 배치 데이터 플랫폼 설계 · 개발</div>
           <ul>
-            <li>Spark · Iceberg 아키텍처로 Hadoop ETL 대비 <b>처리 시간 40% 단축</b>, S3 · Glue로 HDFS 종속성 제거</li>
+            <li>Hadoop ETL 대비 <b>처리 시간 40% 단축</b>, S3 · Aurora 소스 연동으로 HDFS · Hive 종속성 제거</li>
             <li>H/A · Failover로 <b>장애 자동 복구율 95%</b>, Snapshot · Orphan File 정리 자동화로 <b>스토리지 30% 절감</b></li>
             <li>Spark Standalone에 DB Lock 기반 자원 스케줄러를 구축해 Core · Memory · SLA Queue별 제출을 제어하고 Driver 데드락 방지, <b>일 평균 800개 이상 배치 · 25억 건</b> 처리</li>
           </ul>
