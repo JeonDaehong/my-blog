@@ -284,6 +284,44 @@
   </ul>
 </article>
 
+<!-- personal -->
+<article>
+  <h2>주식 · 계좌 데이터 통합 플랫폼 구축</h2>
+  <div class="sub">Stock Project · 3인 사이드 프로젝트 <span class="meta">개인 프로젝트 · 2026.06 - 현재</span></div>
+
+  <figure class="arch"><img src="arch-stock.png" alt="Airflow가 Kubernetes에서 수집 · 정제 Pod를 실행해 KIS · CODEF API 데이터를 S3 Iceberg의 Bronze, Silver, Gold로 적재하고 Glue Catalog에 등록하며, 서비스 DB 변경은 Debezium CDC로 Kafka에 보내고, 파이프라인 이미지는 GitHub Actions가 OIDC로 ECR에 올리는 구조"></figure>
+
+  <h3><span class="n">1.</span>배경 및 목표</h3>
+  <ul>
+    <li>여러 증권사에 흩어진 계좌의 잔고 · 체결 · 배당을 한곳에서 보는 개인 투자 관리 서비스를 3인이 함께 기획</li>
+    <li>계좌 통합, 매수 · 매도 알림, ETF Look-through, 뉴스 해석 LLM, 백테스트 5개 기능을 메달리온 · 람다 아키텍처로 설계</li>
+    <li>실무 데이터 스택(Kafka · Spark · Trino · Airflow · Kubernetes)을 작은 비용으로 직접 구축하고 운영해 보는 것이 목표</li>
+  </ul>
+
+  <h3><span class="n">2.</span>기술 스택 및 환경</h3>
+  <ul>
+    <li>Python, Airflow, Kubernetes, ArgoCD, Kafka(Strimzi), Debezium, Flink, Spark, Trino, Iceberg, AWS(EC2, S3, Glue, ECR, SSM, EventBridge), GitHub Actions</li>
+    <li>EC2 3대(Control Plane 1 · Worker 2) Kubernetes 클러스터, 외부 인바운드 포트 0개</li>
+  </ul>
+
+  <h3><span class="n">3.</span>주요 업무 및 상세 역할</h3>
+  <ul>
+    <li>서비스 통합 설계 문서 작성 (아키텍처, 기능별 데이터 흐름, 인프라 사이징 · 비용)</li>
+    <li>Kubernetes 클러스터 · Airflow 구축, SSM 터널 기반 접속 환경과 EventBridge 기동 · 정지 스케줄 구성</li>
+    <li>KIS · CODEF 계좌 수집기와 Silver 정제 개발, Iceberg 카탈로그를 AWS Glue Data Catalog로 전환</li>
+    <li>파이프라인 실행 이미지 · ECR 배포 워크플로 구성, 계좌 일일 수집 DAG 개발</li>
+  </ul>
+
+  <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
+  <ul>
+    <li>KIS · CODEF 두 원천을 <b>같은 Silver 테이블에 source로 구분해 적재</b>, 증권사가 달라도 잔고 · 체결을 한 기준으로 조회</li>
+    <li>체결은 매번 최근 30일을 다시 조회하고 Silver에서 키로 중복을 제거해, <b>클러스터가 꺼져 며칠 실행이 비어도 누락 없이</b> 이어지게 설계</li>
+    <li>계좌 자격증명은 이미지 · DAG에 두지 않고 수집기가 SSM에서 직접 읽게 하고, Bronze 원문의 계좌 식별 정보는 마스킹해 저장</li>
+    <li>GitHub Actions OIDC 역할을 <b>main 브랜치 · 단일 ECR 저장소 push로만 제한</b>하고 태그 덮어쓰기를 막아, 장기 키 없이 이미지 배포</li>
+    <li>노드 IMDS hop limit을 1로 막아 Pod의 인스턴스 자격증명 접근을 차단하고, 이로 인한 EBS CSI 메타데이터 접근 문제는 hostNetwork · 배치 조정으로 해결</li>
+  </ul>
+</article>
+
 </div>
 </body>
 </html>
