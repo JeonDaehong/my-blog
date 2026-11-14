@@ -85,6 +85,13 @@
     section:nth-of-type(-n+3) h2 { margin-bottom: 3.6mm; }
     .company:first-of-type li { margin-bottom: 1.3mm; }
     .company:first-of-type .group + .group { margin-top: 3mm; }
+    /* 2장(디딤365 이후)도 남는 공간만큼 숨 쉴 틈을 준다 */
+    .company:not(:first-of-type) li, section:nth-of-type(n+4) li { margin-bottom: 1.4mm; }
+    .company:not(:first-of-type) .group + .group { margin-top: 3mm; }
+    .company + .company { margin-top: 7mm; }
+    section:nth-of-type(n+4) { padding-top: 5.5mm; margin-top: 7mm; }
+    section:nth-of-type(n+4) h2 { margin-bottom: 4mm; }
+    section:nth-of-type(n+4) .item + .item { margin-top: 4mm; }
     /* 회사 제목만 1장 끝에 홀로 남지 않게 디딤365는 2장 맨 위에서 시작 */
     .company + .company:not(:last-child) { break-before: page; }
   }
@@ -237,24 +244,18 @@
       </div>
             <div class="body">
         <div class="group">
-          <div class="label">사내 프로젝트 성능 최적화</div>
+          <div class="label">E-commerce B2C 플랫폼 설계 · 개발</div>
           <ul>
             <li>ngram Full Text Index · 쿼리 튜닝으로 상품 조회 <b>300ms → 90ms 미만</b> 단축</li>
+            <li>DB Lock · 트랜잭션 재설계로 동시 발급 시 <b>이벤트 쿠폰 중복 · 초과 발급 방지</b></li>
+          </ul>
+        </div><div class="group">
+          <div class="label">데이터 처리 성능 최적화</div>
+          <ul>
             <li>대용량 처리 도구로 <b>파일당 수십 GB CSV를 Chunk 단위로 분할 · 병렬 처리</b>, Wafer LOT ID 기준 분류</li>
           </ul>
         </div>
       </div></div>
-  </div>
-</section>
-
-<section>
-  <h2>Side Project</h2>
-  <div class="item">
-    <div class="title"><div>주식 · 계좌 통합 플랫폼 구축 <span>(데이터 · 인프라 담당)</span></div><div class="date">2026.06 - 2026.11</div></div>
-    <ul>
-      <li>Debezium · Kafka · Flink CDC 경로를 구축하고, 멈춘 CDC 슬롯이 붙잡은 <b>WAL 6.9GB(볼륨 80%)를 176MB로 회복</b></li>
-      <li>Spark 기반 Iceberg 유지보수 잡으로 만료 Snapshot <b>3,660개</b> · Orphan File 정리 자동화, 실제 대비 <b>8배</b> 부풀던 테이블 정리</li>
-    </ul>
   </div>
 </section>
 
