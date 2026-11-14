@@ -86,12 +86,12 @@
     .company:first-of-type li { margin-bottom: 1.3mm; }
     .company:first-of-type .group + .group { margin-top: 3mm; }
     /* 2장(디딤365 이후)도 남는 공간만큼 숨 쉴 틈을 준다 */
-    .company:not(:first-of-type) li, section:nth-of-type(n+4) li { margin-bottom: 1.4mm; }
+    .company:not(:first-of-type) li, section:nth-of-type(n+4) li { margin-bottom: 1.1mm; }
     .company:not(:first-of-type) .group + .group { margin-top: 3mm; }
     .company + .company { margin-top: 7mm; }
-    section:nth-of-type(n+4) { padding-top: 5.5mm; margin-top: 7mm; }
+    section:nth-of-type(n+4) { padding-top: 5mm; margin-top: 6.5mm; }
     section:nth-of-type(n+4) h2 { margin-bottom: 4mm; }
-    section:nth-of-type(n+4) .item + .item { margin-top: 4mm; }
+    section:nth-of-type(n+4) .item + .item { margin-top: 3.6mm; }
     /* 회사 제목만 1장 끝에 홀로 남지 않게 디딤365는 2장 맨 위에서 시작 */
     .company + .company:not(:last-child) { break-before: page; }
   }
@@ -194,7 +194,7 @@
         <div class="group">
           <div class="label">데이터 플랫폼 운영 · 업무 자동화</div>
           <ul>
-            <li>EKS 기반 Airflow 운영 · 신규 파이프라인 구축, DMS · Zero-ETL 동기화 작업 관리</li>
+            <li>EKS 기반 Airflow 운영 및 신규 데이터 파이프라인 구축, DMS · Zero-ETL 운영 및 이슈 대응</li>
             <li>Grafana · Prometheus · Loki로 데이터 플랫폼 모니터링 · 이슈 분석 · 장애 대응</li>
             <li>인스턴스를 Graviton(ARM)으로 전환하며 컨테이너 이미지를 amd64 · arm64 멀티 아키텍처로 표준화</li>
             <li>DQ 검증 파이프라인과 LLM 기반 코드 리뷰 자동화로 데이터 품질 검증 · 반복 업무 효율화</li>
@@ -216,7 +216,8 @@
           <div class="label">Spark · Iceberg 기반 배치 데이터 플랫폼 설계 · 개발</div>
           <ul>
             <li>Spark · Iceberg 아키텍처 기반 설계 및 구축으로 기존 Hadoop 플랫폼 대비 <b>처리 시간 40% 단축</b></li>
-            <li>H/A · Failover로 <b>장애 자동 복구율 95%</b>, Snapshot · Orphan File 정리 자동화로 <b>스토리지 30% 절감</b></li>
+            <li>H/A · Failover로 <b>장애 자동 복구율 95%</b></li>
+            <li>Iceberg Snapshot · Orphan File 정리 자동화로 <b>스토리지 30% 절감</b></li>
             <li>Spark Standalone에 DB Lock 기반 자원 스케줄러를 구축해 Core · Memory · SLA Queue별 제출을 제어하고 Driver 데드락 방지, <b>일 평균 800개 이상 배치 · 25억 건</b> 처리</li>
           </ul>
         </div>
