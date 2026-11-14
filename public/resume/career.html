@@ -277,7 +277,7 @@
 
   <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
   <ul>
-    <li>Spark · Iceberg 기반 데이터 처리 체계를 신규 아키텍처로 설계 · 구현하여, 기존 Hadoop 기반 ETL 대비 <b>처리 시간 40% 단축</b>, S3 · Aurora 등 클라우드 소스까지 연결해 HDFS · Hive 종속성 제거</li>
+    <li>Spark · Iceberg 기반 데이터 처리 체계를 신규 아키텍처로 설계 · 구현하여, 기존 Hadoop 기반 ETL 대비 <b>처리 시간 40% 단축</b> 및 HDFS 종속성 제거로 S3 · Glue 등 클라우드 확장성 확보</li>
     <li>Module H/A 구성 및 Failover 체계 구현으로 장애 시 대기 노드로 자동 전환되도록 하여 <b>장애 자동 복구율 95% 이상</b> 달성</li>
     <li>Iceberg Expired Snapshot 및 Orphan File 관리를 자동화하여 <b>스토리지 사용량 30% 이상 절감</b>, 장기 운영 시 메타데이터 누적으로 인한 성능 저하 예방</li>
     <li>Spark Standalone에 DB Lock 기반 자원 스케줄러를 구축해 Core · Memory 할당량과 SLA Queue별 작업 제출을 제어하고, Driver 병목에 따른 데드락을 방지해 <b>일 평균 800개 이상 배치 작업</b> 안정 처리</li>
