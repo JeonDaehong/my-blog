@@ -48,13 +48,15 @@
   ul { margin: 0; padding-left: 5mm; }
   li { margin: 0 0 1.1mm; padding-left: 0.5mm; }
   li::marker { color: var(--accent); }
+  .arch { margin: 3.5mm 0 1mm; }
+  .arch img { display: block; width: 100%; height: auto; }
   b { font-weight: 700; }
   .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8mm; font-size: 13px; }
   .toolbar a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--sub); text-decoration: none; }
   .toolbar a:hover { color: var(--ink); border-color: #c7cbd1; }
   .toolbar a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .toolbar .home { margin-right: auto; border: none; padding-left: 0; }
-  @media print { .toolbar { display: none; } }
+  @media print { .toolbar { display: none; } body { line-height: 1.48; font-size: 9.5pt; } h3 { margin: 3.2mm 0 1mm; } li { margin-bottom: 0.6mm; } .doc-head { margin-bottom: 4mm; } }
   @media screen and (min-width: 641px) {
     body { font-size: 15px; }
     .sheet { max-width: 1000px; padding: 48px 48px 80px; }
@@ -89,6 +91,8 @@
   <h2>Redshift → Databricks 메달리온 레이크하우스 전환</h2>
   <div class="sub">CDC 기반 준실시간 레이크하우스 구축 · 운영 <span class="meta">PFCT · 2026.02 - 현재</span></div>
 
+  <figure class="arch"><img src="arch-databricks.png" alt="Aurora MySQL에서 DMS CDC와 S3 Landing을 거쳐 Databricks의 Spark Fan-out Job이 Bronze에 MERGE하고, Silver(가명화 · 정규화)를 거쳐 BI용 · 시맨틱 레이어용 Gold Data Mart로 이어지는 구조"></figure>
+
   <h3><span class="n">1.</span>배경 및 목표</h3>
   <ul>
     <li>운영 DB를 DMS로 Redshift에 직접 복제하는 구조로, 적재 작업이 Redshift 실행 시간의 58% ~ 최대 99.8%를 차지해 조회 성능 저하. 적재 · 조회 컴퓨트 분리 필요</li>
@@ -115,9 +119,9 @@
 
   <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
   <ul>
-    <li>메달리온 계층별 S3 버킷 · Unity Catalog 구조를 설계하고 계층별 권한 · 라이프사이클 정책을 적용하여, 데이터 접근 통제와 스토리지 관리 기준 확립</li>
+    <li>메달리온 계층별 S3 버킷 · Unity Catalog 구조를 설계하고 권한 · 라이프사이클 정책으로 접근 통제 · 스토리지 관리 기준 확립</li>
     <li>Read Replica에서 풀로드 시 조회 성능 저하와 장시간 적재가 발생해, Aurora 스냅샷을 S3로 Export(Parquet)하는 방식으로 전환하여 운영 DB · 복제본 부하 없이 <b>수십TB 초기 적재</b></li>
-    <li>DMS CDC → S3 Landing → Delta Lake Bronze 준실시간 적재를 구축하여, <b>약 1,600개 테이블</b>을 <b>End-to-End Latency p99 30초</b>로 적재</li>
+    <li>DMS CDC → S3 Landing → Bronze 준실시간 적재로 <b>약 1,600개 테이블</b>을 <b>E2E Latency p99 30초</b>로 적재</li>
     <li>테이블별 스트림 구조(DLT)를 스키마당 스트림 하나가 테이블별로 분배 · MERGE하는 Fan-out Job으로 재설계하여, <b>CPU 75% · 메모리 66% · Compute 비용 39% 절감</b></li>
     <li>Execution Plan 분석으로 NULL 허용 머지 키(&lt;=&gt;)가 Data Skipping을 막아 전체 스캔하는 원인을 찾고, 키 범위 조건 추가와 &lt;=&gt; 제한 적용으로 <b>Merge 시간 73% 단축</b></li>
     <li>약 1,600개 테이블 전수 정합성 검증(DQ)을 자동화하여 <b>적재 누락 31만 건 · CDC 순서 오류 15만 건</b>을 탐지하고, 멱등한 조건부 MERGE로 복구하여 <b>최종 누락 0건</b> 달성</li>
