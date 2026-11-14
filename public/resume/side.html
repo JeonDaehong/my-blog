@@ -72,6 +72,8 @@
     .skills dd { margin-bottom: 6px; }
     header h1, .doc-head h1 { font-size: 28px; }
   }
+  /* 사이드 프로젝트는 한 장에 담는다 */
+  @media print { body { line-height: 1.42; } h3 { margin: 2.6mm 0 0.8mm; } li { margin-bottom: 0.3mm; } .arch { margin: 2.5mm 0 0.5mm; } }
 </style>
 </head>
 <body>
@@ -101,7 +103,6 @@
   <ul>
     <li>여러 증권사 계좌의 잔고 · 체결 · 배당과 국내 · 미국 시세를 한곳에서 보는 투자 관리 앱을 3인이 개발 (앱 · 백엔드 1명, 데이터 · 인프라 2명)</li>
     <li>앱이 쓰는 시세 · 기준정보 · 계좌 데이터를 배치와 실시간 두 경로로 공급하는 데이터 플랫폼을 설계 · 구축 · 운영</li>
-    <li>EC2 3대 안에서 Kafka · Flink · Spark · Iceberg · Airflow를 직접 운영하며, 장애 · 비용 · 보안까지 책임지는 구조를 목표로 함</li>
   </ul>
 
   <h3><span class="n">2.</span>기술 스택 및 환경</h3>
@@ -116,20 +117,19 @@
     <li>Kubernetes 클러스터 · Airflow 구축, ArgoCD로 Kafka · Flink · Spark · Trino 운영 구성</li>
     <li>Iceberg 카탈로그를 AWS Glue로 통합하고, Trino에서 레이크와 서비스 DB를 함께 조회하도록 연결</li>
     <li>Debezium CDC를 Flink로 받아 Iceberg Bronze와 Paimon 실시간 테이블에 적재하는 경로 구축</li>
-    <li>Spark를 Kubernetes 네이티브 실행으로 전환하고, Iceberg 테이블 유지보수 잡(Compaction · Snapshot 만료 · Orphan File 정리) 개발</li>
+    <li>Spark를 Kubernetes 네이티브로 전환하고 Iceberg 유지보수 잡(Compaction · Snapshot 만료 · Orphan 정리) 개발</li>
     <li>Prometheus · Grafana 대시보드 4종과 데이터 SLO · DB · 플랫폼 알림 규칙 14개 구성</li>
     <li>시세 · 계좌 수집기와 Silver · Gold 정제 개발, GitHub Actions OIDC 기반 이미지 배포 구성</li>
   </ul>
 
   <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
   <ul>
-    <li>51개 테이블에서 만료 대상 Snapshot <b>3,660개 · 1.1GB</b>와 실제 데이터 대비 8배 큰 테이블(94.6MB → S3 784.6MB)을 찾아, <b>주 1회 Spark 유지보수 잡으로 자동 정리</b></li>
+    <li>만료 Snapshot <b>3,660개 · 1.1GB</b>와 실제 대비 8배 부푼 테이블(94.6MB → 784.6MB)을 찾아 <b>주 1회 Spark 잡으로 자동 정리</b></li>
     <li>Bronze Compaction은 7일 지난 파일만 적재 시각 순으로 합치게 해, 증분 처리의 파일 Pruning이 깨지지 않도록 설계</li>
     <li>청크 단위 다중 커밋을 테이블당 단일 커밋으로 바꿔 수급 정제 <b>15분 이상 → 38초</b>, 레이크 커밋 <b>약 65회 → 13회</b>로 단축</li>
-    <li>스키마 이전 후 멈춘 CDC 슬롯이 WAL <b>6.9GB</b>를 붙잡아 볼륨 80%까지 찬 문제를 찾아, Heartbeat · 최소 권한 커넥터로 재구성해 <b>WAL 176MB · 볼륨 12%</b>로 회복</li>
-    <li>증권사의 소급 가격 정정으로 구간 경계에서 가격이 수 배 튀던 문제를 중앙값 비율 보정으로 해결하고, OHLC 불변식이 깨진 <b>582행 · 313종목</b> 교정</li>
-    <li>Silver 정제에서 나던 OOM과 중첩 조건식 스택 오버플로를 배치 읽기 · 1,000행 청크 처리로 해결</li>
-    <li>OIDC 역할을 main 브랜치 · 단일 ECR 저장소로 제한하고, 계좌 자격증명은 SSM에서만 읽게 하고 로그 · Bronze 원문의 계좌번호는 마스킹</li>
+    <li>멈춘 CDC 슬롯이 WAL <b>6.9GB</b>를 붙잡아 볼륨 80%까지 찬 문제를 Heartbeat 커넥터로 재구성해 <b>176MB</b>로 회복</li>
+    <li>소급 가격 정정으로 수 배 튀던 시세를 중앙값 비율로 보정하고, OHLC 불변식이 깨진 <b>582행 · 313종목</b> 교정</li>
+    <li>OIDC 역할을 main 브랜치 · 단일 ECR로 제한하고, 계좌 자격증명은 SSM에서만 읽고 계좌번호는 마스킹</li>
   </ul>
 </article>
 
