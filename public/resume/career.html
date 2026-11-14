@@ -91,7 +91,7 @@
   <h2>Redshift → Databricks 메달리온 레이크하우스 전환</h2>
   <div class="sub">CDC 기반 준실시간 레이크하우스 구축 · 운영 <span class="meta">PFCT · 2026.02 - 현재</span></div>
 
-  <figure class="arch"><img src="arch-databricks.png" alt="Aurora MySQL에서 DMS CDC와 S3 Landing을 거쳐 Databricks의 Spark Fan-out Job이 Bronze에 MERGE하고, Silver(가명화 · 정규화)를 거쳐 BI용 · 시맨틱 레이어용 Gold Data Mart로 이어지는 구조"></figure>
+  <figure class="arch"><img src="arch-databricks.png" alt="Aurora MySQL에서 DMS CDC와 S3 Landing을 거쳐 Databricks의 Spark Fan-out Job이 Bronze에 MERGE하고, Silver를 거쳐 BI용 · 시맨틱 레이어용 Gold로 이어지는 구조"></figure>
 
   <h3><span class="n">1.</span>배경 및 목표</h3>
   <ul>
@@ -212,7 +212,7 @@
   <h2>Spark · Iceberg 기반 대규모 데이터 파이프라인 플랫폼 설계 · 개발</h2>
   <div class="sub">Didim-DP Batch Cloud Solution 개발 <span class="meta">(주)디딤365 · 2024.07 - 2025.03</span></div>
 
-  <figure class="arch"><img src="arch-iceberg.png" alt="다양한 엔드포인트에서 추출해 DAG 엔진과 DB Lock 자원 스케줄러를 거쳐 Spark Standalone으로 Iceberg 테이블에 쓰는 배치 플랫폼 구조"></figure>
+  <figure class="arch"><img src="arch-iceberg.png" alt="여러 소스에서 추출한 데이터를 DAG 파이프라인과 DB Lock 자원 스케줄러를 거쳐 Spark Standalone으로 Iceberg 테이블에 쓰고, Zookeeper로 Failover하는 배치 플랫폼 구조"></figure>
 
   <h3><span class="n">1.</span>배경 및 목표</h3>
   <ul>
