@@ -171,7 +171,7 @@
   <h2>AWS 인프라 IaC 전환 및 AI Workspace 기반 운영 체계 구축</h2>
   <div class="sub">Terraform 전환 · 폐쇄망 Databricks 통합 관리 <span class="meta">PFCT · 2026.07 - 2026.10</span></div>
 
-  <figure class="arch"><img src="arch-iac.png" alt="엔지니어가 팀 공용 AI Workspace에서 작업하면 PR 리뷰와 GitHub Actions, 검증 게이트를 거쳐 Terraform으로 AWS 운영 리소스에 적용하고, OIDC로 실행한 VPC 내부 CodeBuild Runner가 NAT Gateway를 거쳐 폐쇄망 Databricks Workspace까지 적용하며, 드리프트 감지 결과가 다시 Workspace로 돌아오는 구조"></figure>
+  <figure class="arch"><img src="arch-iac.png" alt="엔지니어가 팀 공용 AI Workspace에서 작업하면 PR 리뷰와 GitHub Actions, 검증 게이트를 거쳐 Terraform으로 AWS 운영 리소스에 적용하고, PR 머지 시 웹훅으로 CodeBuild가 폐쇄망 VPC 안에 띄운 1회성 Runner가 NAT로 GitHub 코드를 받아 VPCE를 통해 Databricks Workspace에 적용하며, 드리프트 감지 결과가 다시 Workspace로 돌아오는 구조"></figure>
 
   <h3><span class="n">1.</span>배경 및 목표</h3>
   <ul>
@@ -182,7 +182,7 @@
 
   <h3><span class="n">2.</span>기술 스택 및 환경</h3>
   <ul>
-    <li>Terraform, AWS(VPC, NAT Gateway, CodeBuild, EKS, Aurora, DMS, S3, IAM), Databricks, GitHub Actions(OIDC), Claude Code</li>
+    <li>Terraform, AWS(VPC, VPC Endpoint, NAT Gateway, CodeBuild, EKS, Aurora, DMS, S3, IAM), Databricks, GitHub Actions(OIDC), Claude Code</li>
     <li>단일 운영 계정 리소스 1,700개 이상, 망분리 Databricks Workspace 환경</li>
   </ul>
 
@@ -192,7 +192,7 @@
     <li>전체 리소스 인벤토리 조사 및 네트워크 · 보안 · 데이터 스토어 · 컴퓨트 · 관측성 5개 레이어 Terraform import</li>
     <li>팀 공용 AI Workspace와 하네스(읽기 전용 스킬, 의도 선언, CI 전용 적용) 설계 · 구현</li>
     <li>AWS 실제 상태 대조 검증 게이트 및 드리프트 감지 체계 개발</li>
-    <li>VPC 내부 CodeBuild Runner 기반 폐쇄망 Databricks Terraform 적용 파이프라인 구성</li>
+    <li>폐쇄망 내 1회성 CodeBuild Runner 기반 Databricks Terraform 적용 파이프라인 구성</li>
   </ul>
 
   <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
@@ -202,7 +202,7 @@
     <li>AI 에이전트는 읽기 전용, 적용은 PR 리뷰를 통과한 CI만 가능하게 하고, 삭제 · 교체가 생기는 변경은 의도 선언 없이는 차단해 <b>운영 리소스 사고 위험을 구조적으로 제거</b></li>
     <li>AWS 실제 상태를 정답지로 대조하는 검증 게이트와 드리프트 감지로 콘솔 변경을 자동 탐지하고 <b>약 5분 내 코드로 재동기화</b></li>
     <li>Terraform 코드 재생성 결과의 비결정적 순서 문제를 해결해 <b>변경 리뷰 범위 11만 줄 → 100줄</b>로 축소</li>
-    <li>GitHub Actions가 OIDC로 VPC 내부 CodeBuild Runner를 실행해 망 안에서 plan · apply하고, 외부 통신은 NAT Gateway로만 나가게 해 <b>망분리를 유지한 채 폐쇄망 Databricks까지 IaC로 통합 관리</b></li>
+    <li>PR 머지 시 웹훅으로 CodeBuild가 폐쇄망 안에 1회성 GitHub Runner를 띄워, NAT로 코드를 받아 VPCE(PrivateLink)로 Databricks에 apply하고 결과를 GitHub에 남기도록 구성해 <b>망분리를 유지한 채 폐쇄망 Databricks까지 IaC로 통합 관리</b></li>
   </ul>
 </article>
 
