@@ -92,7 +92,7 @@
   <h2>Redshift → Databricks 메달리온 레이크하우스 전환</h2>
   <div class="sub">CDC 기반 준실시간 레이크하우스 구축 · 운영 <span class="meta">PFCT · 2026.02 - 현재</span></div>
 
-  <figure class="arch"><img src="arch-databricks.png" alt="Aurora MySQL에서 DMS CDC와 S3 Landing을 거쳐 Databricks의 Spark Fan-out Job이 Bronze에 MERGE하고, Silver를 거쳐 Gold로 이어지며, BI용 Gold는 SQL Warehouse · Notebook을 통해 Superset · Zeppelin에서, 시맨틱 레이어용 Gold는 LLM 질의 엔진에서 조회하는 구조"></figure>
+  <figure class="arch"><img src="arch-databricks.png" alt="Aurora MySQL에서 DMS CDC와 S3 Landing을 거쳐 Databricks의 Spark Fan-out Job이 Bronze에 MERGE하고, Silver를 거쳐 Gold로 이어지며, BI용 Gold는 Superset과 SQL Warehouse · Notebook에서 조회하고, 시맨틱 레이어용 Gold는 OWL Ontology로 이어지는 구조"></figure>
 
   <h3><span class="n">1.</span>배경 및 목표</h3>
   <ul>
