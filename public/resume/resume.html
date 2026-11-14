@@ -76,6 +76,10 @@
   .toolbar a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .toolbar .home { margin-right: auto; border: none; padding-left: 0; }
   @media print { .toolbar { display: none; } section { padding-top: 3.2mm; margin-top: 4mm; } h2 { margin-bottom: 2.6mm; } .company + .company { margin-top: 4.5mm; } .group + .group { margin-top: 1.4mm; } body { line-height: 1.47; } li { margin-bottom: 0.4mm; } .item + .item { margin-top: 2.6mm; } }
+  /* PDF: 날짜를 오른쪽 끝 대신 제목 바로 옆에 둬서 시선이 흩어지지 않게 한다 */
+  @media print {
+    .item .title { justify-content: flex-start; gap: 3mm; }
+  }
   @media screen and (min-width: 641px) {
     body { font-size: 15px; }
     .sheet { max-width: 1000px; padding: 48px 48px 80px; }
