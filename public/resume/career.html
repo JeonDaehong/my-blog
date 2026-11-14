@@ -134,6 +134,8 @@
   <h2>데이터 분석 전용 온톨로지 · 시맨틱 레이어 구축</h2>
   <div class="sub">분석용 Data Mart 및 지표 표준화 질의 엔진 개발 <span class="meta">PFCT · 2026.03 - 2026.11</span></div>
 
+  <figure class="arch"><img src="arch-semantic.png" alt="현업 질문을 LLM이 닫힌 선택지로 의도만 추출하고, OWL 시맨틱 레이어의 정의로 실행 전 검증한 뒤 SQL 컴파일러가 분석용 Data Mart에 실행하는 질의 구조"></figure>
+
   <h3><span class="n">1.</span>배경 및 목표</h3>
   <ul>
     <li>데이터 분석가들이 의미가 겹치는 테이블과 중복 컬럼 때문에 어떤 테이블을 써야 할지 판단하기 어려워, 분석용 데이터 정리와 질의 체계 개선을 요청</li>
@@ -168,6 +170,8 @@
 <article>
   <h2>Hadoop Ecosystem 기반 플랫폼 성능 최적화 및 고도화</h2>
   <div class="sub">NH 금융 빅데이터 개인신용정보 파기 프로세스 성능 개선 <span class="meta">(주)디딤365 · 2025.04 - 2025.08</span></div>
+
+  <figure class="arch"><img src="arch-deletion.png" alt="준비 · 백업 · 집계 · 파기 · 후처리 단계로 나눈 Spark 워크플로우와 파티션 단위 병렬 제출, 실패 파티션 재실행 구조"></figure>
 
   <h3><span class="n">1.</span>배경 및 목표</h3>
   <ul>
@@ -207,6 +211,8 @@
 <article>
   <h2>Spark · Iceberg 기반 대규모 데이터 파이프라인 플랫폼 설계 · 개발</h2>
   <div class="sub">Didim-DP Batch Cloud Solution 개발 <span class="meta">(주)디딤365 · 2024.07 - 2025.03</span></div>
+
+  <figure class="arch"><img src="arch-iceberg.png" alt="다양한 엔드포인트에서 추출해 DAG 엔진과 DB Lock 자원 스케줄러를 거쳐 Spark Standalone으로 Iceberg 테이블에 쓰는 배치 플랫폼 구조"></figure>
 
   <h3><span class="n">1.</span>배경 및 목표</h3>
   <ul>
