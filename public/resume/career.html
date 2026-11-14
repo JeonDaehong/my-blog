@@ -118,9 +118,9 @@
     <li>메달리온 계층별 S3 버킷 · Unity Catalog 구조를 설계하고 계층별 권한 · 라이프사이클 정책을 적용하여, 데이터 접근 통제와 스토리지 관리 기준 확립</li>
     <li>Read Replica에서 풀로드 시 조회 성능 저하와 장시간 적재가 발생해, Aurora 스냅샷을 S3로 Export(Parquet)하는 방식으로 전환하여 운영 DB · 복제본 부하 없이 <b>수십TB 초기 적재</b></li>
     <li>DMS CDC → S3 Landing → Delta Lake Bronze 준실시간 적재를 구축하여, <b>약 1,600개 테이블</b>을 <b>End-to-End Latency p99 30초</b>로 적재</li>
-    <li>테이블별 스트림 구조(DLT)를 스키마당 스트림 하나가 테이블별로 분배 · MERGE하는 Fan-out Job으로 재설계하여, <b>CPU 75% · 메모리 66% · 인프라 비용 39% 절감</b></li>
+    <li>테이블별 스트림 구조(DLT)를 스키마당 스트림 하나가 테이블별로 분배 · MERGE하는 Fan-out Job으로 재설계하여, <b>CPU 75% · 메모리 66% · Compute 비용 39% 절감</b></li>
     <li>Execution Plan 분석으로 NULL 허용 머지 키(&lt;=&gt;)가 Data Skipping을 막아 전체 스캔하는 원인을 찾고, 키 범위 조건 추가와 &lt;=&gt; 제한 적용으로 <b>Merge 시간 73% 단축</b></li>
-    <li>약 1,600개 테이블 전수 정합성 검증(DQ)을 자동화하여 <b>적재 누락 31만 행 · CDC 순서 오류 15만 행</b>을 탐지하고, 멱등한 조건부 MERGE로 복구하여 <b>최종 누락 0건</b> 달성</li>
+    <li>약 1,600개 테이블 전수 정합성 검증(DQ)을 자동화하여 <b>적재 누락 31만 건 · CDC 순서 오류 15만 건</b>을 탐지하고, 멱등한 조건부 MERGE로 복구하여 <b>최종 누락 0건</b> 달성</li>
     <li>Redshift 감사 로그와 Airflow DAG 분석으로 테이블을 실시간 · 6시간 · 일 배치로 등급화하고, 등급별 Job 클러스터와 인스턴스 타입을 최적화하여 <b>일 운영 비용 DBU $100 이내</b> 달성</li>
   </ul>
 </article>
@@ -128,7 +128,7 @@
 <!-- 2 -->
 <article>
   <h2>데이터 분석 전용 온톨로지 · 시맨틱 레이어 구축</h2>
-  <div class="sub">분석용 Gold 테이블 및 지표 표준화 질의 엔진 개발 <span class="meta">PFCT · 2026.03 - 2026.11</span></div>
+  <div class="sub">분석용 Data Mart 및 지표 표준화 질의 엔진 개발 <span class="meta">PFCT · 2026.03 - 2026.11</span></div>
 
   <h3><span class="n">1.</span>배경 및 목표</h3>
   <ul>
@@ -145,7 +145,7 @@
 
   <h3><span class="n">3.</span>주요 업무 및 상세 역할</h3>
   <ul>
-    <li>원천 테이블 · 중복 컬럼 전수 분석 및 분석용 Gold 테이블 설계 · 구축</li>
+    <li>Redshift 대출 도메인 테이블 약 250개의 중복 · 구조 분석 및 분석용 Data Mart 설계 · 구축</li>
     <li>OWL 기반 데이터 · 지표 정의 계층 설계</li>
     <li>LLM 질의 의도 추출 · 실행 전 검증 · SQL 컴파일러 구조의 질의 엔진 설계 · 개발</li>
     <li>정답지 기반 정확도 · 일관성 측정 하네스 및 테스트 체계 개발</li>
@@ -153,7 +153,7 @@
 
   <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
   <ul>
-    <li>의미가 겹치는 원천 테이블과 중복 컬럼을 전수 분석하여, 컬럼마다 기준 테이블을 하나로 정한 분석용 Gold 테이블 설계 · 구축</li>
+    <li>Redshift에 파편화된 <b>약 250개 대출 도메인 테이블</b>의 중복 테이블 · 컬럼과 구조를 분석하고, 업무 흐름 기준으로 통합 · 재구성해 기준 테이블이 하나인 분석용 Data Mart 구축</li>
     <li>단계별 출력을 비교하는 측정 하네스로 불일치 원인을 분리하고, LLM은 질의 의도만 구조화해 추출하고 코드가 SQL을 생성하는 구조로 재설계</li>
     <li>현업 질문 61문항 × 20회 반복 테스트에서 기존 대비 <b>정답률 17% → 98%</b>, 동일 질문 응답 <b>일관성 30% → 98%</b> 개선</li>
     <li>동일 테스트 기준 <b>응답 시간 91% 단축</b>(416분 → 38분), <b>LLM 토큰 사용량 87% 절감</b>(134.8M → 17.2M)</li>
@@ -174,7 +174,7 @@
 
   <h3><span class="n">2.</span>기술 스택 및 환경</h3>
   <ul>
-    <li>Terraform, AWS(VPC, EKS, Aurora, Redshift, DMS, S3, IAM), Databricks, GitHub Actions(OIDC), Airflow, Grafana, Prometheus, Loki, Python, Claude Code</li>
+    <li>Terraform, AWS(VPC, NAT Gateway, EKS, ECR, CodeBuild, Aurora, Redshift, DMS, S3, IAM), Databricks, GitHub Actions(OIDC), Airflow, Grafana, Prometheus, Loki, Python, Claude Code</li>
     <li>단일 운영 계정 리소스 1,700개 이상, EKS 클러스터 2개 환경</li>
   </ul>
 
@@ -183,18 +183,20 @@
     <li>전체 리소스 인벤토리 조사 및 네트워크 · 보안 · 데이터 스토어 · 컴퓨트 · 관측성 5개 레이어 Terraform import</li>
     <li>팀 공용 AI Workspace와 하네스(읽기 전용 스킬, 의도 선언, CI 전용 적용) 설계 · 구현</li>
     <li>AWS 실제 상태 대조 검증 게이트 및 드리프트 감지 체계 개발</li>
-    <li>EKS 기반 Airflow · DMS · Zero-ETL 운영 및 사내 데이터 업무 자동화</li>
+    <li>Graviton(ARM) 전환 및 컨테이너 이미지 멀티 아키텍처 표준화</li>
   </ul>
 
   <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
   <ul>
-    <li>AWS 리소스 약 1,200개를 LLM 기반으로 Terraform IaC로 전환하고, <b>plan 변경 0건</b> · CloudTrail 쓰기 API 0회로 운영 영향 없는 이관 검증</li>
-    <li><b>팀 공용 AI Workspace</b> 기반 IaC로 데이터 팀 누가 작업해도 같은 절차 · 같은 결과가 나오고, 모든 변경 이력이 남는 운영 체계 구축</li>
+    <li>콘솔로 관리하던 AWS 리소스 <b>약 1,200개를 Terraform IaC로 전환</b>하고, 상태 일치 검증(<b>plan 변경 0건</b> · CloudTrail 쓰기 API 0회)으로 <b>무중단 이관</b></li>
+    <li>LLM 기반 Terraform 생성 · 동기화 절차를 <b>팀 공용 AI Workspace</b>로 표준화해, 데이터 팀 누가 작업해도 같은 결과가 나오고 모든 변경 이력이 남는 IaC 운영 체계 구축</li>
     <li>AI 에이전트는 읽기 전용, 적용은 PR 리뷰를 통과한 CI만 가능하게 하고, 삭제 · 교체가 생기는 변경은 의도 선언 없이는 차단해 <b>운영 리소스 사고 위험을 구조적으로 제거</b></li>
     <li>AWS 실제 상태를 정답지로 대조하는 검증 게이트와 드리프트 감지로 콘솔 변경을 자동 탐지하고 <b>약 5분 내 코드로 재동기화</b></li>
     <li>Terraform 코드 재생성 결과의 비결정적 순서 문제를 해결해 <b>변경 리뷰 범위 11만 줄 → 100줄</b>로 축소</li>
-    <li>망분리 환경의 Databricks까지 Workspace로 제어하고, 장애 분석은 Grafana · Prometheus · Loki 지표부터 확인하도록 표준화</li>
-    <li>EKS 기반 Airflow 운영, 신규 데이터 파이프라인 구축, DMS · Zero-ETL 태스크 관리와 함께 신규 데이터 적재 · 모기지론 데이터 싱크 등 사내 데이터 업무 자동화</li>
+    <li>NAT Gateway · CodeBuild 제어 경로를 구성해 <b>망분리 환경의 Databricks Workspace까지 IaC로 관리</b></li>
+    <li>Grafana · Prometheus · Loki로 데이터 플랫폼을 모니터링하고, 이슈 발생 시 관측 지표부터 확인하는 분석 · 장애 대응 절차 표준화</li>
+    <li>인스턴스를 Graviton(ARM)으로 전환하며, amd64 전용과 멀티 아키텍처가 섞여 있던 컨테이너 이미지를 <b>amd64 · arm64 멀티 아키텍처로 표준화</b></li>
+    <li>EKS 기반 Airflow 운영 · 신규 파이프라인 구축, DMS · Zero-ETL 동기화 작업 관리, DQ 검증 파이프라인과 LLM 기반 코드 리뷰 자동화로 반복 업무 효율화</li>
   </ul>
 </article>
 
@@ -261,7 +263,7 @@
     <li>Spark · Iceberg 기반 분산 데이터 처리 체계 및 플랫폼 아키텍처 설계 · 개발</li>
     <li>Module H/A 구성 및 Failover 체계 설계 · 구현</li>
     <li>Iceberg Expired Snapshot · Orphan File 관리 체계 구현</li>
-    <li>DB Lock 기반 Resource 제어 Module 개발</li>
+    <li>Spark Standalone용 DB Lock 기반 자원 스케줄러 개발</li>
   </ul>
 
   <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
@@ -269,7 +271,7 @@
     <li>Spark · Iceberg 기반 데이터 처리 체계를 신규 아키텍처로 설계 · 구현하여, 기존 Hadoop 기반 ETL 대비 <b>처리 시간 40% 단축</b> 및 HDFS 종속성 제거로 S3 · Glue 등 클라우드 확장성 확보</li>
     <li>Module H/A 구성 및 Failover 체계 구현으로 장애 시 대기 노드로 자동 전환되도록 하여 <b>장애 자동 복구율 95% 이상</b> 달성</li>
     <li>Iceberg Expired Snapshot 및 Orphan File 관리를 자동화하여 <b>스토리지 사용량 30% 이상 절감</b>, 장기 운영 시 메타데이터 누적으로 인한 성능 저하 예방</li>
-    <li>DB Lock 기반 Resource 제어 모듈로 병렬 작업 간 자원 경합 없이 <b>일 평균 800건 이상의 배치 작업</b> 안정 처리</li>
+    <li>Spark Standalone에 DB Lock 기반 자원 스케줄러를 구축해 Core · Memory 할당량과 SLA Queue별 작업 제출을 제어하고, Driver 병목에 따른 데드락을 방지해 <b>일 평균 800개 이상 배치 작업</b> 안정 처리</li>
     <li><b>일 평균 25억 건</b> 이상의 대용량 데이터 처리 환경에서 성능 · 안정성을 검증하고, 금융권 고객사 프로젝트에 납품 · 운영</li>
   </ul>
 </article>
