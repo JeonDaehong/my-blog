@@ -255,10 +255,10 @@
 <section>
   <h2>Side Project</h2>
   <div class="item">
-    <div class="title"><div>Stock Project <span>/ 주식 · 계좌 데이터 플랫폼 (3인, 데이터 · 인프라 담당) · <a class="pr" href="https://daehong770.me.kr/resume/side">상세</a></span></div><div class="date">2026.06 - 2026.11</div></div>
+    <div class="title"><div>주식 · 계좌 통합 플랫폼 구축 <span>(데이터 · 인프라 담당)</span></div><div class="date">2026.06 - 2026.11</div></div>
     <ul>
-      <li>Debezium CDC · Kafka · Flink로 서비스 DB 변경을 Iceberg · Paimon에 적재, Spark로 Snapshot · Orphan File 정리 자동화</li>
-      <li>단일 커밋 전환으로 정제 <b>15분 → 38초</b>, CDC 슬롯이 붙잡은 <b>WAL 6.9GB</b> 문제 해결</li>
+      <li>Debezium · Kafka · Flink CDC 경로를 구축하고, 멈춘 CDC 슬롯이 붙잡은 <b>WAL 6.9GB(볼륨 80%)를 176MB로 회복</b></li>
+      <li>Spark 기반 Iceberg 유지보수 잡으로 만료 Snapshot <b>3,660개</b> · Orphan File 정리 자동화, 실제 대비 <b>8배</b> 부풀던 테이블 정리</li>
     </ul>
   </div>
 </section>
