@@ -75,7 +75,7 @@
   .toolbar a:hover { color: var(--ink); border-color: #c7cbd1; }
   .toolbar a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .toolbar .home { margin-right: auto; border: none; padding-left: 0; }
-  @media print { .toolbar { display: none; } section { padding-top: 3.8mm; margin-top: 4.8mm; } h2 { margin-bottom: 2.9mm; } .company + .company { margin-top: 5mm; } .group + .group { margin-top: 1.7mm; } body { line-height: 1.52; } li { margin-bottom: 0.6mm; } .item + .item { margin-top: 2.6mm; } }
+  @media print { .toolbar { display: none; } section { padding-top: 4mm; margin-top: 5mm; } h2 { margin-bottom: 3mm; } .company + .company { margin-top: 5.2mm; } .group + .group { margin-top: 1.8mm; } body { line-height: 1.54; } li { margin-bottom: 0.7mm; } .item + .item { margin-top: 3mm; } }
   /* PDF: 날짜를 오른쪽 끝 대신 제목 바로 옆에 둬서 시선이 흩어지지 않게 한다 */
   @media print {
     .item .title { justify-content: flex-start; gap: 3mm; }
@@ -237,14 +237,9 @@
       </div>
             <div class="body">
         <div class="group">
-          <div class="label">E-commerce B2C 플랫폼 설계 · 개발</div>
+          <div class="label">사내 프로젝트 성능 최적화</div>
           <ul>
             <li>ngram Full Text Index · 쿼리 튜닝으로 상품 조회 <b>300ms → 90ms 미만</b> 단축</li>
-            <li>DB Lock · 트랜잭션 재설계로 동시 발급 시 <b>이벤트 쿠폰 중복 · 초과 발급 방지</b></li>
-          </ul>
-        </div><div class="group">
-          <div class="label">데이터 처리 성능 최적화</div>
-          <ul>
             <li>대용량 처리 도구로 <b>파일당 수십 GB CSV를 Chunk 단위로 분할 · 병렬 처리</b>, Wafer LOT ID 기준 분류</li>
           </ul>
         </div>
