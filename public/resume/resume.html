@@ -75,7 +75,7 @@
   .toolbar a:hover { color: var(--ink); border-color: #c7cbd1; }
   .toolbar a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .toolbar .home { margin-right: auto; border: none; padding-left: 0; }
-  @media print { .toolbar { display: none; } section { padding-top: 4mm; margin-top: 5mm; } .company + .company { margin-top: 4.5mm; } .group + .group { margin-top: 1.4mm; } body { line-height: 1.5; } li { margin-bottom: 0.5mm; } }
+  @media print { .toolbar { display: none; } section { padding-top: 3.2mm; margin-top: 4mm; } h2 { margin-bottom: 2.6mm; } .company + .company { margin-top: 4.5mm; } .group + .group { margin-top: 1.4mm; } body { line-height: 1.47; } li { margin-bottom: 0.4mm; } .item + .item { margin-top: 2.6mm; } }
   @media screen and (min-width: 641px) {
     body { font-size: 15px; }
     .sheet { max-width: 1000px; padding: 48px 48px 80px; }
@@ -238,6 +238,17 @@
           </ul>
         </div>
       </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Side Project</h2>
+  <div class="item">
+    <div class="title"><div>Stock Project <span>/ 주식 · 계좌 데이터 플랫폼 (3인, 데이터 · 인프라 담당) · <a class="pr" href="https://daehong770.me.kr/resume/side">상세</a></span></div><div class="date">2026.06 - 2026.11</div></div>
+    <ul>
+      <li>Debezium CDC · Kafka · Flink로 서비스 DB 변경을 Iceberg · Paimon에 적재, Spark로 Snapshot · Orphan File 정리 자동화</li>
+      <li>단일 커밋 전환으로 정제 <b>15분 → 38초</b>, CDC 슬롯이 붙잡은 <b>WAL 6.9GB</b> 문제 해결</li>
+    </ul>
   </div>
 </section>
 
