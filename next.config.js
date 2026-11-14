@@ -13,6 +13,7 @@ const nextConfig = {
     return [
       { source: "/resume", destination: "/resume/resume.html" },
       { source: "/resume/career", destination: "/resume/career.html" },
+      { source: "/resume/side", destination: "/resume/side.html" },
     ];
   },
 };

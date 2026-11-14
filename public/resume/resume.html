@@ -75,7 +75,7 @@
   .toolbar a:hover { color: var(--ink); border-color: #c7cbd1; }
   .toolbar a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .toolbar .home { margin-right: auto; border: none; padding-left: 0; }
-  @media print { .toolbar { display: none; } section { padding-top: 3.2mm; margin-top: 4mm; } h2 { margin-bottom: 2.6mm; } .company + .company { margin-top: 4.5mm; } .group + .group { margin-top: 1.4mm; } body { line-height: 1.47; } li { margin-bottom: 0.4mm; } .item + .item { margin-top: 2.6mm; } }
+  @media print { .toolbar { display: none; } section { padding-top: 4mm; margin-top: 5mm; } .company + .company { margin-top: 4.5mm; } .group + .group { margin-top: 1.4mm; } body { line-height: 1.5; } li { margin-bottom: 0.5mm; } }
   @media screen and (min-width: 641px) {
     body { font-size: 15px; }
     .sheet { max-width: 1000px; padding: 48px 48px 80px; }
@@ -104,6 +104,7 @@
   <a class="home" href="/">← Daehong's Blog</a>
   <a class="on" href="/resume">이력서</a>
   <a href="/resume/career">경력기술서</a>
+  <a href="/resume/side">사이드 프로젝트</a>
   <a href="/resume/resume.pdf" download>PDF 다운로드</a>
 </nav>
 
@@ -237,18 +238,6 @@
           </ul>
         </div>
       </div></div>
-  </div>
-</section>
-
-<section>
-  <h2>Personal Project</h2>
-  <div class="item">
-    <div class="title"><div>Stock Project <span>/ 주식 · 계좌 데이터 통합 플랫폼 (3인 사이드 프로젝트)</span></div><div class="date">2026.06 - 현재</div></div>
-    <ul>
-      <li>증권사 API(KIS · CODEF) 원문을 Bronze에 쌓고 Silver · Gold로 정제하는 <b>S3 Iceberg 메달리온 파이프라인</b> 구축</li>
-      <li>EC2 3대 Kubernetes에 <b>ArgoCD GitOps</b>로 Kafka · Debezium · Flink · Spark · Trino 구성</li>
-      <li>Airflow가 태스크마다 ECR 이미지를 Pod로 실행, GitHub Actions <b>OIDC</b>로 키 없이 이미지 배포</li>
-    </ul>
   </div>
 </section>
 

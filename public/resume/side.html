@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>전대홍 사이드 프로젝트</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --ink: #1f2328;
+    --sub: #6b7280;
+    --line: #e5e7eb;
+    --accent: #2f7a5b;
+  }
+  @page { size: A4; margin: 14mm 16mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body {
+    font-family: "Pretendard", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    color: var(--ink);
+    font-size: 9.8pt;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .sheet { max-width: 178mm; margin: 0 auto; padding: 10mm 0; }
+  @media print { .sheet { padding: 0; max-width: none; } }
+
+  .doc-head { margin-bottom: 6mm; }
+  .doc-head .kind { color: var(--accent); font-weight: 700; font-size: 12pt; }
+  .doc-head h1 { font-size: 22pt; margin: 0.5mm 0 0; letter-spacing: -0.5px; }
+
+  article { border-top: 2px solid var(--ink); padding-top: 4mm; }
+  article + article { break-before: page; margin-top: 10mm; }
+  @media print { article + article { margin-top: 0; } }
+
+  article h2 { font-size: 15pt; color: var(--accent); margin: 0; letter-spacing: -0.3px; }
+  .sub { margin-top: 1mm; font-weight: 600; font-size: 10.6pt; }
+  .sub .meta { color: var(--sub); font-weight: 500; font-size: 9pt; margin-left: 2mm; }
+
+  h3 { font-size: 10.6pt; margin: 4.5mm 0 1.5mm; }
+  h3 .n { color: var(--accent); margin-right: 1.5mm; }
+
+  ul { margin: 0; padding-left: 5mm; }
+  li { margin: 0 0 1.1mm; padding-left: 0.5mm; }
+  li::marker { color: var(--accent); }
+  .arch { margin: 3.5mm 0 1mm; }
+  .links { margin-top: 1mm; color: var(--sub); font-size: 9pt; }
+  .links a { color: var(--accent); }
+  .arch img { display: block; width: 100%; height: auto; }
+  b { font-weight: 700; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8mm; font-size: 13px; }
+  .toolbar a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--sub); text-decoration: none; }
+  .toolbar a:hover { color: var(--ink); border-color: #c7cbd1; }
+  .toolbar a.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .toolbar .home { margin-right: auto; border: none; padding-left: 0; }
+  @media print { .toolbar { display: none; } body { line-height: 1.48; font-size: 9.5pt; } h3 { margin: 3.2mm 0 1mm; } li { margin-bottom: 0.6mm; } .doc-head { margin-bottom: 4mm; } }
+  @media screen and (min-width: 641px) {
+    body { font-size: 15px; }
+    .sheet { max-width: 1000px; padding: 48px 48px 80px; }
+    .row { grid-template-columns: 170px 1fr; column-gap: 28px; }
+    .skills { grid-template-columns: 150px 1fr; }
+  }  @media (max-width: 640px) {
+    body { font-size: 14px; }
+    .sheet { padding: 20px 16px; }
+    .row { grid-template-columns: 1fr; row-gap: 4px; }
+    .skills { grid-template-columns: 1fr; }
+    .skills dd { margin-bottom: 6px; }
+    header h1, .doc-head h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+<nav class="toolbar">
+  <a class="home" href="/">← Daehong's Blog</a>
+  <a href="/resume">이력서</a>
+  <a href="/resume/career">경력기술서</a>
+  <a class="on" href="/resume/side">사이드 프로젝트</a>
+  <a href="/resume/side.pdf" download>PDF 다운로드</a>
+</nav>
+
+<div class="doc-head">
+  <div class="kind">사이드 프로젝트</div>
+  <h1>전대홍</h1>
+</div>
+
+<!-- personal -->
+<article>
+  <h2>주식 · 계좌 데이터 통합 플랫폼 구축</h2>
+  <div class="sub">Stock Project · 3인 사이드 프로젝트, 데이터 · 인프라 담당 <span class="meta">2026.06 - 현재</span></div>
+  <div class="links">설계 · 스펙 문서 <a href="https://github.com/stock-project-crew/docs">github.com/stock-project-crew/docs</a> · 코드 저장소는 팀 비공개(요청 시 공유)</div>
+
+  <figure class="arch"><img src="arch-stock.png" alt="KIS 실시간 시세는 Quote Ingestor와 Kafka를 거쳐 Flink가 서비스 DB와 Paimon, Iceberg Bronze에 쓰고, 서비스 DB 변경은 Debezium CDC로 Kafka에 들어가며, Airflow가 실행하는 수집 · 정제 Pod는 KIS · KRX · DART · CODEF 데이터를 S3 Iceberg의 Bronze, Silver, Gold로 정제한 뒤 Reverse ETL로 서비스 DB에 공급하고, Spark가 레이크 테이블을 유지보수하는 Kubernetes 기반 구조"></figure>
+
+  <h3><span class="n">1.</span>배경 및 목표</h3>
+  <ul>
+    <li>여러 증권사 계좌의 잔고 · 체결 · 배당과 국내 · 미국 시세를 한곳에서 보는 투자 관리 앱을 3인이 개발 (앱 · 백엔드 1명, 데이터 · 인프라 2명)</li>
+    <li>앱이 쓰는 시세 · 기준정보 · 계좌 데이터를 배치와 실시간 두 경로로 공급하는 데이터 플랫폼을 설계 · 구축 · 운영</li>
+    <li>EC2 3대 안에서 Kafka · Flink · Spark · Iceberg · Airflow를 직접 운영하며, 장애 · 비용 · 보안까지 책임지는 구조를 목표로 함</li>
+  </ul>
+
+  <h3><span class="n">2.</span>기술 스택 및 환경</h3>
+  <ul>
+    <li>Python, Airflow, Kubernetes(kubeadm), ArgoCD, Kafka(Strimzi), Debezium, Flink, Paimon, Spark, Trino, Iceberg, Prometheus, Grafana, AWS(EC2, S3, Glue, ECR, SSM, EventBridge), GitHub Actions</li>
+    <li>EC2 t3a.xlarge 3대, 외부 인바운드 포트 0개(SSM 터널 접속), EventBridge로 가동 시간대에만 노드 기동</li>
+    <li>Glue 카탈로그 Iceberg 테이블 55개(Bronze 31 · Silver 22 · Gold 2), 파이프라인 단위 테스트 363개</li>
+  </ul>
+
+  <h3><span class="n">3.</span>주요 업무 및 상세 역할</h3>
+  <ul>
+    <li>Kubernetes 클러스터 · Airflow 구축, ArgoCD로 Kafka · Flink · Spark · Trino 운영 구성</li>
+    <li>Iceberg 카탈로그를 AWS Glue로 통합하고, Trino에서 레이크와 서비스 DB를 함께 조회하도록 연결</li>
+    <li>Debezium CDC를 Flink로 받아 Iceberg Bronze와 Paimon 실시간 테이블에 적재하는 경로 구축</li>
+    <li>Spark를 Kubernetes 네이티브 실행으로 전환하고, Iceberg 테이블 유지보수 잡(Compaction · Snapshot 만료 · Orphan File 정리) 개발</li>
+    <li>Prometheus · Grafana 대시보드 4종과 데이터 SLO · DB · 플랫폼 알림 규칙 14개 구성</li>
+    <li>시세 · 계좌 수집기와 Silver · Gold 정제 개발, GitHub Actions OIDC 기반 이미지 배포 구성</li>
+  </ul>
+
+  <h3><span class="n">4.</span>비즈니스 가치 및 기술적 성과</h3>
+  <ul>
+    <li>51개 테이블에서 만료 대상 Snapshot <b>3,660개 · 1.1GB</b>와 실제 데이터 대비 8배 큰 테이블(94.6MB → S3 784.6MB)을 찾아, <b>주 1회 Spark 유지보수 잡으로 자동 정리</b></li>
+    <li>Bronze Compaction은 7일 지난 파일만 적재 시각 순으로 합치게 해, 증분 처리의 파일 Pruning이 깨지지 않도록 설계</li>
+    <li>청크 단위 다중 커밋을 테이블당 단일 커밋으로 바꿔 수급 정제 <b>15분 이상 → 38초</b>, 레이크 커밋 <b>약 65회 → 13회</b>로 단축</li>
+    <li>스키마 이전 후 멈춘 CDC 슬롯이 WAL <b>6.9GB</b>를 붙잡아 볼륨 80%까지 찬 문제를 찾아, Heartbeat · 최소 권한 커넥터로 재구성해 <b>WAL 176MB · 볼륨 12%</b>로 회복</li>
+    <li>증권사의 소급 가격 정정으로 구간 경계에서 가격이 수 배 튀던 문제를 중앙값 비율 보정으로 해결하고, OHLC 불변식이 깨진 <b>582행 · 313종목</b> 교정</li>
+    <li>Silver 정제에서 나던 OOM과 중첩 조건식 스택 오버플로를 배치 읽기 · 1,000행 청크 처리로 해결</li>
+    <li>OIDC 역할을 main 브랜치 · 단일 ECR 저장소로 제한하고, 계좌 자격증명은 SSM에서만 읽게 하고 로그 · Bronze 원문의 계좌번호는 마스킹</li>
+  </ul>
+</article>
+
+</div>
+</body>
+</html>
