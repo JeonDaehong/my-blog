@@ -6,7 +6,7 @@ import type { PaginationMeta, PostSummary } from "@/lib/types";
  * 공부 블로그(/study) 쪽 조회. 기술 블로그와 글도 카테고리도 완전히 갈라져 있고,
  * 가르는 기준은 Post.blog / Category.blog 다.
  *
- * 카테고리는 두 단계다. 최상위(개인 공부 · 사이드 프로젝트 · 기타) 아래에
+ * 카테고리는 두 단계다. 최상위(개인 공부 · 기타) 아래에
  * 하위 카테고리가 붙고(예: 개인 공부 > Spark), 상위 목록은 하위 글까지 함께 보여준다.
  */
 export const STUDY = "study";
