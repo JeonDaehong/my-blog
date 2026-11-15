@@ -25,22 +25,24 @@ export type Contribution = {
   tags: string[];
   ko: string;
   en: string;
+  /** 측정한 개선 수치. 목록에서 강조해 보여준다 */
+  impact?: { ko: string; en: string };
 };
 
 export const CONTRIBUTIONS: Contribution[] = [
-  { project: "paimon-rust", pr: 1370, date: "26.11", tags: ["Performance", "Core"],
+  { project: "paimon-rust", pr: 1370, impact: { ko: "읽기 −52%", en: "Read −52%" }, date: "26.11", tags: ["Performance", "Core"],
     ko: "불필요한 sort-merge 를 건너뛰어 aggregation 테이블 읽기를 최적화했습니다. 읽기 시간 약 52% 단축.",
     en: "Optimized aggregation table reads by bypassing unnecessary sort-merge operations, reducing read time by ~52%." },
-  { project: "paimon-rust", pr: 1338, date: "26.11", tags: ["Performance", "Core"],
+  { project: "paimon-rust", pr: 1338, impact: { ko: "할당 −19.6%", en: "Allocs −19.6%" }, date: "26.11", tags: ["Performance", "Core"],
     ko: "병합에서 이긴 셀을 참조로 유지해 키당 할당을 약 19.6%, 읽기 시간을 약 13% 줄였습니다.",
     en: "Kept winning cells by reference, reducing allocations per merged key by ~19.6% and read time by ~13%." },
   { project: "iceberg-rust", pr: 3435, date: "26.11", tags: ["Bug Fix", "Core"],
     ko: "positional delete 로딩이 실패하면 재시도와 동시 로딩이 멈추던 문제를 고쳤습니다.",
     en: "Fixed positional delete loading failures that caused retries and concurrent loads to hang." },
-  { project: "paimon-rust", pr: 1164, date: "26.11", tags: ["Performance", "Core"],
+  { project: "paimon-rust", pr: 1164, impact: { ko: "실행 −62%", en: "Exec −62%" }, date: "26.11", tags: ["Performance", "Core"],
     ko: "단일 run 읽기를 최적화했습니다. 실행 시간 약 62% 단축.",
     en: "Optimized single-run reads, reducing execution time by ~62%." },
-  { project: "iceberg-rust", pr: 3454, date: "26.10", tags: ["Performance", "Core"],
+  { project: "iceberg-rust", pr: 3454, impact: { ko: "읽기 최대 +48%", en: "Read up to +48%" }, date: "26.10", tags: ["Performance", "Core"],
     ko: "삭제 범위(deleted ranges)로 delete row selection 을 최적화했습니다. 읽기 성능 최대 48% 개선.",
     en: "Optimized delete row selection using deleted ranges, improving read performance by up to 48%." },
   { project: "paimon-rust", pr: 1190, date: "26.10", tags: ["Bug Fix", "Core"],

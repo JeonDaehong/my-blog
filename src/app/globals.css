@@ -24,6 +24,12 @@
   --accent-muted: rgba(232, 112, 64, 0.1);
   --code-bg: #f2f4f6;
   --link-color: #e87040;
+  /* PR 상태색 (/oss). GitHub 과 같은 색을 써서 머지·열림·닫힘이 바로 읽히게 한다 */
+  --pr-merged: #8250df;
+  --pr-open: #1a7f37;
+  --pr-closed: #6e7781;
+  --impact: #1a7f37;
+  --impact-bg: rgba(26, 127, 55, 0.09);
 }
 
 /* Dark theme */
@@ -43,6 +49,11 @@
   --accent-muted: rgba(232, 112, 64, 0.15);
   --code-bg: #1e1e1e;
   --link-color: #e87040;
+  --pr-merged: #a371f7;
+  --pr-open: #3fb950;
+  --pr-closed: #8b949e;
+  --impact: #3fb950;
+  --impact-bg: rgba(63, 185, 80, 0.12);
 }
 
 html {
