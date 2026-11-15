@@ -133,9 +133,15 @@ export default function AdminPage() {
           <Link href="/" className="text-text-tertiary hover:text-text-primary transition-colors"><HiOutlineArrowLeft size={18} /></Link>
           <h1 className="text-xl font-bold text-text-primary">관리자</h1>
         </div>
-        <button onClick={logout} className="flex items-center gap-2 text-[13px] text-text-tertiary hover:text-text-primary transition-colors">
-          <HiOutlineArrowRightOnRectangle size={16} /> 로그아웃
-        </button>
+        <div className="flex items-center gap-5">
+          {/* 이력서는 로그인한 사람만 본다. 라우트가 쿠키 서명을 확인한 뒤에 파일을 내준다. */}
+          <a href="/wjseoghd/resume" className="flex items-center gap-2 text-[13px] text-text-tertiary hover:text-text-primary transition-colors">
+            <HiOutlineDocumentText size={16} /> 이력서
+          </a>
+          <button onClick={logout} className="flex items-center gap-2 text-[13px] text-text-tertiary hover:text-text-primary transition-colors">
+            <HiOutlineArrowRightOnRectangle size={16} /> 로그아웃
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-1 mb-6 border-b border-border-color">
