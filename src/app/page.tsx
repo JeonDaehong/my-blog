@@ -21,6 +21,7 @@ import { useI18n } from "@/lib/i18n";
 const LINKS = {
   blog: "/posts",
   study: "/study",
+  oss: "/oss",
   github: "https://github.com/JeonDaehong",
   linkedin: "https://linkedin.com/in/daehong-jeon",
 };
@@ -33,6 +34,7 @@ const TEXT = {
     study: "공부 블로그 읽기",
     navBlog: "기술 블로그",
     navStudy: "공부 블로그",
+    navOss: "OSS",
   },
   en: {
     title: "Daehong's Data Log",
@@ -41,6 +43,7 @@ const TEXT = {
     study: "Read Study Blog",
     navBlog: "Tech Blog",
     navStudy: "Study Blog",
+    navOss: "OSS",
   },
 };
 
@@ -75,12 +78,13 @@ export default function LandingPage() {
     return () => clearInterval(timer);
   }, [lang, mounted]);
 
-  // 블로그 · 공부 메뉴. 넓은 화면과 좁은 화면에서 같은 목록을 다른 자리에 그린다.
+  // 블로그 · 공부 · OSS 메뉴. 넓은 화면과 좁은 화면에서 같은 목록을 다른 자리에 그린다.
   // 이력서는 공개 메뉴에 두지 않는다. 관리자 화면(/wjseoghd)에서 로그인한 뒤에만 열린다.
   const pageLinks = (size: string) => (
     <>
       <Link href={LINKS.blog} className={`${size} text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap`}>{t.navBlog}</Link>
       <Link href={LINKS.study} className={`${size} text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap`}>{t.navStudy}</Link>
+      <Link href={LINKS.oss} className={`${size} text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap`}>{t.navOss}</Link>
     </>
   );
 
