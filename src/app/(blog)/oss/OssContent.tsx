@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { GoArrowUpRight, GoGitMerge, GoGitPullRequest, GoGitPullRequestClosed, GoRepo } from "react-icons/go";
-import { HiXMark } from "react-icons/hi2";
+import { GoGitMerge, GoGitPullRequest, GoGitPullRequestClosed, GoRepo, GoStack } from "react-icons/go";
+import { HiArrowRight } from "react-icons/hi2";
 import { useI18n } from "@/lib/i18n";
 import {
   CONTRIBUTIONS,
@@ -13,17 +13,26 @@ import {
   prUrl,
   type Contribution,
   type ProjectKey,
+  type Review,
   type ReviewStatus,
 } from "@/lib/oss";
 
 /*
-  화면 구성은 익숙한 패턴을 빌려 왔다.
-  - 프로젝트 카드 : GitHub 프로필의 고정 저장소 카드. 누르면 아래 두 목록이 그 프로젝트로 좁혀진다.
-  - 기여 목록     : Linear · Stripe 체인지로그처럼 왼쪽에 월, 오른쪽에 항목.
-  - 리뷰 목록     : GitHub PR 목록. 테두리 상자 + 상단 상태 필터 + 상태 아이콘.
+  구성은 카탈로그형 페이지(예 : MonkeyLearn 모듈 목록)를 따른다.
+  - 맨 위 가운데 : 제목, 한 줄 숫자, 프로젝트 원형 버튼 줄 (누르면 그 프로젝트만)
+  - 아래 왼쪽     : 분류 알약 목록 (기여 유형 / 리뷰 상태)
+  - 아래 오른쪽   : 흰 카드 3열 격자 + "더 보기"
 */
 
-const REVIEW_PAGE = 12;
+const PAGE = 9;
+
+type ContribType = "Performance" | "Bug Fix" | "Improvement" | "Docs";
+const CONTRIB_TYPES: { key: ContribType; ko: string; en: string }[] = [
+  { key: "Performance", ko: "성능 개선", en: "Performance" },
+  { key: "Bug Fix", ko: "버그 수정", en: "Bug fixes" },
+  { key: "Improvement", ko: "개선", en: "Improvements" },
+  { key: "Docs", ko: "문서", en: "Docs" },
+];
 
 const STATUS: Record<ReviewStatus, { ko: string; en: string; color: string; Icon: typeof GoGitMerge }> = {
   merged: { ko: "머지", en: "Merged", color: "var(--pr-merged)", Icon: GoGitMerge },
@@ -31,87 +40,112 @@ const STATUS: Record<ReviewStatus, { ko: string; en: string; color: string; Icon
   closed: { ko: "닫힘", en: "Closed", color: "var(--pr-closed)", Icon: GoGitPullRequestClosed },
 };
 
+type View = { kind: "contrib"; type: ContribType | null } | { kind: "review"; status: ReviewStatus | null };
+type ReviewItem = Review & { project: ProjectKey };
+
+const typeOf = (c: Contribution) => c.tags[0] as ContribType;
 const MONTHS_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-function monthLabel(date: string, isKo: boolean) {
-  const [yy, mm] = date.split(".");
+const dateLabel = (d: string, isKo: boolean) => {
+  const [yy, mm] = d.split(".");
   return isKo ? `20${yy}.${mm}` : `${MONTHS_EN[Number(mm) - 1]} 20${yy}`;
-}
+};
 
-/** 요약문 속 `코드` 를 code 태그로 바꾼다 */
-function Inline({ text }: { text: string }) {
+/** 프로젝트 색을 옅게 깐 원 안에 아이콘 */
+function IconBubble({ color, children }: { color: string; children: React.ReactNode }) {
   return (
-    <>
-      {text.split("`").map((part, i) =>
-        i % 2 === 1 ? (
-          <code key={i} className="px-1 py-px rounded bg-bg-tertiary border border-border-color text-[0.88em] font-mono">
-            {part}
-          </code>
-        ) : (
-          <span key={i}>{part}</span>
-        ),
-      )}
-    </>
-  );
-}
-
-function ProjectMark({ project, size = "sm" }: { project: ProjectKey; size?: "sm" | "lg" }) {
-  const p = PROJECTS[project];
-  if (size === "sm") {
-    return <span className="inline-block w-2.5 h-2.5 rounded-full shrink-0" style={{ background: p.color }} />;
-  }
-  return (
-    <span
-      className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
-      style={{ background: p.color, color: p.text }}
-    >
-      <GoRepo size={17} />
+    <span className="relative flex items-center justify-center w-10 h-10 rounded-full shrink-0" style={{ color }}>
+      <span className="absolute inset-0 rounded-full opacity-[0.13]" style={{ background: color }} />
+      <span className="relative">{children}</span>
     </span>
   );
 }
 
-function SectionHead({ title, desc }: { title: string; desc?: string }) {
+function Pill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="mb-5">
-      <h2 className="text-[19px] font-bold text-text-primary tracking-tight">{title}</h2>
-      {desc && <p className="mt-1 text-[13.5px] text-text-tertiary">{desc}</p>}
-    </div>
+    <button
+      onClick={onClick}
+      aria-pressed={active}
+      className={`shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] whitespace-nowrap transition-all ${
+        active
+          ? "bg-accent text-white shadow-[0_2px_8px_rgba(232,112,64,0.35)]"
+          : "bg-bg-primary text-text-secondary border border-border-color hover:text-text-primary hover:border-border-light"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
+const CARD =
+  "group flex flex-col h-full rounded-2xl bg-bg-primary border border-border-color p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-12px_rgba(16,24,40,0.18)] hover:border-border-light";
+
 function ContributionCard({ c, isKo }: { c: Contribution; isKo: boolean }) {
   const p = PROJECTS[c.project];
+  const desc = (isKo ? c.ko : c.en).replace(/`/g, "");
   return (
-    <a
-      href={prUrl(c.project, c.pr, c.anchor)}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block rounded-xl border border-border-color bg-bg-primary px-4 sm:px-5 py-3.5 transition-colors hover:border-border-light hover:bg-bg-secondary"
-    >
-      <div className="flex items-center gap-2 text-[12.5px]">
-        <ProjectMark project={c.project} />
-        <span className="font-semibold text-text-secondary">{p.name}</span>
-        <span className="hidden sm:inline text-text-tertiary">·</span>
-        <span className="hidden sm:inline text-text-tertiary truncate">{c.tags.join(" · ")}</span>
-        <span className="ml-auto flex items-center gap-2 shrink-0">
-          {c.impact && (
-            <span
-              className="px-2 py-0.5 rounded-md text-[12px] font-bold tabular-nums"
-              style={{ color: "var(--impact)", background: "var(--impact-bg)" }}
-            >
-              {isKo ? c.impact.ko : c.impact.en}
-            </span>
-          )}
-          <span className="inline-flex items-center gap-0.5 font-mono text-text-tertiary group-hover:text-accent transition-colors">
-            #{c.pr}
-            <GoArrowUpRight size={13} />
+    <a href={prUrl(c.project, c.pr, c.anchor)} target="_blank" rel="noopener noreferrer" className={CARD}>
+      <div className="flex items-start justify-between">
+        <IconBubble color={p.ink}>
+          <GoGitMerge size={18} />
+        </IconBubble>
+        {c.impact && (
+          <span
+            className="px-2.5 py-1 rounded-full text-[12px] font-bold tabular-nums"
+            style={{ color: "var(--impact)", background: "var(--impact-bg)" }}
+          >
+            {isKo ? c.impact.ko : c.impact.en}
           </span>
+        )}
+      </div>
+      <h3 className="mt-4 text-[15px] font-semibold leading-snug text-text-primary line-clamp-2">
+        {isKo ? c.title.ko : c.title.en}
+      </h3>
+      <p className="mt-1.5 text-[13px] leading-relaxed text-text-tertiary line-clamp-3">{desc}</p>
+      <div className="mt-auto pt-4 flex items-center gap-2 text-[12px] text-text-tertiary">
+        <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.color }} />
+        <span className="truncate">{p.name}</span>
+        <span>·</span>
+        <span className="shrink-0 tabular-nums">{dateLabel(c.date, isKo)}</span>
+        <span className="ml-auto shrink-0 font-mono group-hover:text-accent transition-colors">#{c.pr}</span>
+      </div>
+    </a>
+  );
+}
+
+function ReviewCard({ r, isKo }: { r: ReviewItem; isKo: boolean }) {
+  const p = PROJECTS[r.project];
+  const s = STATUS[r.status];
+  return (
+    <a href={prUrl(r.project, r.pr)} target="_blank" rel="noopener noreferrer" className={CARD}>
+      <div className="flex items-start justify-between">
+        <IconBubble color={s.color}>
+          <s.Icon size={18} />
+        </IconBubble>
+        <span className="text-[12px] font-medium" style={{ color: s.color }}>
+          {isKo ? s.ko : s.en}
         </span>
       </div>
-      <p className="mt-1.5 text-[15px] leading-[1.6] text-text-primary group-hover:text-text-primary">
-        <Inline text={isKo ? c.ko : c.en} />
+      <h3 className="mt-4 text-[15px] font-semibold leading-snug text-text-primary line-clamp-3">{isKo ? r.ko : r.en}</h3>
+      <p className="mt-1.5 text-[13px] text-text-tertiary">
+        <span className="font-mono">#{r.pr}</span> · @{r.author}
       </p>
-      <p className="sm:hidden mt-1.5 text-[12px] text-text-tertiary">{c.tags.join(" · ")}</p>
+      <div className="mt-auto pt-4 flex items-center gap-2 text-[12px] text-text-tertiary">
+        <span className="w-2 h-2 rounded-full" style={{ background: p.color }} />
+        <span className="truncate">{p.name}</span>
+        {r.coauthor && (
+          <span className="ml-auto shrink-0 px-2 py-0.5 rounded-full bg-accent-muted text-accent text-[11.5px] font-semibold">
+            {isKo ? "공동 작성" : "Co-author"}
+          </span>
+        )}
+      </div>
     </a>
   );
 }
@@ -120,284 +154,237 @@ export default function OssContent() {
   const { locale } = useI18n();
   const isKo = locale === "ko";
   const [project, setProject] = useState<ProjectKey | null>(null);
-  const [status, setStatus] = useState<ReviewStatus | null>(null);
-  const [showAll, setShowAll] = useState(false);
+  const [view, setView] = useState<View>({ kind: "contrib", type: null });
+  const [limit, setLimit] = useState(PAGE);
 
-  const allReviews = useMemo(
+  const allReviews: ReviewItem[] = useMemo(
     () => REVIEWS.flatMap((g) => g.items.map((r) => ({ ...r, project: g.project }))),
     [],
   );
 
-  // 프로젝트 카드 : 활동이 많은 순서
-  const projects = useMemo(() => {
-    const keys = Object.keys(PROJECTS) as ProjectKey[];
-    return keys
-      .map((k) => ({
-        key: k,
-        contrib: CONTRIBUTIONS.filter((c) => c.project === k).length,
-        review: allReviews.filter((r) => r.project === k).length,
-      }))
-      .filter((p) => p.contrib + p.review > 0)
-      .sort((a, b) => b.contrib + b.review - (a.contrib + a.review));
-  }, [allReviews]);
+  const projects = useMemo(
+    () =>
+      (Object.keys(PROJECTS) as ProjectKey[])
+        .map((k) => ({
+          key: k,
+          total:
+            CONTRIBUTIONS.filter((c) => c.project === k).length + allReviews.filter((r) => r.project === k).length,
+        }))
+        .filter((p) => p.total > 0)
+        .sort((a, b) => b.total - a.total),
+    [allReviews],
+  );
 
-  const contributions = CONTRIBUTIONS.filter((c) => !project || c.project === project);
-  const months = useMemo(() => {
-    const out: { date: string; items: Contribution[] }[] = [];
-    for (const c of contributions) {
-      const last = out[out.length - 1];
-      if (last && last.date === c.date) last.items.push(c);
-      else out.push({ date: c.date, items: [c] });
-    }
-    return out;
-  }, [contributions]);
+  const inProject = <T extends { project: ProjectKey }>(xs: T[]) => xs.filter((x) => !project || x.project === project);
+  const contribs = inProject(CONTRIBUTIONS);
+  const reviews = inProject(allReviews);
 
-  const reviewsInProject = allReviews.filter((r) => !project || r.project === project);
-  const reviews = reviewsInProject.filter((r) => !status || r.status === status);
-  const visibleReviews = showAll ? reviews : reviews.slice(0, REVIEW_PAGE);
-  const countOf = (s: ReviewStatus) => reviewsInProject.filter((r) => r.status === s).length;
+  const items =
+    view.kind === "contrib"
+      ? contribs.filter((c) => !view.type || typeOf(c) === view.type)
+      : reviews.filter((r) => !view.status || r.status === view.status);
 
-  const stats = [
-    { value: CONTRIBUTIONS.length, label: isKo ? "기여한 PR" : "PRs contributed" },
-    { value: allReviews.length, label: isKo ? "리뷰한 PR" : "PRs reviewed" },
-    { value: allReviews.filter((r) => r.status === "merged").length, label: isKo ? "리뷰 후 머지" : "Reviewed & merged" },
-    { value: projects.length, label: isKo ? "프로젝트" : "Projects" },
-  ];
-
-  function pickProject(k: ProjectKey) {
-    setProject((cur) => (cur === k ? null : k));
-    setStatus(null);
-    setShowAll(false);
+  function go(next: View) {
+    setView(next);
+    setLimit(PAGE);
+  }
+  function pickProject(k: ProjectKey | null) {
+    setProject(k);
+    setLimit(PAGE);
   }
 
+  // 오른쪽 제목 : 기여한 PR · "Paimon-Rust · 성능 개선"
+  const filterLabel = [
+    project ? PROJECTS[project].name : null,
+    view.kind === "contrib" && view.type
+      ? CONTRIB_TYPES.find((t) => t.key === view.type)![isKo ? "ko" : "en"]
+      : null,
+    view.kind === "review" && view.status ? STATUS[view.status][isKo ? "ko" : "en"] : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const heading = view.kind === "contrib" ? (isKo ? "기여한 PR" : "Contributions") : isKo ? "리뷰한 PR" : "Reviews";
+
   return (
-    <div className="max-w-3xl mx-auto break-keep">
+    <div className="break-keep">
       {/* 머리말 */}
-      <header>
-        <p className="text-[12px] font-semibold tracking-[0.14em] uppercase text-accent">Open Source</p>
-        <h1 className="mt-2 text-[30px] sm:text-[36px] font-bold text-text-primary tracking-tight leading-tight">
+      <header className="text-center pt-4">
+        <p className="text-[12px] font-semibold tracking-[0.16em] uppercase text-accent">Open Source</p>
+        <h1 className="mt-3 text-[30px] sm:text-[38px] font-bold tracking-tight text-text-primary">
           {isKo ? "오픈소스 기여 기록" : "Open source work"}
         </h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-text-secondary">
-          {isKo ? (
-            <>
-              Apache Iceberg, Paimon, Gravitino 같은 데이터 인프라 프로젝트에 보낸 PR 과, 다른 기여자의 PR 에 남긴 리뷰를 모았습니다.
-              기여 과정을 길게 풀어 쓴 글은{" "}
-              <Link href="/category/opensource" className="text-accent font-medium hover:underline underline-offset-2">
-                오픈소스기여
-              </Link>{" "}
-              카테고리에 있습니다.
-            </>
-          ) : (
-            <>
-              PRs I sent to data infrastructure projects such as Apache Iceberg, Paimon and Gravitino, and reviews I left on other
-              contributors&apos; PRs. Longer write-ups live in the{" "}
-              <Link href="/category/opensource" className="text-accent font-medium hover:underline underline-offset-2">
-                Open Source
-              </Link>{" "}
-              category.
-            </>
-          )}
+        <p className="mt-3 mx-auto max-w-xl text-[15px] leading-relaxed text-text-secondary">
+          {isKo
+            ? "데이터 인프라 프로젝트에 보낸 PR 과, 다른 기여자의 PR 에 남긴 리뷰를 모았습니다."
+            : "PRs I sent to data infrastructure projects, and reviews I left on other contributors' PRs."}
         </p>
-      </header>
+        <p className="mt-4 text-[13px] text-text-tertiary tabular-nums">
+          {isKo ? "기여" : "PRs"} <b className="text-text-primary">{CONTRIBUTIONS.length}</b>
+          <span className="mx-2.5 text-border-light">|</span>
+          {isKo ? "리뷰" : "Reviews"} <b className="text-text-primary">{allReviews.length}</b>
+          <span className="mx-2.5 text-border-light">|</span>
+          {isKo ? "프로젝트" : "Projects"} <b className="text-text-primary">{projects.length}</b>
+        </p>
 
-      {/* 숫자 */}
-      <dl className="mt-8 grid grid-cols-2 sm:grid-cols-4 rounded-2xl border border-border-color bg-bg-secondary overflow-hidden">
-        {stats.map((s, i) => (
-          <div
-            key={s.label}
-            className={`px-5 py-4 ${i % 2 === 1 ? "border-l" : ""} ${i >= 2 ? "border-t sm:border-t-0" : ""} ${
-              i === 2 ? "sm:border-l" : ""
-            } border-border-color`}
-          >
-            <dd className="text-[28px] font-bold text-text-primary tabular-nums leading-none">{s.value}</dd>
-            <dt className="mt-2 text-[12.5px] text-text-tertiary">{s.label}</dt>
-          </div>
-        ))}
-      </dl>
-
-      {/* 프로젝트 */}
-      <section className="mt-14">
-        <SectionHead
-          title={isKo ? "프로젝트" : "Projects"}
-          desc={isKo ? "카드를 누르면 아래 목록이 그 프로젝트로 좁혀집니다." : "Pick a card to narrow the lists below."}
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {projects.map((p) => {
+        {/* 프로젝트 원형 버튼 */}
+        <div className="mt-9 flex flex-wrap justify-center gap-x-5 gap-y-4 sm:gap-x-7">
+          {[{ key: null as ProjectKey | null, total: CONTRIBUTIONS.length + allReviews.length }, ...projects].map((p) => {
             const active = project === p.key;
+            const meta = p.key ? PROJECTS[p.key] : null;
             return (
-              <button
-                key={p.key}
-                onClick={() => pickProject(p.key)}
-                aria-pressed={active}
-                className={`flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-all ${
-                  active
-                    ? "border-accent bg-accent-muted ring-1 ring-accent"
-                    : "border-border-color bg-bg-primary hover:border-border-light hover:bg-bg-secondary"
-                }`}
-              >
-                <ProjectMark project={p.key} size="lg" />
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-semibold text-text-primary">{PROJECTS[p.key].name}</span>
-                  <span className="hidden sm:block text-[12px] font-mono text-text-tertiary truncate">{PROJECTS[p.key].repo}</span>
+              <button key={p.key ?? "all"} onClick={() => pickProject(p.key)} aria-pressed={active} className="group w-[72px] sm:w-20">
+                <span
+                  className={`mx-auto flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-bg-primary border transition-all ${
+                    active
+                      ? "border-accent ring-4 ring-accent-muted"
+                      : "border-border-color shadow-[0_4px_14px_-6px_rgba(16,24,40,0.18)] group-hover:-translate-y-0.5"
+                  }`}
+                  style={{ color: meta ? meta.ink : "var(--text-secondary)" }}
+                >
+                  {meta ? <GoRepo size={24} /> : <GoStack size={24} />}
                 </span>
-                <span className="shrink-0 text-right text-[12px] leading-[1.5] text-text-tertiary tabular-nums">
-                  <span className="block">
-                    {isKo ? "기여" : "PRs"} <b className="text-text-primary font-semibold">{p.contrib}</b>
-                  </span>
-                  <span className="block">
-                    {isKo ? "리뷰" : "Reviews"} <b className="text-text-primary font-semibold">{p.review}</b>
-                  </span>
+                <span
+                  className={`mt-2 block text-[12px] leading-tight ${
+                    active ? "text-accent font-semibold" : "text-text-secondary"
+                  }`}
+                >
+                  {meta ? meta.name : isKo ? "전체" : "All"}
                 </span>
               </button>
             );
           })}
         </div>
-        {project && (
-          <button
-            onClick={() => setProject(null)}
-            className="mt-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-bg-tertiary text-[12.5px] text-text-secondary hover:text-text-primary"
-          >
-            {PROJECTS[project].name} {isKo ? "만 보는 중" : "only"}
-            <HiXMark size={14} />
-          </button>
-        )}
-      </section>
+      </header>
 
-      {/* 기여 : 체인지로그 */}
-      <section id="contributions" className="mt-14 scroll-mt-20">
-        <SectionHead
-          title={isKo ? "기여한 PR" : "Contributions"}
-          desc={isKo ? `${contributions.length}건 · 최신순` : `${contributions.length} PRs · newest first`}
-        />
-        <ol className="space-y-8">
-          {months.map((m) => (
-            <li key={m.date} className="sm:grid sm:grid-cols-[104px_1fr] sm:gap-6">
-              <div className="mb-3 sm:mb-0 sm:pt-4">
-                <div className="sm:sticky sm:top-24 flex sm:block items-baseline gap-2">
-                  <div className="text-[14px] font-semibold text-text-primary tabular-nums">{monthLabel(m.date, isKo)}</div>
-                  <div className="text-[12px] text-text-tertiary">{isKo ? `${m.items.length}건` : `${m.items.length} PRs`}</div>
-                </div>
+      <hr className="mt-12 mb-10 border-border-color" />
+
+      <div className="lg:grid lg:grid-cols-[190px_1fr] lg:gap-10">
+        {/* 왼쪽 분류 */}
+        <aside className="mb-8 lg:mb-0">
+          <h2 className="hidden lg:block text-[17px] font-semibold text-text-primary mb-5">{isKo ? "분류" : "Browse"}</h2>
+
+          <div className="space-y-5">
+            <div>
+              <p className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-wider text-text-tertiary">
+                {isKo ? "기여한 PR" : "Contributions"}
+              </p>
+              <div className="flex lg:flex-col lg:items-start gap-2 overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0">
+                <Pill active={view.kind === "contrib" && !view.type} onClick={() => go({ kind: "contrib", type: null })}>
+                  {isKo ? "전체" : "All"} <span className="opacity-60 tabular-nums">{contribs.length}</span>
+                </Pill>
+                {CONTRIB_TYPES.map((t) => {
+                  const n = contribs.filter((c) => typeOf(c) === t.key).length;
+                  // 0건이라도 지금 고른 분류는 남겨 둔다. 숨기면 걸린 필터를 풀 방법이 안 보인다.
+                  if (n === 0 && !(view.kind === "contrib" && view.type === t.key)) return null;
+                  return (
+                    <Pill
+                      key={t.key}
+                      active={view.kind === "contrib" && view.type === t.key}
+                      onClick={() => go({ kind: "contrib", type: t.key })}
+                    >
+                      {isKo ? t.ko : t.en} <span className="opacity-60 tabular-nums">{n}</span>
+                    </Pill>
+                  );
+                })}
               </div>
-              <div className="space-y-2.5">
-                {m.items.map((c) => (
-                  <ContributionCard key={`${c.project}-${c.pr}`} c={c} isKo={isKo} />
-                ))}
+            </div>
+
+            <div>
+              <p className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-wider text-text-tertiary">
+                {isKo ? "리뷰한 PR" : "Reviews"}
+              </p>
+              <div className="flex lg:flex-col lg:items-start gap-2 overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0">
+                <Pill active={view.kind === "review" && !view.status} onClick={() => go({ kind: "review", status: null })}>
+                  {isKo ? "전체" : "All"} <span className="opacity-60 tabular-nums">{reviews.length}</span>
+                </Pill>
+                {(Object.keys(STATUS) as ReviewStatus[]).map((s) => {
+                  const n = reviews.filter((r) => r.status === s).length;
+                  if (n === 0 && !(view.kind === "review" && view.status === s)) return null;
+                  return (
+                    <Pill
+                      key={s}
+                      active={view.kind === "review" && view.status === s}
+                      onClick={() => go({ kind: "review", status: s })}
+                    >
+                      {STATUS[s][isKo ? "ko" : "en"]} <span className="opacity-60 tabular-nums">{n}</span>
+                    </Pill>
+                  );
+                })}
               </div>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* 리뷰 : GitHub PR 목록 */}
-      <section id="reviews" className="mt-16 scroll-mt-20">
-        <SectionHead
-          title={isKo ? "리뷰한 PR" : "Reviews"}
-          desc={
-            isKo
-              ? `다른 기여자의 PR 에 남긴 리뷰입니다. 상태는 ${REVIEWS_AS_OF} 기준입니다.`
-              : `Reviews I left on other contributors' PRs. Status as of ${REVIEWS_AS_OF}.`
-          }
-        />
-
-        <div className="rounded-xl border border-border-color overflow-hidden">
-          {/* 상단 바 : 상태 필터 */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 bg-bg-secondary border-b border-border-color">
-            <button
-              onClick={() => {
-                setStatus(null);
-                setShowAll(false);
-              }}
-              className={`text-[13.5px] transition-colors ${
-                status === null ? "font-semibold text-text-primary" : "text-text-tertiary hover:text-text-primary"
-              }`}
-            >
-              {isKo ? "전체" : "All"} <span className="tabular-nums">{reviewsInProject.length}</span>
-            </button>
-            {(Object.keys(STATUS) as ReviewStatus[]).map((s) => {
-              const { Icon, color } = STATUS[s];
-              const active = status === s;
-              return (
-                <button
-                  key={s}
-                  onClick={() => {
-                    setStatus(active ? null : s);
-                    setShowAll(false);
-                  }}
-                  className={`inline-flex items-center gap-1.5 text-[13.5px] transition-colors ${
-                    active ? "font-semibold text-text-primary" : "text-text-tertiary hover:text-text-primary"
-                  }`}
-                >
-                  <Icon size={15} style={{ color }} />
-                  <span className="tabular-nums">{countOf(s)}</span> {STATUS[s][locale]}
-                </button>
-              );
-            })}
+            </div>
           </div>
 
-          {/* 목록 */}
-          {visibleReviews.length === 0 ? (
-            <p className="px-4 py-10 text-center text-[14px] text-text-tertiary">
-              {isKo ? "이 프로젝트에서 리뷰한 PR 은 없습니다." : "No reviews in this project."}
+          <div className="hidden lg:block mt-8 pt-6 border-t border-border-color">
+            <p className="text-[14px] font-semibold text-text-primary">
+              {isKo ? "기여 과정이 궁금하다면" : "Want the full story?"}
             </p>
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-text-tertiary">
+              {isKo ? "이슈를 고르고 PR 이 머지되기까지를 글로 정리했습니다." : "How each PR went from issue to merge, written up."}
+            </p>
+            <Link
+              href="/category/opensource"
+              className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-accent hover:gap-2.5 transition-all"
+            >
+              {isKo ? "오픈소스기여 글 보기" : "Read the posts"} <HiArrowRight size={14} />
+            </Link>
+          </div>
+        </aside>
+
+        {/* 오른쪽 카드 */}
+        <section>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mb-6">
+            <h2 className="text-[20px] sm:text-[22px] font-semibold text-text-primary">
+              {heading}
+              {filterLabel && <span className="text-accent"> “{filterLabel}”</span>}
+            </h2>
+            <span className="text-[13px] text-text-tertiary tabular-nums">
+              {isKo ? `${items.length}건` : `${items.length}`}
+            </span>
+            {view.kind === "review" && (
+              <span className="basis-full text-[12.5px] text-text-tertiary">
+                {isKo ? `상태는 ${REVIEWS_AS_OF} 기준입니다.` : `Status as of ${REVIEWS_AS_OF}.`}
+              </span>
+            )}
+          </div>
+
+          {items.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border-light py-16 text-center text-[14px] text-text-tertiary">
+              {isKo ? "이 조건에 해당하는 PR 이 없습니다." : "Nothing here yet."}
+            </div>
           ) : (
-            <ul className="divide-y divide-border-color">
-              {visibleReviews.map((r) => {
-                const { Icon, color } = STATUS[r.status];
-                return (
-                  <li key={`${r.project}-${r.pr}`}>
-                    <a
-                      href={prUrl(r.project, r.pr)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex items-start gap-3 px-4 py-3 transition-colors hover:bg-bg-hover"
-                    >
-                      <Icon size={16} className="mt-[3px] shrink-0" style={{ color }} aria-label={STATUS[r.status][locale]} />
-                      <span className="min-w-0 flex-1">
-                        <span className="text-[14.5px] font-medium leading-snug text-text-primary group-hover:text-accent transition-colors">
-                          {isKo ? r.ko : r.en}
-                        </span>
-                        {r.coauthor && (
-                          <span className="ml-2 align-[1px] px-1.5 py-px rounded-full border border-accent text-accent text-[11px] font-semibold whitespace-nowrap">
-                            {isKo ? "공동 작성" : "Co-author"}
-                          </span>
-                        )}
-                        <span className="mt-1 flex flex-wrap items-center gap-x-1.5 text-[12.5px] text-text-tertiary">
-                          {!project && (
-                            <>
-                              <ProjectMark project={r.project} />
-                              <span>{PROJECTS[r.project].name}</span>
-                              <span>·</span>
-                            </>
-                          )}
-                          <span className="font-mono">#{r.pr}</span>
-                          <span>·</span>
-                          <span>@{r.author}</span>
-                        </span>
-                      </span>
-                    </a>
-                  </li>
-                );
-              })}
+            <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              {items.slice(0, limit).map((it) => (
+                <li key={`${it.project}-${it.pr}`}>
+                  {view.kind === "contrib" ? (
+                    <ContributionCard c={it as Contribution} isKo={isKo} />
+                  ) : (
+                    <ReviewCard r={it as ReviewItem} isKo={isKo} />
+                  )}
+                </li>
+              ))}
             </ul>
           )}
 
-          {reviews.length > REVIEW_PAGE && (
-            <button
-              onClick={() => setShowAll((v) => !v)}
-              className="w-full px-4 py-3 border-t border-border-color bg-bg-secondary text-[13.5px] font-medium text-text-secondary hover:text-text-primary transition-colors"
-            >
-              {showAll
-                ? isKo
-                  ? "접기"
-                  : "Show less"
-                : isKo
-                  ? `${reviews.length - REVIEW_PAGE}개 더 보기`
-                  : `Show ${reviews.length - REVIEW_PAGE} more`}
-            </button>
+          {items.length > limit && (
+            <div className="mt-10 text-center">
+              <button
+                onClick={() => setLimit((l) => l + PAGE)}
+                className="px-6 py-2.5 rounded-full border border-accent text-accent text-[14px] font-semibold hover:bg-accent hover:text-white transition-colors"
+              >
+                {isKo
+                  ? `${Math.min(PAGE, items.length - limit)}개 더 보기`
+                  : `Show ${Math.min(PAGE, items.length - limit)} more`}
+              </button>
+            </div>
           )}
-        </div>
-      </section>
+
+          <div className="lg:hidden mt-10 pt-6 border-t border-border-color text-center">
+            <Link href="/category/opensource" className="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-accent">
+              {isKo ? "기여 과정을 풀어 쓴 글 보기" : "Read the full write-ups"} <HiArrowRight size={14} />
+            </Link>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
