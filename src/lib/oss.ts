@@ -32,6 +32,14 @@ export type Contribution = {
 };
 
 export const CONTRIBUTIONS: Contribution[] = [
+  { project: "paimon-rust", pr: 1420, impact: { ko: "읽기 −52%", en: "Read −52%" }, date: "26.11", tags: ["Performance", "Core"],
+    title: { ko: "Partial-update 병합 행을 입력에서 바로 모으기", en: "Gather merged partial-update rows from inputs" },
+    ko: "키마다 한 줄짜리 batch 를 만들지 않고 각 컬럼을 입력 행에서 바로 모아, partial-update 테이블 읽기 시간을 약 52% 줄였습니다.",
+    en: "Gathered merged partial-update rows straight from their input rows instead of building a one-row batch per key, reducing read time by ~52%." },
+  { project: "paimon-rust", pr: 1419, impact: { ko: "쓰기 −11~13%", en: "Write −11–13%" }, date: "26.11", tags: ["Performance", "Core"],
+    title: { ko: "키 통계를 컬럼 단위로 계산", en: "Column-wise key stats bounds" },
+    ko: "PK 데이터 파일의 키 통계(min/max)를 행마다 Datum 으로 비교하던 방식에서 컬럼 단위 스캔으로 바꿔, 쓰기 시간을 약 11~13% 줄였습니다.",
+    en: "Found primary-key stats bounds with a typed scan per column instead of comparing a Datum per row, reducing write time by ~11–13%." },
   { project: "paimon-rust", pr: 1377, impact: { ko: "읽기 −54%", en: "Read −54%" }, date: "26.11", tags: ["Performance", "Core"],
     title: { ko: "Partial-update 읽기에서 sort-merge 생략", en: "Skip sort-merge for partial-update reads" },
     ko: "불필요한 sort-merge 를 건너뛰어 partial-update 테이블 읽기를 최적화했습니다. 읽기 시간 약 54% 단축.",
@@ -151,7 +159,7 @@ export type Review = {
 };
 
 /** 리뷰 상태를 확인한 날짜 */
-export const REVIEWS_AS_OF = "2026-11-15";
+export const REVIEWS_AS_OF = "2026-11-18";
 
 export const REVIEWS: { project: ProjectKey; label: string; items: Review[] }[] = [
   {
@@ -172,7 +180,11 @@ export const REVIEWS: { project: ProjectKey; label: string; items: Review[] }[] 
       { pr: 3377, status: "merged", author: "YuangGao", ko: "REST freshness-aware 테이블 로딩", en: "Freshness-aware table loading for REST" },
       { pr: 3243, status: "merged", author: "advancedxy", ko: "decimal·binary truncate 리터럴 수정", en: "Fix decimal and binary truncate literals" },
       { pr: 3145, status: "merged", author: "linhongyu510", ko: "DV delete task 검증", en: "Validate DV delete tasks" },
-      { pr: 3697, status: "open", author: "c-thiel", coauthor: true, ko: "eq delete 대기자 깨우기", en: "Wake equality-delete waiters" },
+      { pr: 3697, status: "merged", author: "c-thiel", coauthor: true, ko: "eq delete 대기자 깨우기", en: "Wake equality-delete waiters" },
+      { pr: 3507, status: "merged", author: "rich7420", ko: "비교 불가한 page index bounds 페이지 유지", en: "Keep pages whose page index bounds are not comparable" },
+      { pr: 3704, status: "open", author: "CTTY", ko: "FileScanTask 에 split offsets 전달", en: "Carry split offsets on FileScanTask" },
+      { pr: 3698, status: "open", author: "iceberg-kitten", ko: "경로 기반 position delete 의 파티션 검증", en: "Validate partitions of path-based position deletes" },
+      { pr: 3670, status: "open", author: "CTTY", ko: "매니페스트 병렬 파싱 (perf)", en: "Parse manifests concurrently (perf)" },
       { pr: 3624, status: "open", author: "darshpatel1052", ko: "Parquet leaf index 로 프로젝션", en: "Project by Parquet leaf index" },
       { pr: 3587, status: "open", author: "alexanderbianchi", ko: "delete 파일 디코딩을 CPU 런타임에서", en: "Decode delete files on the CPU runtime" },
       { pr: 3566, status: "open", author: "ewoodbury", ko: "매니페스트 파티션 필드를 ID 로 매칭", en: "Match manifest partition fields by ID" },
@@ -180,7 +192,6 @@ export const REVIEWS: { project: ProjectKey; label: string; items: Review[] }[] 
       { pr: 3540, status: "open", author: "comphead", ko: "승격 컬럼 필터링 시 매칭 행 유지", en: "Keep matching rows when filtering promoted columns" },
       { pr: 3537, status: "open", author: "sankarreddy-atlan", ko: "truncate 된 row group 통계로 파일 경계", en: "File boundaries from truncated row group stats" },
       { pr: 3508, status: "open", author: "mattfaltyn", ko: "파일에 없는 nullable 컬럼의 비교 필터링", en: "Comparison filtering on nullable columns missing from the file" },
-      { pr: 3507, status: "open", author: "rich7420", ko: "비교 불가한 page index bounds 페이지 유지", en: "Keep pages whose page index bounds are not comparable" },
       { pr: 3485, status: "open", author: "ump45nose", ko: "date→timestamp 승격 컬럼 프로젝션", en: "Project date→timestamp promoted columns" },
       { pr: 3479, status: "open", author: "lyne7-sc", ko: "이름이 바뀐 컬럼의 필드 정체성 유지", en: "Keep field identity for renamed columns" },
       { pr: 3441, status: "open", author: "dhruvarya-db", ko: "파티션 스펙 변경 액션", en: "Update partition spec action" },
@@ -209,8 +220,10 @@ export const REVIEWS: { project: ProjectKey; label: string; items: Review[] }[] 
       { pr: 1176, status: "merged", author: "QuakeWang", ko: "non-DE append 테이블 full-text prefilter", en: "Full-text prefilter for non-DE append tables" },
       { pr: 1144, status: "merged", author: "JingsongLi", ko: "upsert 용 Arrow 레이아웃 정규화", en: "Normalize Arrow layout for upserts" },
       { pr: 1139, status: "merged", author: "reswqa", ko: "partial-update 삭제 상태 보존", en: "Preserve delete state in partial-update" },
-      { pr: 1390, status: "open", author: "suxiaogang223", ko: "소비된 merge batch 회수", en: "Reclaim consumed merge batches" },
+      { pr: 1434, status: "open", author: "dragonknightk", ko: "partial-update 에서 혼자 온 UPDATE_BEFORE 를 철회로 처리", en: "Treat a lone UPDATE_BEFORE as a retraction in partial-update" },
+      { pr: 1417, status: "open", author: "QuakeWang", ko: "재시도된 스냅샷 게시 뒤 파일 보존", en: "Preserve files after a replayed snapshot publication" },
       { pr: 1267, status: "closed", author: "QuakeWang", ko: "local-cache 확장 제외", en: "Exclude local-cache extension" },
+      { pr: 1390, status: "closed", author: "suxiaogang223", ko: "소비된 merge batch 회수", en: "Reclaim consumed merge batches" },
     ],
   },
   {
@@ -219,6 +232,9 @@ export const REVIEWS: { project: ProjectKey; label: string; items: Review[] }[] 
     items: [
       { pr: 18626, status: "merged", author: "kinolaev", ko: "추가된 데이터 파일은 동시 DV 검증 생략", en: "Skip concurrent DV validation for added data files" },
       { pr: 18478, status: "merged", author: "jiwen624", ko: "timestamp_ns 파티션 IN/NOT IN 오류", en: "Fix IN/NOT IN on timestamp_ns partitions" },
+      { pr: 18997, status: "open", author: "regadas", ko: "ManifestReader 에 addedFiles·deletedFiles 추가", en: "Add addedFiles and deletedFiles to ManifestReader" },
+      { pr: 18993, status: "open", author: "fmorillo7694", ko: "v4 테이블에서 새 equality delete 거부", en: "Reject new equality deletes in v4 tables" },
+      { pr: 18981, status: "open", author: "iceberg-kitten", ko: "delete 파일 제거 시 append 로 분류하지 않기", en: "Avoid append classification when removing delete files" },
       { pr: 18846, status: "open", author: "jiwen624", ko: "CoW 와 eq delete 경합 시 삭제 행 부활", en: "Deleted rows resurrected when CoW races with equality deletes" },
       { pr: 18673, status: "open", author: "rajendrag", ko: "메타데이터 삭제에서 null 파티션 보존", en: "Preserve null partitions in metadata deletes" },
       { pr: 18631, status: "open", author: "mikepapadim", ko: "delete 파일 복사 시 equality field ID 보존", en: "Keep equality field IDs when copying delete files" },
