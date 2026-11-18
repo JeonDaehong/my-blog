@@ -32,6 +32,10 @@ export type Contribution = {
 };
 
 export const CONTRIBUTIONS: Contribution[] = [
+  { project: "iceberg-rust", pr: 3433, date: "26.11", tags: ["Improvement", "Core"],
+    title: { ko: "delete 파일 크기를 필요할 때 확인", en: "Resolve delete file sizes lazily" },
+    ko: "크기를 모르는 delete 파일은 실제로 읽을 때 한 번만 크기를 확인하도록 바꿔, 동시 로딩에서도 중복 요청 없이 처리되게 했습니다.",
+    en: "Resolved unknown delete-file sizes lazily, once per file even under concurrent loads, instead of up front." },
   { project: "paimon-rust", pr: 1420, impact: { ko: "읽기 −52%", en: "Read −52%" }, date: "26.11", tags: ["Performance", "Core"],
     title: { ko: "Partial-update 병합 행을 입력에서 바로 모으기", en: "Gather merged partial-update rows from inputs" },
     ko: "키마다 한 줄짜리 batch 를 만들지 않고 각 컬럼을 입력 행에서 바로 모아, partial-update 테이블 읽기 시간을 약 52% 줄였습니다.",
@@ -159,7 +163,7 @@ export type Review = {
 };
 
 /** 리뷰 상태를 확인한 날짜 */
-export const REVIEWS_AS_OF = "2026-11-18";
+export const REVIEWS_AS_OF = "2026-11-19";
 
 export const REVIEWS: { project: ProjectKey; label: string; items: Review[] }[] = [
   {
@@ -220,8 +224,8 @@ export const REVIEWS: { project: ProjectKey; label: string; items: Review[] }[] 
       { pr: 1176, status: "merged", author: "QuakeWang", ko: "non-DE append 테이블 full-text prefilter", en: "Full-text prefilter for non-DE append tables" },
       { pr: 1144, status: "merged", author: "JingsongLi", ko: "upsert 용 Arrow 레이아웃 정규화", en: "Normalize Arrow layout for upserts" },
       { pr: 1139, status: "merged", author: "reswqa", ko: "partial-update 삭제 상태 보존", en: "Preserve delete state in partial-update" },
-      { pr: 1434, status: "open", author: "dragonknightk", ko: "partial-update 에서 혼자 온 UPDATE_BEFORE 를 철회로 처리", en: "Treat a lone UPDATE_BEFORE as a retraction in partial-update" },
-      { pr: 1417, status: "open", author: "QuakeWang", ko: "재시도된 스냅샷 게시 뒤 파일 보존", en: "Preserve files after a replayed snapshot publication" },
+      { pr: 1434, status: "merged", author: "dragonknightk", ko: "partial-update 에서 혼자 온 UPDATE_BEFORE 를 철회로 처리", en: "Treat a lone UPDATE_BEFORE as a retraction in partial-update" },
+      { pr: 1417, status: "merged", author: "QuakeWang", ko: "재시도된 스냅샷 게시 뒤 파일 보존", en: "Preserve files after a replayed snapshot publication" },
       { pr: 1267, status: "closed", author: "QuakeWang", ko: "local-cache 확장 제외", en: "Exclude local-cache extension" },
       { pr: 1390, status: "closed", author: "suxiaogang223", ko: "소비된 merge batch 회수", en: "Reclaim consumed merge batches" },
     ],
@@ -242,9 +246,9 @@ export const REVIEWS: { project: ProjectKey; label: string; items: Review[] }[] 
       { pr: 18617, status: "open", author: "autoCAT6", ko: "메타데이터 삭제의 NULL 의미 보존", en: "Preserve NULL semantics in metadata deletes" },
       { pr: 18603, status: "open", author: "sezruby", ko: "UPDATE delete 충돌 범위 축소", en: "Narrow the delete conflict scope for UPDATE" },
       { pr: 18495, status: "open", author: "ebyhr", ko: "1.11.x 백포트 : DV 공유 Puffin 보존", en: "1.11.x backport: preserve Puffin files shared by DVs" },
-      { pr: 18343, status: "open", author: "grantatspothero", ko: "delete file index 병렬 로딩", en: "Load the delete file index in parallel" },
       { pr: 18268, status: "open", author: "zhang-arvin", ko: "고아 merged DV Puffin 삭제", en: "Delete orphaned merged DV Puffin files" },
       { pr: 18224, status: "open", author: "hemanthboyina", ko: "동시에 추가된 DV 감지", en: "Detect concurrently added DVs" },
+      { pr: 18343, status: "closed", author: "grantatspothero", ko: "delete file index 병렬 로딩", en: "Load the delete file index in parallel" },
     ],
   },
 ];
