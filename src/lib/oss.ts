@@ -32,6 +32,14 @@ export type Contribution = {
 };
 
 export const CONTRIBUTIONS: Contribution[] = [
+  { project: "paimon-rust", pr: 1456, impact: { ko: "컴팩션 3.5배", en: "Compaction 3.5×" }, date: "26.11", tags: ["Performance", "Core"],
+    title: { ko: "Lookup 파일 데이터 블록 재사용", en: "Reuse decoded Lookup File blocks" },
+    ko: "lookup 컴팩션이 키마다 같은 데이터 블록을 다시 읽고 압축을 풀던 것을, 직전 블록을 재사용하도록 바꿔 DV 테이블 컴팩션을 약 3.5배 빠르게 했습니다.",
+    en: "Reused the decoded data block across sorted Lookup File lookups instead of decompressing it for every key, making deletion-vector compaction ~3.5x faster." },
+  { project: "iceberg-rust", pr: 3453, date: "26.11", tags: ["Bug Fix", "Core"],
+    title: { ko: "struct 안 필드의 equality delete 적용", en: "Equality deletes on nested fields" },
+    ko: "struct 안에 있는 필드로 정의된 equality delete 를 읽지 못하던 문제를 고쳐, 삭제된 행이 다시 보이지 않게 했습니다.",
+    en: "Fixed loading equality deletes defined on fields nested in structs, so deleted rows no longer come back." },
   { project: "iceberg-rust", pr: 3433, date: "26.11", tags: ["Improvement", "Core"],
     title: { ko: "delete 파일 크기를 필요할 때 확인", en: "Resolve delete file sizes lazily" },
     ko: "크기를 모르는 delete 파일은 실제로 읽을 때 한 번만 크기를 확인하도록 바꿔, 동시 로딩에서도 중복 요청 없이 처리되게 했습니다.",
@@ -163,7 +171,7 @@ export type Review = {
 };
 
 /** 리뷰 상태를 확인한 날짜 */
-export const REVIEWS_AS_OF = "2026-11-19";
+export const REVIEWS_AS_OF = "2026-11-20";
 
 export const REVIEWS: { project: ProjectKey; label: string; items: Review[] }[] = [
   {
@@ -186,9 +194,9 @@ export const REVIEWS: { project: ProjectKey; label: string; items: Review[] }[] 
       { pr: 3145, status: "merged", author: "linhongyu510", ko: "DV delete task 검증", en: "Validate DV delete tasks" },
       { pr: 3697, status: "merged", author: "c-thiel", coauthor: true, ko: "eq delete 대기자 깨우기", en: "Wake equality-delete waiters" },
       { pr: 3507, status: "merged", author: "rich7420", ko: "비교 불가한 page index bounds 페이지 유지", en: "Keep pages whose page index bounds are not comparable" },
+      { pr: 3670, status: "merged", author: "CTTY", ko: "매니페스트 병렬 파싱 (perf)", en: "Parse manifests concurrently (perf)" },
       { pr: 3704, status: "open", author: "CTTY", ko: "FileScanTask 에 split offsets 전달", en: "Carry split offsets on FileScanTask" },
       { pr: 3698, status: "open", author: "iceberg-kitten", ko: "경로 기반 position delete 의 파티션 검증", en: "Validate partitions of path-based position deletes" },
-      { pr: 3670, status: "open", author: "CTTY", ko: "매니페스트 병렬 파싱 (perf)", en: "Parse manifests concurrently (perf)" },
       { pr: 3624, status: "open", author: "darshpatel1052", ko: "Parquet leaf index 로 프로젝션", en: "Project by Parquet leaf index" },
       { pr: 3587, status: "open", author: "alexanderbianchi", ko: "delete 파일 디코딩을 CPU 런타임에서", en: "Decode delete files on the CPU runtime" },
       { pr: 3566, status: "open", author: "ewoodbury", ko: "매니페스트 파티션 필드를 ID 로 매칭", en: "Match manifest partition fields by ID" },
